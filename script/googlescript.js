@@ -6,6 +6,7 @@ function onSignIn(googleUser) {
     data: {idtoken : id_token},
     success : function(data) {
       $('#ubah').html(data);
+      localStorage.setItem("token", data)
 
     },
   });

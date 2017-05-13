@@ -17,6 +17,7 @@ func main() {
 	http.Handle("/script/", http.StripPrefix("/script/", fs))
 
 	http.HandleFunc("/", index)
+	//http.HandleFunc("/login", login)
 	http.ListenAndServe(":9090", nil)
 	log.Println("Listening...")
 }
