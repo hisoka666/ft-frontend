@@ -1,9 +1,10 @@
 package main
 
 import (
+	"bytes"
+	"encoding/json"
 	"fmt"
 	"html/template"
-	"io/ioutil"
 	"log"
 	"net/http"
 )
@@ -11,6 +12,33 @@ import (
 // type ReturnError struct {
 // 	Error string `json:"error"`
 // }
+
+type WebView struct {
+	Token  string   `json:"token"`
+	User   string   `json:"user"`
+	Pasien []Pasien `json:"pasien"`
+	//IKI      []List    `json:"list"`
+}
+type NavBar struct {
+	Token string   `json:"token"`
+	User  string   `json:"user"`
+	Bulan []string `json:"bulan"`
+}
+type Pasien struct {
+	TglKunjungan string `json:"tgl"`
+	ShiftJaga    string `json:"shift"`
+	NoCM         string `json:"nocm"`
+	NamaPasien   string `json:"nama"`
+	Diagnosis    string `json:"diag"`
+	IKI1         string `json:"iki1"`
+	IKI2         string `json:"iki2"`
+	LinkID       string `json:"link"`
+}
+
+type Response struct {
+	Token  string `json:"token"`
+	Script string `json:"script"`
+}
 
 func main() {
 	// variable fs membuat folder "script" menjadi sebuah file server,
@@ -62,12 +90,28 @@ func mainContent(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	data, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		log.Fatal(err)
-	}
-	resp.Body.Close()
+	var web NavBar
 
-	fmt.Fprintln(w, string(data))
+	json.NewDecoder(resp.Body).Decode(&web)
+
+	var b bytes.Buffer
+	tmp := template.Must(template.New("main.html").ParseFiles("templates/main.html"))
+	err = tmp.Execute(&b, web)
+	if err != nil {
+		fmt.Print(err)
+	}
+
+	res := &Response{
+		Token:  web.Token,
+		Script: b.String(),
+	}
+
+	// fmt.Println(b.String())
+	// fmt.Fprintln(w, )
+	enc := json.NewEncoder(w)
+	enc.SetEscapeHTML(false)
+	err = enc.Encode(&res)
+
+	// fmt.Fprintln(w, string(data))
 
 }

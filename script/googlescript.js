@@ -3,13 +3,19 @@ function onSignIn(googleUser) {
   var url = "/login?idtoken=" + id_token;
   $.get(url)
   .done(function(data){
-    if ($.trim(data) == "no-access"){
+
+    var jos = JSON.parse(data)
+
+    if (jos.token == ""){
       signOut();
       alert("Maaf Anda tidak terdaftar sebagai staf. Silahkan hubungi admin");
+      $("#signinbut").show();
      } else {
-      // alert("Token adalah: " + $.trim(data));
-      localStorage.setItem("token", $.trim(data));
+
+      localStorage.setItem("token", jos.token);
+      $("#navbar").html(jos.script)
       $("#signoutbut").show();
+      $("#signinbut").hide();
      }
   })
   .fail(function(err){
@@ -17,19 +23,13 @@ function onSignIn(googleUser) {
   });
 };
 
-// function getMain() {
-//   var token = localStorage.getItem("token")
-//   var url = "/getmain?token=" + token
-//   $.get(url)
-//   .done(function(data){
-
-//   })
-
 function signOut() {
    var auth2 = gapi.auth2.getAuthInstance();
    auth2.signOut().then(function () {
    console.log('User signed out.');
    localStorage.clear();
    $("#signoutbut").hide();
+   $("#navbar").html("");
+   $("#signinbut").show();
    });
 };

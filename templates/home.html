@@ -1,0 +1,85 @@
+
+<div class="container-fluid">
+   <div class="col-sm-4"></div>
+   <div class="col-sm-4">
+      <p>Selamat datang {{.User}}</p><br>
+      
+      <div id="infouser" class="text-center"></div>
+   </div>
+   <div class="col-sm-4"></div>
+</div>
+<div class="container-fluid">
+  <div class="col-sm-1"></div>
+  <div class="col-sm-5">
+    <div class="panel panel-info">
+      <div class="panel-heading text-center">Input Data Pasien</div>
+      <div class="panel-body">
+        <form action="" method="post" role="form">
+          <div class="form-group" id="form1">
+            <label for="nocm">No. CM:</label><br>
+            <input type="text" name="nocm" id="nocm" class="form-control"><br>
+            <span id="datapasien"></span>
+            <!-- <input type="submit" value="Cari"> -->
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+  <div class="col-sm-5">
+
+  </div>
+  <div class="col-sm-1"></div>
+</div>
+
+<div class="container-fluid">
+  <div class="col-sm-1"></div>
+  <div class="col-sm-10">
+    <div class="panel panel-info">
+      <div class="panel-heading text-center">Daftar Pasien Bulan</div>
+      <div class="panel-body table-responsive">
+        <table class="table table-bordered table-condensed" id="tabelpasien">
+            <thead>
+			<tr>
+              <th class="bg-success">Tanggal</th>
+              <th class="bg-success">No. CM</th>
+              <th class="bg-success">Nama Pasien</th>
+              <th class="bg-success">Diagnosis</th>
+              <th class="bg-success">IKI 1</th>
+              <th class="bg-success">IKI 2</th>
+			  <th class="bg-success">Edit/Delete</th>
+            </tr>
+			</thead>
+			<tbody>
+			{{with .Pasien}}
+			   {{range $m, $n := .}}
+			      {{if $n.NoCM}}
+				     <tr>
+                        <td>{{$n.TglKunjungan}}</td>
+                        <td><a href="/getdetail/{{$n.NoCM}}">{{$n.NoCM}}</a></td>
+                        <td>{{$n.NamaPasien}}</td>
+                        <td>{{$n.Diagnosis}}</td>
+                           {{if .IKI1}}
+			                  <td class="text-center checkmark">&#x2714;</td>
+                              <td class="text-center checkmark"></td>
+			               {{else}}
+			                  <td class="text-center checkmark"></td>
+                              <td class="text-center checkmark">&#x2714;</td>
+			               {{end}}
+			            <td class="text-center">
+		                   <div class="btn-group btn-group-xs">
+			                  <a href="/entri/edit/{{$n.LinkID}}" class="btn btn-info" role="button">Edit</a>
+				              <a href="/entri/del/{{$n.LinkID}}" class="btn btn-danger" role="button">Delete</a>
+                      <a href="/entri/editdate/{{$n.LinkID}}" class="btn btn-info" role="button">Ubah Tanggal</a>
+			               </div>
+			            </td>
+	                 </tr>
+				  {{end}}
+			   {{end}}
+			   {{end}}
+			</tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+  <div class="col-sm-1"></div>
+</div>

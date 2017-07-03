@@ -1,0 +1,30 @@
+<p>Selamat datang {{.User}}</p><br>
+
+<tbody>
+			{{with .Pasien}}
+			   {{range $m, $n := .}}
+			      {{if $n.NoCM}}
+				     <tr>
+                        <td>{{$n.TglKunjungan}}</td>
+                        <td><a href="/getdetail/{{$n.NoCM}}">{{$n.NoCM}}</a></td>
+                        <td>{{$n.NamaPasien}}</td>
+                        <td>{{$n.Diagnosis}}</td>
+                           {{if .IKI1}}
+			                  <td class="text-center checkmark">&#x2714;</td>
+                              <td class="text-center checkmark"></td>
+			               {{else}}
+			                  <td class="text-center checkmark"></td>
+                              <td class="text-center checkmark">&#x2714;</td>
+			               {{end}}
+			            <td class="text-center">
+		                   <div class="btn-group btn-group-xs">
+			                  <a href="/entri/edit/{{$n.LinkID}}" class="btn btn-info" role="button">Edit</a>
+				              <a href="/entri/del/{{$n.LinkID}}" class="btn btn-danger" role="button">Delete</a>
+                      <a href="/entri/editdate/{{$n.LinkID}}" class="btn btn-info" role="button">Ubah Tanggal</a>
+			               </div>
+			            </td>
+	                 </tr>
+				  {{end}}
+			   {{end}}
+			{{end}}
+			</tbody>
