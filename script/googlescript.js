@@ -1,3 +1,4 @@
+// $(document).ready(function(){
 function onSignIn(googleUser) {
   var id_token = googleUser.getAuthResponse().id_token;
   var url = "/login?idtoken=" + id_token;
@@ -13,14 +14,14 @@ function onSignIn(googleUser) {
      } else {
 
       localStorage.setItem("token", jos.token);
-      $("#navbar").html(jos.script)
-      $("#signoutbut").show();
-      $("#signinbut").hide();
+      $("#navbar").html(jos.script);
      }
   })
   .fail(function(err){
     alert("Error: " + err)
   });
+  $("#signoutbut").show();
+  $("#signinbut").hide();
 };
 
 function signOut() {
@@ -33,3 +34,6 @@ function signOut() {
    $("#signinbut").show();
    });
 };
+
+
+// })

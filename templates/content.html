@@ -1,36 +1,4 @@
-
-<div class="container-fluid">
-   <div class="col-sm-4"></div>
-   <div class="col-sm-4">
-      <p>Selamat datang {{.User}}</p><br>
-      
-      <div id="infouser" class="text-center"></div>
-   </div>
-   <div class="col-sm-4"></div>
-</div>
-<div class="container-fluid">
-  <div class="col-sm-1"></div>
-  <div class="col-sm-5">
-    <div class="panel panel-info">
-      <div class="panel-heading text-center">Input Data Pasien</div>
-      <div class="panel-body">
-        <form action="" method="post" role="form">
-          <div class="form-group" id="form1">
-            <label for="nocm">No. CM:</label><br>
-            <input type="text" name="nocm" id="nocm" class="form-control"><br>
-            <span id="datapasien"></span>
-            <!-- <input type="submit" value="Cari"> -->
-          </div>
-        </form>
-      </div>
-    </div>
-  </div>
-  <div class="col-sm-5">
-
-  </div>
-  <div class="col-sm-1"></div>
-</div>
-
+{{define "content"}}
 <div class="container-fluid">
   <div class="col-sm-1"></div>
   <div class="col-sm-10">
@@ -83,3 +51,5 @@
   </div>
   <div class="col-sm-1"></div>
 </div>
+
+{{end}}

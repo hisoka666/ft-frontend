@@ -13,16 +13,18 @@ import (
 // 	Error string `json:"error"`
 // }
 
-type WebView struct {
+type MainView struct {
 	Token  string   `json:"token"`
 	User   string   `json:"user"`
+	Bulan  []string `json:"bulan"`
 	Pasien []Pasien `json:"pasien"`
 	//IKI      []List    `json:"list"`
 }
 type NavBar struct {
-	Token string   `json:"token"`
-	User  string   `json:"user"`
-	Bulan []string `json:"bulan"`
+	Token   string   `json:"token"`
+	User    string   `json:"user"`
+	Bulan   []string `json:"bulan"`
+	Pasien  []Pasien `json:"pasien"`
 }
 type Pasien struct {
 	TglKunjungan string `json:"tgl"`
@@ -68,15 +70,31 @@ func index(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-// func jsonError(m string) []byte {
-// 	res := &ReturnError{
-// 		Error: m,
-// 	}
+func getMain(w http.ResponseWriter, r *http.Request) {
+	// if r.Method != "POST" {
+	// 	responseTemplate(w, "", "")
+	// }
 
-// 	js, _ := json.Marshal(res)
+	// token := js.Global.Get("localStorage").Get("token")
+	// js.Global.Call("alert", token)
+	// fmt.Print(token)
+	// responseTemplate(w, token, "")
 
-// 	return js
-// }
+}
+
+func responseTemplate(w http.ResponseWriter, token, script string) {
+	res := &Response{
+		Token:  token,
+		Script: script,
+	}
+	enc := json.NewEncoder(w)
+	enc.SetEscapeHTML(false)
+	err := enc.Encode(&res)
+
+	if err != nil {
+		fmt.Print(err)
+	}
+}
 
 func mainContent(w http.ResponseWriter, r *http.Request) {
 	if r.Method != "GET" {
@@ -90,27 +108,29 @@ func mainContent(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var web NavBar
+	var web MainView
 
 	json.NewDecoder(resp.Body).Decode(&web)
 
 	var b bytes.Buffer
-	tmp := template.Must(template.New("main.html").ParseFiles("templates/main.html"))
+	tmp := template.Must(template.New("main.html").ParseFiles("templates/main.html", "templates/input.html", "templates/content.html"))
 	err = tmp.Execute(&b, web)
 	if err != nil {
 		fmt.Print(err)
 	}
 
-	res := &Response{
-		Token:  web.Token,
-		Script: b.String(),
-	}
+	responseTemplate(w, web.Token, b.String())
+
+	// res := &Response{
+	// 	Token:  web.Token,
+	// 	Script: b.String(),
+	// }
 
 	// fmt.Println(b.String())
 	// fmt.Fprintln(w, )
-	enc := json.NewEncoder(w)
-	enc.SetEscapeHTML(false)
-	err = enc.Encode(&res)
+	// enc := json.NewEncoder(w)
+	// enc.SetEscapeHTML(false)
+	// err = enc.Encode(&res)
 
 	// fmt.Fprintln(w, string(data))
 
