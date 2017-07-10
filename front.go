@@ -7,6 +7,7 @@ import (
 	"html/template"
 	"log"
 	"net/http"
+	"time"
 )
 
 // type ReturnError struct {
@@ -20,12 +21,12 @@ type MainView struct {
 	Pasien []Pasien `json:"pasien"`
 	//IKI      []List    `json:"list"`
 }
-
-type PostTemplate struct {
-    Code   string `json:"code"`
-	Token  string `json:"token"`
+type NavBar struct {
+	Token  string   `json:"token"`
+	User   string   `json:"user"`
+	Bulan  []string `json:"bulan"`
+	Pasien []Pasien `json:"pasien"`
 }
-
 type Pasien struct {
 	TglKunjungan string `json:"tgl"`
 	ShiftJaga    string `json:"shift"`
@@ -35,6 +36,22 @@ type Pasien struct {
 	IKI1         string `json:"iki1"`
 	IKI2         string `json:"iki2"`
 	LinkID       string `json:"link"`
+	Baru         bool   `json:"baru"`
+}
+
+type KunjunganPasien struct {
+	Diagnosis, LinkID      string
+	GolIKI, ATS, ShiftJaga string
+	JamDatang              time.Time
+	Dokter                 string
+	Hide                   bool
+	JamDatangRiil          time.Time
+	Bagian                 string
+}
+
+type DataPasien struct {
+	NamaPasien, NomorCM, JenKel, Alamat string
+	TglDaftar, Umur                     time.Time
 }
 
 type Response struct {
@@ -42,15 +59,10 @@ type Response struct {
 	Script string `json:"script"`
 }
 
-type DataPasien struct {
-	NamaPasien   string    `json:"nama"`
-	NomorCM      string    `json:"nocm"`
-	JenKel       string    `json:"jk"`
-	Alamat       string    `json:"alamat"`
-	TglDaftar    time.Time `json:"tgldaf"`
-	Umur         time.Time `json:"umur"`
+type InputPts struct {
+	Datapasien        `json:"datapts"`
+	KunjunganPasien   `json:"kunjungan"`
 }
-
 func main() {
 	// variable fs membuat folder "script" menjadi sebuah file server,
 	// alamat dari file server ini akan diarahkan oleh http.Handle
@@ -64,6 +76,8 @@ func main() {
 	http.HandleFunc("/", index)
 	http.HandleFunc("/login", mainContent)
 	http.HandleFunc("/getcm", getCM)
+	http.HandleFunc("/inputdata", inputData)
+	// http.HandleFunc("/getmain", getMain)
 	http.ListenAndServe(":9090", nil)
 	log.Println("Listening...")
 }
@@ -79,44 +93,111 @@ func index(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func getCM(w http.ResponseWriter, r *http.Request){
-    if r.Method != "POST" {
-	    responseTemplate(w, "not-post-method", "")
+func inputData(w http.ResponseWriter, r *http.Request) {
+	if r.Method != "POST" {
+		http.Error(w, "Post request only", http.StatusMethodNotAllowed)
 	}
-	
-	token := r.FormValue("token")
-	nocm := r.FormValue("nocm")
-	
-	p := PostTemplate{
-	        Code: nocm,
-	    }
-		
-	b := new(bytes.Buffer)
-	json.NewEncoder(b).Encode(p)
-	
-	//resp, _ := http.Post("https://2.igdsanglah.appspot.com/getcm", "application/json; charset=utf-8", b)
-	
-	client := &http.Client{}
-	
-	req, err := http.NewRequest("POST", "http://2.igdsanglah.appspot.com/getcm", b)
-	
-	req.Header.Set("Authorization", token)
-	req.Header.Add("Content-Type", "application/json")
-	resp, err := client.Do(req)
-	
-	var pts DataPasien
-	
-	json.NewDecoder(resp.Body).Decode(&pts)
-	
-	tmp := template.Must(template.New("inputpts.html").ParseFiles("templates/inputpts"))
-	err = tmp.Execute(&b, web)
+    if r.FormValue("baru") == "true"{
+	            data := &DataPasien{
+		        NamaPasien: r.FormValue("namapts"),
+		        NomorCM:    r.FormValue("nocm"),
+		        TglDaftar:  CreateTime(),
+	            }
+			}else{
+				data := &DataPasien{
+		        NamaPasien: r.FormValue("namapts"),
+		        NomorCM:    r.FormValue("nocm"),	            
+			}
+	}
+
+	kun := &KunjunganPasien{
+		Diagnosis:     r.FormValue("diag"),
+		GolIKI:        r.FormValue("iki"),
+		ATS:           r.FormValue("ats"),
+		ShiftJaga:     r.FormValue("shift"),
+		JamDatang:     CreateTime(),
+		JamDatangRiil: CreateTime(),
+		Dokter:        r.FormValue("dok"),
+	}
+
+	input := InputPts{Baru: r.FormValue("baru"),data,kun}
+
+	url := "http://2.igdsanglah.appspot.com/inputpts"
+
+	resp, err := sendPost(input, r.FormValue("token"), url)
 	if err != nil {
-	    responseTemplate(w, "Error parsing template", "")
+		responseTemplate(w, "kesalahan-server", "")
 	}
-	
+
+	pts := &Pasien{}
+
+	json.NewDecoder(resp.Body).Decode(pts)
+	b := new(bytes.Buffer)
+	tmp := template.Must(template.New("baristabel.html").ParseFiles("templates/baristabel.html"))
+	err = tmp.Execute(b, pts)
+	if err != nil {
+		responseTemplate(w, "kesalahan-template", "")
+	}
 	responseTemplate(w, "OK", b.String())
-	
-	
+
+
+
+}
+
+func CreateTime() time.Time {
+	t := time.Now()
+	zone, err := time.LoadLocation("Asia/Makassar")
+	if err != nil {
+		fmt.Println("Err: ", err.Error())
+	}
+	jam := t.In(zone)
+	return jam
+}
+
+func getCM(w http.ResponseWriter, r *http.Request) {
+	if r.Method != "POST" {
+		fmt.Fprintln(w, "Akses ditolak")
+	}
+
+	token := r.FormValue("token")
+	// fmt.Print(token)
+	// fmt.Println(r.FormValue("nocm"))
+	pts := &Pasien{
+		NoCM: r.FormValue("nocm"),
+	}
+
+	url := "http://2.igdsanglah.appspot.com/getcm"
+
+	resp, err := sendPost(pts, token, url)
+	if err != nil {
+		// fmt.Print(err)
+		responseTemplate(w, "kesalahan-server", "")
+	}
+
+	json.NewDecoder(resp.Body).Decode(pts)
+	b := new(bytes.Buffer)
+	tmp := template.Must(template.New("inputpts.html").ParseFiles("templates/inputpts.html"))
+	err = tmp.Execute(b, pts)
+	if err != nil {
+		responseTemplate(w, "kesalahan-template", "")
+	}
+	responseTemplate(w, "OK", b.String())
+
+}
+
+func sendPost(n interface{}, token, url string) (*http.Response, error) {
+	b := new(bytes.Buffer)
+	json.NewEncoder(b).Encode(n)
+	req, err := http.NewRequest("POST", url, b)
+	req.Header.Set("Authorization", token)
+
+	client := &http.Client{}
+	resp, err := client.Do(req)
+
+	if err != nil {
+		return nil, err
+	}
+	return resp, nil
 }
 
 func responseTemplate(w http.ResponseWriter, token, script string) {
@@ -157,4 +238,18 @@ func mainContent(w http.ResponseWriter, r *http.Request) {
 	}
 
 	responseTemplate(w, web.Token, b.String())
+
+	// res := &Response{
+	// 	Token:  web.Token,
+	// 	Script: b.String(),
+	// }
+
+	// fmt.Println(b.String())
+	// fmt.Fprintln(w, )
+	// enc := json.NewEncoder(w)
+	// enc.SetEscapeHTML(false)
+	// err = enc.Encode(&res)
+
+	// fmt.Fprintln(w, string(data))
+
 }

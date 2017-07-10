@@ -2,15 +2,17 @@
 	     <label for="namalkp">Nama Pasien:</label>
 		 {{if .NamaPasien}}
 		 <input type="text" name="namapasien" id="namapts" class="form-control text-capitalize" value={{.NamaPasien}}>
+		 <input type="hidden" id="baru" value="false">
 		 {{else}}
 		 <input type="text" name="namapasien" id="namapts" class="form-control text-capitalize">
+		 <input type="hidden" id="baru" value="true">
 		 {{end}}
 	  </div>
 	  <div class="form-group">
 	     <label for="">Diagnosis:</label>
 		 <input type="text" name="diagnosis" id="diag" class="form-control text-capitalize">
 	  </div>
-	  <div class="col-sm-4">
+	  <div class="col-sm-3">
       <div class="form-group">
 				<label for="">ATS</label>
       	<div class="radio"><label for="" class="radio-inline"><input type="radio" name="ats" id="" value="1">ATS 1</label></div>
@@ -20,14 +22,31 @@
       	<div class="radio"><label for="" class="radio-inline"><input type="radio" name="ats" id="" value="5">ATS 5</label></div>
       </div>
 	  </div>
-	  <div class="col-sm-4">
+	  <div class="col-sm-3">
+	  <div class="form-group">
+			<label for="">Bagian</label>
+	  	<div class="radio"><label for="" class="radio-inline"><input type="radio" name="bagian" id="" value="1">Interna</label></div>
+	  	<div class="radio"><label for="" class="radio-inline"><input type="radio" name="bagian" id="" value="2">Bedah</label></div>
+	  	<div class="radio"><label for="" class="radio-inline"><input type="radio" name="bagian" id="" value="3">Anak</label></div>
+		<div class="radio"><label for="" class="radio-inline"><input type="radio" name="bagian" id="" value="4">Obgyn</label></div>
+		<div class="radio"><label for="" class="radio-inline"><input type="radio" name="bagian" id="" value="5">Saraf</label></div>
+		<div class="radio"><label for="" class="radio-inline"><input type="radio" name="bagian" id="" value="6">Forensik</label></div>
+		<div class="radio"><label for="" class="radio-inline"><input type="radio" name="bagian" id="" value="7">Psikiatri</label></div>
+		<div class="radio"><label for="" class="radio-inline"><input type="radio" name="bagian" id="" value="8">THT</label></div>
+		<div class="radio"><label for="" class="radio-inline"><input type="radio" name="bagian" id="" value="9">Kulit/Kelamin</label></div>
+		<div class="radio"><label for="" class="radio-inline"><input type="radio" name="bagian" id="" value="10">Jantung</label></div>
+		<div class="radio"><label for="" class="radio-inline"><input type="radio" name="bagian" id="" value="11">Umum</label></div>
+		<div class="radio"><label for="" class="radio-inline"><input type="radio" name="bagian" id="" value="12">Mata</label></div>
+	  </div>
+	  </div>
+	  <div class="col-sm-3">
 	  <div class="form-group">
 			<label for="">IKI</label>
 	  	<div class="radio"><label for="" class="radio-inline"><input type="radio" name="iki" id="" value="1">IKI 1</label></div>
 	  	<div class="radio"><label for="" class="radio-inline"><input type="radio" name="iki" id="" value="2">IKI 2</label></div>
 	  </div>
 	  </div>
-	  <div class="col-sm-4">
+	  <div class="col-sm-3">
 	  <div class="form-group">
 			<label for="">Shift Jaga</label>
 	  	<div class="radio"><label for="" class="radio-inline"><input type="radio" name="shift" id="" value="1">Pagi</label></div>

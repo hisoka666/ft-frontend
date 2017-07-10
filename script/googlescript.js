@@ -19,6 +19,8 @@ function onSignIn(googleUser) {
   .fail(function(err){
     alert("Error: " + err)
   });
+  var profile = googleUser.getBasicProfile();
+  $("#dokter").html(profile.getName())
   $("#signoutbut").show();
   $("#signinbut").hide();
 };
