@@ -20,12 +20,12 @@ type MainView struct {
 	Pasien []Pasien `json:"pasien"`
 	//IKI      []List    `json:"list"`
 }
-type NavBar struct {
-	Token   string   `json:"token"`
-	User    string   `json:"user"`
-	Bulan   []string `json:"bulan"`
-	Pasien  []Pasien `json:"pasien"`
+
+type PostTemplate struct {
+    Code   string `json:"code"`
+	Token  string `json:"token"`
 }
+
 type Pasien struct {
 	TglKunjungan string `json:"tgl"`
 	ShiftJaga    string `json:"shift"`
@@ -42,6 +42,15 @@ type Response struct {
 	Script string `json:"script"`
 }
 
+type DataPasien struct {
+	NamaPasien   string    `json:"nama"`
+	NomorCM      string    `json:"nocm"`
+	JenKel       string    `json:"jk"`
+	Alamat       string    `json:"alamat"`
+	TglDaftar    time.Time `json:"tgldaf"`
+	Umur         time.Time `json:"umur"`
+}
+
 func main() {
 	// variable fs membuat folder "script" menjadi sebuah file server,
 	// alamat dari file server ini akan diarahkan oleh http.Handle
@@ -54,7 +63,7 @@ func main() {
 
 	http.HandleFunc("/", index)
 	http.HandleFunc("/login", mainContent)
-	// http.HandleFunc("/getmain", getMain)
+	http.HandleFunc("/getcm", getCM)
 	http.ListenAndServe(":9090", nil)
 	log.Println("Listening...")
 }
@@ -70,16 +79,44 @@ func index(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func getMain(w http.ResponseWriter, r *http.Request) {
-	// if r.Method != "POST" {
-	// 	responseTemplate(w, "", "")
-	// }
-
-	// token := js.Global.Get("localStorage").Get("token")
-	// js.Global.Call("alert", token)
-	// fmt.Print(token)
-	// responseTemplate(w, token, "")
-
+func getCM(w http.ResponseWriter, r *http.Request){
+    if r.Method != "POST" {
+	    responseTemplate(w, "not-post-method", "")
+	}
+	
+	token := r.FormValue("token")
+	nocm := r.FormValue("nocm")
+	
+	p := PostTemplate{
+	        Code: nocm,
+	    }
+		
+	b := new(bytes.Buffer)
+	json.NewEncoder(b).Encode(p)
+	
+	//resp, _ := http.Post("https://2.igdsanglah.appspot.com/getcm", "application/json; charset=utf-8", b)
+	
+	client := &http.Client{}
+	
+	req, err := http.NewRequest("POST", "http://2.igdsanglah.appspot.com/getcm", b)
+	
+	req.Header.Set("Authorization", token)
+	req.Header.Add("Content-Type", "application/json")
+	resp, err := client.Do(req)
+	
+	var pts DataPasien
+	
+	json.NewDecoder(resp.Body).Decode(&pts)
+	
+	tmp := template.Must(template.New("inputpts.html").ParseFiles("templates/inputpts"))
+	err = tmp.Execute(&b, web)
+	if err != nil {
+	    responseTemplate(w, "Error parsing template", "")
+	}
+	
+	responseTemplate(w, "OK", b.String())
+	
+	
 }
 
 func responseTemplate(w http.ResponseWriter, token, script string) {
@@ -120,18 +157,4 @@ func mainContent(w http.ResponseWriter, r *http.Request) {
 	}
 
 	responseTemplate(w, web.Token, b.String())
-
-	// res := &Response{
-	// 	Token:  web.Token,
-	// 	Script: b.String(),
-	// }
-
-	// fmt.Println(b.String())
-	// fmt.Fprintln(w, )
-	// enc := json.NewEncoder(w)
-	// enc.SetEscapeHTML(false)
-	// err = enc.Encode(&res)
-
-	// fmt.Fprintln(w, string(data))
-
 }

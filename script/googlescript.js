@@ -1,4 +1,3 @@
-// $(document).ready(function(){
 function onSignIn(googleUser) {
   var id_token = googleUser.getAuthResponse().id_token;
   var url = "/login?idtoken=" + id_token;
@@ -34,6 +33,3 @@ function signOut() {
    $("#signinbut").show();
    });
 };
-
-
-// })
