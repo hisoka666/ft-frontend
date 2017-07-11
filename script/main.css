@@ -1,0 +1,12 @@
+#welcome {
+    hide: true;
+}
+
+#signoutbut {
+    hide: true;
+}
+
+.modal-content {
+    width: 900px;
+    height: 1000px;
+}

@@ -20,7 +20,8 @@ function onSignIn(googleUser) {
     alert("Error: " + err)
   });
   var profile = googleUser.getBasicProfile();
-  $("#dokter").html(profile.getName())
+  $("#dokter").html(profile.getName());
+  $("#email").attr({"value" : profile.getEmail()});
   $("#signoutbut").show();
   $("#signinbut").hide();
 };
@@ -30,8 +31,8 @@ function signOut() {
    auth2.signOut().then(function () {
    console.log('User signed out.');
    localStorage.clear();
+   $("#welcome").hide();
    $("#signoutbut").hide();
    $("#navbar").html("");
-   $("#signinbut").show();
    });
 };

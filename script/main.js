@@ -46,7 +46,8 @@ $(document).ready(function(){
 
 	});
 	
-	$("#navbar").on("click", "#btnsub", function(){
+	$("#navbar").on("click", "#btnsub", function(event){
+		event.preventDefault();
 		
 		var nocm = $("#nocm").val();
 		var namapts = $("#namapts").val();
@@ -56,12 +57,9 @@ $(document).ready(function(){
 		var shift = $("input[type='radio'][name='shift']:checked").val();
 		var bagian = $("input[type='radio'][name='bagian']:checked").val();
 		var baru = $("#baru").val();
-		// var auth2 = gapi.auth2.getAuthInstance();
-		var profile = gapi.auth2.getBasicProfile();
-		var dok = profile.getEmail();
-		if (nocm == ""||namapts == ""||diag == ""||ats == ""||iki == ""||shift ==""||bagian==""){
-			alert("Data Belum Lengkap");
-		}else{
+		var dok = $("#email").val();
+		console.log("Dokter adalah: " + dok)
+		if (nocm !== "" && namapts !== "" && diag !== "" && ats !== "" && iki !== "" && shift !== "" && bagian !== "" ){
 			$.post("inputdata",{
 				token: localStorage.getItem("token"),
 				nocm: nocm,
@@ -75,19 +73,35 @@ $(document).ready(function(){
 				baru: baru
 			},
 			function(data){
-				$("tbody").prepend(data)
+				$("#nocm").empty();
+				var js = JSON.parse(data)
+				if (js.token != "OK"){
+					alert(js.script)
+				}else{
+  				    $("tbody").prepend(js.script)
+				}
 			})
-			// $.post({
-			// 	type:'post',
-			// 	url:'inputdata',
-			// 	data:"nocm="+nocm+"&namapts="+namapts+"&diag="+diag+"&ats="+ats+"&iki="+iki+"&shift="+shift,
-			// 	success:function(){
-			// 		location.reload();
-			// 	}
-				
-			// })
+		}else{
+			alert("Data Belum Lengkap");
 		}
 		
+	});
+
+	$("#navbar").on("click", "#editbut", function(event){
+		event.preventDefault();
+		token = localStorage.getItem("token")
+		var link = $(this).offsetParent().children().first().html();
+		console.log("link adalah: " + link)
+		$.post("editentri",{
+			token: token,
+			link: link
+		},
+		function(data){
+			var js = JSON.parse(data)
+			console.log(js.token)
+			$(js.script).appendTo('body').modal()
+		})
+
 	})
 
 })

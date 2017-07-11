@@ -36,7 +36,6 @@ type Pasien struct {
 	IKI1         string `json:"iki1"`
 	IKI2         string `json:"iki2"`
 	LinkID       string `json:"link"`
-	Baru         bool   `json:"baru"`
 }
 
 type KunjunganPasien struct {
@@ -60,9 +59,22 @@ type Response struct {
 }
 
 type InputPts struct {
-	Datapasien        `json:"datapts"`
-	KunjunganPasien   `json:"kunjungan"`
+	*DataPasien      `json:"datapts"`
+	*KunjunganPasien `json:"kunjungan"`
 }
+
+type UbahPasien struct {
+	NoCM         string `json:"nocm"`
+	NamaPasien   string `json:"namapts"`
+	Diagnosis    string `json:"diag"`
+	ATS          string `json:"ats"`
+	Shift        string `json:"shift"`
+	Bagian       string `json:"bagian"`
+	IKI          string `json:"iki"`
+	LinkID       string `json:"link"`
+	TglAsli      time.Time `json:"tgl"`
+}
+
 func main() {
 	// variable fs membuat folder "script" menjadi sebuah file server,
 	// alamat dari file server ini akan diarahkan oleh http.Handle
@@ -77,7 +89,7 @@ func main() {
 	http.HandleFunc("/login", mainContent)
 	http.HandleFunc("/getcm", getCM)
 	http.HandleFunc("/inputdata", inputData)
-	// http.HandleFunc("/getmain", getMain)
+	http.HandleFunc("/editentri", editEntri)
 	http.ListenAndServe(":9090", nil)
 	log.Println("Listening...")
 }
@@ -93,21 +105,49 @@ func index(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func editEntri(w http.ResponseWriter, r *http.Request) {
+	if r.Method != "POST" {
+		http.Error(w, "Post request only", http.StatusMethodNotAllowed)
+	}
+
+	url := "http://2.igdsanglah.appspot.com/entri/edit"
+
+	fmt.Print(r.FormValue("link"))
+	pts := Pasien{
+		LinkID: r.FormValue("link"),
+	}
+
+	resp, err := sendPost(pts, r.FormValue("token"), url)
+	if err != nil {
+		responseTemplate(w, "kesalahan-server", "")
+	}
+	kun := &UbahPasien{}
+	json.NewDecoder(resp.Body).Decode(kun)
+
+	b := new(bytes.Buffer)
+	tmp := template.Must(template.New("modedit.html").ParseFiles("templates/modedit.html"))
+	err = tmp.Execute(b, kun)
+	if err != nil {
+		responseTemplate(w, "kesalahan-template", "")
+	}
+
+	fmt.Print(b.String())
+	responseTemplate(w, "OK", b.String())
+
+}
 func inputData(w http.ResponseWriter, r *http.Request) {
 	if r.Method != "POST" {
 		http.Error(w, "Post request only", http.StatusMethodNotAllowed)
 	}
-    if r.FormValue("baru") == "true"{
-	            data := &DataPasien{
-		        NamaPasien: r.FormValue("namapts"),
-		        NomorCM:    r.FormValue("nocm"),
-		        TglDaftar:  CreateTime(),
-	            }
-			}else{
-				data := &DataPasien{
-		        NamaPasien: r.FormValue("namapts"),
-		        NomorCM:    r.FormValue("nocm"),	            
-			}
+
+	data := &DataPasien{}
+	if r.FormValue("baru") == "true" {
+		data.NamaPasien = r.FormValue("namapts")
+		data.NomorCM = r.FormValue("nocm")
+		data.TglDaftar = CreateTime()
+	} else {
+		data.NamaPasien = r.FormValue("namapts")
+		data.NomorCM = r.FormValue("nocm")
 	}
 
 	kun := &KunjunganPasien{
@@ -118,9 +158,10 @@ func inputData(w http.ResponseWriter, r *http.Request) {
 		JamDatang:     CreateTime(),
 		JamDatangRiil: CreateTime(),
 		Dokter:        r.FormValue("dok"),
+		Bagian:        r.FormValue("bagian"),
 	}
 
-	input := InputPts{Baru: r.FormValue("baru"),data,kun}
+	input := InputPts{data, kun}
 
 	url := "http://2.igdsanglah.appspot.com/inputpts"
 
@@ -132,6 +173,9 @@ func inputData(w http.ResponseWriter, r *http.Request) {
 	pts := &Pasien{}
 
 	json.NewDecoder(resp.Body).Decode(pts)
+	if pts.NoCM == "kesalahan-database" {
+		responseTemplate(w, "kesalahan-database", "")
+	}
 	b := new(bytes.Buffer)
 	tmp := template.Must(template.New("baristabel.html").ParseFiles("templates/baristabel.html"))
 	err = tmp.Execute(b, pts)
@@ -139,8 +183,6 @@ func inputData(w http.ResponseWriter, r *http.Request) {
 		responseTemplate(w, "kesalahan-template", "")
 	}
 	responseTemplate(w, "OK", b.String())
-
-
 
 }
 

@@ -1,8 +1,9 @@
-                    <tr>
-                        <td>{{$n.TglKunjungan}}</td>
-                        <td><a href="/getdetail/{{$n.NoCM}}">{{$n.NoCM}}</a></td>
-                        <td>{{$n.NamaPasien}}</td>
-                        <td>{{$n.Diagnosis}}</td>
+                    {{with .}}
+					<tr>
+                        <td>{{.TglKunjungan}}</td>
+                        <td><a href="/getdetail/{{.NoCM}}">{{.NoCM}}</a></td>
+                        <td>{{.NamaPasien}}</td>
+                        <td>{{.Diagnosis}}</td>
                            {{if .IKI1}}
 			                  <td class="text-center checkmark">&#x2714;</td>
                               <td class="text-center checkmark"></td>
@@ -12,9 +13,11 @@
 			               {{end}}
 			            <td class="text-center">
 		                   <div class="btn-group btn-group-xs">
-			                  <a href="/entri/edit/{{$n.LinkID}}" class="btn btn-info" role="button">Edit</a>
-				              <a href="/entri/del/{{$n.LinkID}}" class="btn btn-danger" role="button">Delete</a>
-                      <a href="/entri/editdate/{{$n.LinkID}}" class="btn btn-info" role="button">Ubah Tanggal</a>
+			                  <a href="/entri/edit/{{.LinkID}}" class="btn btn-info" role="button">Edit</a>
+				              <a href="/entri/del/{{.LinkID}}" class="btn btn-danger" role="button">Delete</a>
+                      <a href="/entri/editdate/{{.LinkID}}" class="btn btn-info" role="button">Ubah Tanggal</a>
 			               </div>
 			            </td>
 	                 </tr>
+
+					 {{end}}
