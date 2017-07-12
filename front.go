@@ -64,15 +64,20 @@ type InputPts struct {
 }
 
 type UbahPasien struct {
-	NoCM         string `json:"nocm"`
-	NamaPasien   string `json:"namapts"`
-	Diagnosis    string `json:"diag"`
-	ATS          string `json:"ats"`
-	Shift        string `json:"shift"`
-	Bagian       string `json:"bagian"`
-	IKI          string `json:"iki"`
-	LinkID       string `json:"link"`
-	TglAsli      time.Time `json:"tgl"`
+	NoCM       string    `json:"nocm"`
+	NamaPasien string    `json:"namapts"`
+	Diagnosis  string    `json:"diag"`
+	ATS        string    `json:"ats"`
+	Shift      string    `json:"shift"`
+	Bagian     string    `json:"bagian"`
+	IKI        string    `json:"iki"`
+	LinkID     string    `json:"link"`
+	TglAsli    time.Time `json:"tgl"`
+}
+
+type ModalTemplate struct {
+	Script  string      `json:"script"`
+	Content *UbahPasien `json:"content"`
 }
 
 func main() {
@@ -112,7 +117,6 @@ func editEntri(w http.ResponseWriter, r *http.Request) {
 
 	url := "http://2.igdsanglah.appspot.com/entri/edit"
 
-	fmt.Print(r.FormValue("link"))
 	pts := Pasien{
 		LinkID: r.FormValue("link"),
 	}
@@ -126,13 +130,17 @@ func editEntri(w http.ResponseWriter, r *http.Request) {
 
 	b := new(bytes.Buffer)
 	tmp := template.Must(template.New("modedit.html").ParseFiles("templates/modedit.html"))
-	err = tmp.Execute(b, kun)
+	err = tmp.Execute(b, nil)
 	if err != nil {
 		responseTemplate(w, "kesalahan-template", "")
 	}
 
-	fmt.Print(b.String())
-	responseTemplate(w, "OK", b.String())
+	mod := &ModalTemplate{
+		Script:  b.String(),
+		Content: kun,
+	}
+
+	json.NewEncoder(w).Encode(mod)
 
 }
 func inputData(w http.ResponseWriter, r *http.Request) {

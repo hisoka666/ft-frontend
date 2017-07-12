@@ -12,11 +12,21 @@
                               <td class="text-center checkmark">&#x2714;</td>
 			               {{end}}
 			            <td class="text-center">
-		                   <div class="btn-group btn-group-xs">
-			                  <a href="/entri/edit/{{.LinkID}}" class="btn btn-info" role="button">Edit</a>
-				              <a href="/entri/del/{{.LinkID}}" class="btn btn-danger" role="button">Delete</a>
-                      <a href="/entri/editdate/{{.LinkID}}" class="btn btn-info" role="button">Ubah Tanggal</a>
-			               </div>
+                      <div class="dropdown">
+                        <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown">
+                         Pilihan <span class="caret"></span>
+                        </button>
+                        <ul class="dropdown-menu">
+                          <li id="link" hidden></li>
+                          <li><a id="editbut" data-toggle="modal" href="#edit">Edit</a></li>
+                          <li><a id="delbut" data-toggle="modal" href="#modhapus">Hapus</a></li>
+                          <li><a id="tglbut" data-toggle="modal" href="#modtgl">Ubah Tanggal</a></li>
+                          <li class="divider"></li>
+                          <li><a id="resepbut" data-toggle="modal" href="#modresep">Buat Resep</a></li>
+                          <li><a id="sakitbut" data-toggle="modal" href="#modsakit">Buat Surat Sakit</a></li>
+                          <li><a id="detailbut" data-toggle="modal" href="#moddetail">Buat Surat Sakit</a></li>
+                        </ul>
+                      </div>
 			            </td>
 	                 </tr>
 
