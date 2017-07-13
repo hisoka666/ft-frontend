@@ -56,6 +56,7 @@ type DataPasien struct {
 type Response struct {
 	Token  string `json:"token"`
 	Script string `json:"script"`
+	Modal  string `json:"modal"`
 }
 
 type InputPts struct {
@@ -139,7 +140,7 @@ func editEntri(w http.ResponseWriter, r *http.Request) {
 		Script:  b.String(),
 		Content: kun,
 	}
-
+	fmt.Print(mod.Content)
 	json.NewEncoder(w).Encode(mod)
 
 }

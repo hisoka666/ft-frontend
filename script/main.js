@@ -1,17 +1,6 @@
 $(document).ready(function(){
 	var nocm = $("#nocm").val()
 	
-	// $("#nocm").focus(function(){
-	// 	var value = $("#nocm").val();
-	// 	if (value == ""){
-	// 		$("#datapasien").html("Masukkan No. CM");
-	// 		//nocm = "";
-	// 	} else {
-	// 		$("#datapasien").html("No. CM tidak lengkap");
-	// 		//nocm = "";
-	// 	} 
-	// });
-	
 	$("#navbar").on("keyup", "#nocm", function(){
 		
 		var value = $("#nocm").val();
@@ -65,53 +54,83 @@ $(document).ready(function(){
 			case namapts === "":
 			break;
 			case diag === "":
-			console.log("Ini adalah: " + diag);
+			$("#alertmsg").html("<div class=\"alert alert-danger alert-dismissable\"\>" +
+		                            "<a href=\"#\" class=\"close\" data-dismiss=\"alert\" aria-label=\"close\">&times;</a\>" +
+									"Diagnosis belum diisi" +
+		                        "</div>");
+			// alert("Diagnosis harus diisi");
 			break;
-			case ats == "":
-			console.log("Ini adalah: " + ats);
+			case ats == null :
+			$("#alertmsg").html("<div class=\"alert alert-danger alert-dismissable\"\>" +
+		                            "<a href=\"#\" class=\"close\" data-dismiss=\"alert\" aria-label=\"close\">&times;</a\>" +
+									"ATS belum diisi" +
+		                        "</div>");
+			// alert("ATS harus diisi");
 			break;
-			case iki == "":
-			console.log("Ini adalah: " + iki);
+			case iki == null :
+			$("#alertmsg").html("<div class=\"alert alert-danger alert-dismissable\"\>" +
+		                            "<a href=\"#\" class=\"close\" data-dismiss=\"alert\" aria-label=\"close\">&times;</a\>" +
+									"Golongan IKI belum diisi" +
+		                        "</div>");
+			// alert("Golongan IKI harus diisi");
 			break;
-			case shift == "":
-			console.log("Ini adalah: " + shift);
+			case shift == null :
+			$("#alertmsg").html("<div class=\"alert alert-danger alert-dismissable\"\>" +
+		                            "<a href=\"#\" class=\"close\" data-dismiss=\"alert\" aria-label=\"close\">&times;</a\>" +
+									"Shift belum diisi" +
+		                        "</div>");
+			// alert("Shift harus diisi");
 			break;
-			case bagian == "":
-			console.log("Ini adalah: " + bagian);
+			case bagian == null:
+			$("#alertmsg").html("<div class=\"alert alert-danger alert-dismissable\"\>" +
+		                            "<a href=\"#\" class=\"close\" data-dismiss=\"alert\" aria-label=\"close\">&times;</a\>" +
+									"Bagian belum diisi" +
+		                        "</div>");
+			// alert("Bagian harus diisi");
 			break;
 			default:
-			console.log("Default is running");
-			// $.post("inputdata",{
-			// 	token: localStorage.getItem("token"),
-			// 	nocm: nocm,
-			// 	namapts: namapts,
-			// 	diag: diag,
-			// 	ats: ats,
-			// 	iki: iki,
-			// 	shift: shift,
-			// 	bagian: bagian,
-			// 	dok: dok,
-			// 	baru: baru
-			// },
-			// function(data){
-			// 	$("#nocm").empty();
-			// 	var js = JSON.parse(data)
-			// 	if (js.token != "OK"){
-			// 		alert(js.script)
-			// 	}else{
-  			// 	    $("tbody").prepend(js.script)
-			// 	}
+			if (namapts !== "" && diag !== "" && ats !== undefined && iki !== undefined && shift !== undefined && bagian !== undefined) {
+			$.post("inputdata",{
+				token: localStorage.getItem("token"),
+				nocm: nocm,
+				namapts: namapts,
+				diag: diag,
+				ats: ats,
+				iki: iki,
+				shift: shift,
+				bagian: bagian,
+				dok: dok,
+				baru: baru
+			},
+			function(data){
+				var js = JSON.parse(data)
+				if (js.token != "OK"){
+					alert(js.script);
+				}else{
+  				    $("tbody").prepend(js.script);
+					  alert("Data berhasil diinput");
+					  $("#nocm").val('');
+					  $("#datapasien").html('');
+				}
 
 
-			// });
+			});
+			}else{
+			$("#alertmsg").html("<div class=\"alert alert-danger alert-dismissable\"\>" +
+		                            "<a href=\"#\" class=\"close\" data-dismiss=\"alert\" aria-label=\"close\">&times;</a\>" +
+									"Ada kolom belum diisi" +
+		                        "</div>");
+			}
 		}
-		alert("Form belum lengkap!")		
+		// alert("Form belum lengkap!")		
 	});
 
-	$("#navbar").on("click", "#editbut, #modedit", function(event){
+	$("#navbar").on("click", "#editbut", function(event){
 		event.preventDefault();
 		token = localStorage.getItem("token")
 		var link = $(this).offsetParent().children().first().html();
+		// var baris = $(this).parent("ul").index();
+		// console.log("Ini baris ke: " + baris);
 		$.post("editentri",{
 			token: token,
 			link: link
@@ -119,12 +138,16 @@ $(document).ready(function(){
 		function(data){
 			var js = JSON.parse(data)
 			$(js.script).modal();
-			console.log(js.content.namapts);
 			$("body").on('shown.bs.modal', function(){
-			var ats = 'input[name="ats"][value=' + js.content.ats + ']';
-			var iki = 'input[name="iki"][value=' + js.content.iki + ']';
-			var shift = 'input[name="shift"][value=' + js.content.shift + ']';
-			var bagian = 'input[name="bagian"][value=' + js.content.bagian + ']';
+			var ats = 'input[name="modats"][value=' + js.content.ats + ']';
+			var iki = 'input[name="modiki"][value=' + js.content.iki + ']';
+			var shift = 'input[name="modshift"][value=' + js.content.shift + ']';
+			var bagian = 'input[name="modbagian"][value=' + js.content.bagian + ']';
+			
+			$('input[name="entri"]').val(js.content.link);
+			$('input[name="namapasien"]').val(js.content.namapts);
+			$('input[name="diagnosis"]').val(js.content.diag);
+			
 			if (js.content.bagian == ""){
  		    	$(ats).prop('checked', true);
    				$(iki).prop('checked', true);
@@ -136,16 +159,100 @@ $(document).ready(function(){
    				$(shift).prop('checked', true);
    				$(bagian).prop('checked', true);
 
-			};
-				$('input[name="entri"]').val(js.content.link);
-				$('input[name="namapasien"]').val(js.content.namapts);
-				$('input[name="diagnosis"]').val(js.content.diag);
-
+				};
 			});
-			
-			
 		})
+	});
 
-	})
+	// $("#modedit").on("click", "#confirmedit", function(){
+	// 	token = localStorage.getItem("token");
+	// 	var link = $("#modentri").val();
+	// 	var namapts = $("#modnamapts").val();
+	// 	var diag = $("#moddiag").val();
+	// 	var ats = $("input[name='modats']:checked").val();
+	// 	var bagian = $("input[name='modbagian']:checked").val();
+	// 	var iki = $("input[name='modiki']:checked").val();
+	// 	var shift = $("input[name='modshift']:checked").val();
+		
+	// 	switch (true) {
+	// 		case namapts === "":
+	// 		$("#alertmodal").html("<div class=\"alert alert-danger alert-dismissable\"\>" +
+	// 	                            "<a href=\"#\" class=\"close\" data-dismiss=\"alert\" aria-label=\"close\">&times;</a\>" +
+	// 								"Nama pasien belum diisi" +
+	// 	                        "</div>");
+	// 		break;
+	// 		case diag === "":
+	// 		$("#alertmodal").html("<div class=\"alert alert-danger alert-dismissable\"\>" +
+	// 	                            "<a href=\"#\" class=\"close\" data-dismiss=\"alert\" aria-label=\"close\">&times;</a\>" +
+	// 								"Diagnosis belum diisi" +
+	// 	                        "</div>");
+	// 		// alert("Diagnosis harus diisi");
+	// 		break;
+	// 		case ats == null :
+	// 		$("#alertmodal").html("<div class=\"alert alert-danger alert-dismissable\"\>" +
+	// 	                            "<a href=\"#\" class=\"close\" data-dismiss=\"alert\" aria-label=\"close\">&times;</a\>" +
+	// 								"ATS belum diisi" +
+	// 	                        "</div>");
+	// 		// alert("ATS harus diisi");
+	// 		break;
+	// 		case iki == null :
+	// 		$("#alertmodal").html("<div class=\"alert alert-danger alert-dismissable\"\>" +
+	// 	                            "<a href=\"#\" class=\"close\" data-dismiss=\"alert\" aria-label=\"close\">&times;</a\>" +
+	// 								"Golongan IKI belum diisi" +
+	// 	                        "</div>");
+	// 		// alert("Golongan IKI harus diisi");
+	// 		break;
+	// 		case shift == null :
+	// 		$("#alertmodal").html("<div class=\"alert alert-danger alert-dismissable\"\>" +
+	// 	                            "<a href=\"#\" class=\"close\" data-dismiss=\"alert\" aria-label=\"close\">&times;</a\>" +
+	// 								"Shift belum diisi" +
+	// 	                        "</div>");
+	// 		// alert("Shift harus diisi");
+	// 		break;
+	// 		case bagian == null:
+	// 		$("#alertmodal").html("<div class=\"alert alert-danger alert-dismissable\"\>" +
+	// 	                            "<a href=\"#\" class=\"close\" data-dismiss=\"alert\" aria-label=\"close\">&times;</a\>" +
+	// 								"Bagian belum diisi" +
+	// 	                        "</div>");
+	// 		// alert("Bagian harus diisi");
+	// 		break;
+	// 		default:
+	// 		if (namapts !== "" && diag !== "" && ats !== undefined && iki !== undefined && shift !== undefined && bagian !== undefined) {
+	// 		$.post("inputdata",{
+	// 			token: localStorage.getItem("token"),
+	// 			nocm: nocm,
+	// 			namapts: namapts,
+	// 			diag: diag,
+	// 			ats: ats,
+	// 			iki: iki,
+	// 			shift: shift,
+	// 			bagian: bagian,
+	// 			dok: dok,
+	// 			baru: baru
+	// 		},
+	// 		function(data){
+	// 			var js = JSON.parse(data)
+	// 			if (js.token != "OK"){
+	// 				alert(js.script);
+	// 			}else{
+  	// 			    $("tbody").prepend(js.script);
+	// 				  alert("Data berhasil diinput");
+	// 				  $("#nocm").val('');
+	// 				  $("#datapasien").html('');
+	// 			}
+
+
+	// 		});
+	// 		}else{
+	// 		$("#alertmsg").html("<div class=\"alert alert-danger alert-dismissable\"\>" +
+	// 	                            "<a href=\"#\" class=\"close\" data-dismiss=\"alert\" aria-label=\"close\">&times;</a\>" +
+	// 								"Ada kolom belum diisi" +
+	// 	                        "</div>");
+	// 		}
+	// 	}
+		
+
+
+	// });
 
 })

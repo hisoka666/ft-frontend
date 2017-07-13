@@ -5,3 +5,7 @@
 #signoutbut {
     hide: true;
 }
+
+.modal-body {
+    overflow-y: auto;
+}
