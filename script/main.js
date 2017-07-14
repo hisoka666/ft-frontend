@@ -164,95 +164,94 @@ $(document).ready(function(){
 		})
 	});
 
-	// $("#modedit").on("click", "#confirmedit", function(){
-	// 	token = localStorage.getItem("token");
-	// 	var link = $("#modentri").val();
-	// 	var namapts = $("#modnamapts").val();
-	// 	var diag = $("#moddiag").val();
-	// 	var ats = $("input[name='modats']:checked").val();
-	// 	var bagian = $("input[name='modbagian']:checked").val();
-	// 	var iki = $("input[name='modiki']:checked").val();
-	// 	var shift = $("input[name='modshift']:checked").val();
+	$("#modedit").on("click", "#confirmedit", function(){
+
+		var link = $("#modentri").val();
+		var namapts = $("#modnamapts").val();
+		var diag = $("#moddiag").val();
+		var ats = $("input[name='modats']:checked").val();
+		var bagian = $("input[name='modbagian']:checked").val();
+		var iki = $("input[name='modiki']:checked").val();
+		var shift = $("input[name='modshift']:checked").val();
 		
-	// 	switch (true) {
-	// 		case namapts === "":
-	// 		$("#alertmodal").html("<div class=\"alert alert-danger alert-dismissable\"\>" +
-	// 	                            "<a href=\"#\" class=\"close\" data-dismiss=\"alert\" aria-label=\"close\">&times;</a\>" +
-	// 								"Nama pasien belum diisi" +
-	// 	                        "</div>");
-	// 		break;
-	// 		case diag === "":
-	// 		$("#alertmodal").html("<div class=\"alert alert-danger alert-dismissable\"\>" +
-	// 	                            "<a href=\"#\" class=\"close\" data-dismiss=\"alert\" aria-label=\"close\">&times;</a\>" +
-	// 								"Diagnosis belum diisi" +
-	// 	                        "</div>");
-	// 		// alert("Diagnosis harus diisi");
-	// 		break;
-	// 		case ats == null :
-	// 		$("#alertmodal").html("<div class=\"alert alert-danger alert-dismissable\"\>" +
-	// 	                            "<a href=\"#\" class=\"close\" data-dismiss=\"alert\" aria-label=\"close\">&times;</a\>" +
-	// 								"ATS belum diisi" +
-	// 	                        "</div>");
-	// 		// alert("ATS harus diisi");
-	// 		break;
-	// 		case iki == null :
-	// 		$("#alertmodal").html("<div class=\"alert alert-danger alert-dismissable\"\>" +
-	// 	                            "<a href=\"#\" class=\"close\" data-dismiss=\"alert\" aria-label=\"close\">&times;</a\>" +
-	// 								"Golongan IKI belum diisi" +
-	// 	                        "</div>");
-	// 		// alert("Golongan IKI harus diisi");
-	// 		break;
-	// 		case shift == null :
-	// 		$("#alertmodal").html("<div class=\"alert alert-danger alert-dismissable\"\>" +
-	// 	                            "<a href=\"#\" class=\"close\" data-dismiss=\"alert\" aria-label=\"close\">&times;</a\>" +
-	// 								"Shift belum diisi" +
-	// 	                        "</div>");
-	// 		// alert("Shift harus diisi");
-	// 		break;
-	// 		case bagian == null:
-	// 		$("#alertmodal").html("<div class=\"alert alert-danger alert-dismissable\"\>" +
-	// 	                            "<a href=\"#\" class=\"close\" data-dismiss=\"alert\" aria-label=\"close\">&times;</a\>" +
-	// 								"Bagian belum diisi" +
-	// 	                        "</div>");
-	// 		// alert("Bagian harus diisi");
-	// 		break;
-	// 		default:
-	// 		if (namapts !== "" && diag !== "" && ats !== undefined && iki !== undefined && shift !== undefined && bagian !== undefined) {
-	// 		$.post("inputdata",{
-	// 			token: localStorage.getItem("token"),
-	// 			nocm: nocm,
-	// 			namapts: namapts,
-	// 			diag: diag,
-	// 			ats: ats,
-	// 			iki: iki,
-	// 			shift: shift,
-	// 			bagian: bagian,
-	// 			dok: dok,
-	// 			baru: baru
-	// 		},
-	// 		function(data){
-	// 			var js = JSON.parse(data)
-	// 			if (js.token != "OK"){
-	// 				alert(js.script);
-	// 			}else{
-  	// 			    $("tbody").prepend(js.script);
-	// 				  alert("Data berhasil diinput");
-	// 				  $("#nocm").val('');
-	// 				  $("#datapasien").html('');
-	// 			}
+		switch (true) {
+			case namapts === "":
+			$("#alertmodal").html("<div class=\"alert alert-danger alert-dismissable\"\>" +
+		                            "<a href=\"#\" class=\"close\" data-dismiss=\"alert\" aria-label=\"close\">&times;</a\>" +
+									"Nama pasien belum diisi" +
+		                        "</div>");
+			break;
+			case diag === "":
+			$("#alertmodal").html("<div class=\"alert alert-danger alert-dismissable\"\>" +
+		                            "<a href=\"#\" class=\"close\" data-dismiss=\"alert\" aria-label=\"close\">&times;</a\>" +
+									"Diagnosis belum diisi" +
+		                        "</div>");
+			// alert("Diagnosis harus diisi");
+			break;
+			case ats == null :
+			$("#alertmodal").html("<div class=\"alert alert-danger alert-dismissable\"\>" +
+		                            "<a href=\"#\" class=\"close\" data-dismiss=\"alert\" aria-label=\"close\">&times;</a\>" +
+									"ATS belum diisi" +
+		                        "</div>");
+			// alert("ATS harus diisi");
+			break;
+			case iki == null :
+			$("#alertmodal").html("<div class=\"alert alert-danger alert-dismissable\"\>" +
+		                            "<a href=\"#\" class=\"close\" data-dismiss=\"alert\" aria-label=\"close\">&times;</a\>" +
+									"Golongan IKI belum diisi" +
+		                        "</div>");
+			// alert("Golongan IKI harus diisi");
+			break;
+			case shift == null :
+			$("#alertmodal").html("<div class=\"alert alert-danger alert-dismissable\"\>" +
+		                            "<a href=\"#\" class=\"close\" data-dismiss=\"alert\" aria-label=\"close\">&times;</a\>" +
+									"Shift belum diisi" +
+		                        "</div>");
+			// alert("Shift harus diisi");
+			break;
+			case bagian == null:
+			$("#alertmodal").html("<div class=\"alert alert-danger alert-dismissable\"\>" +
+		                            "<a href=\"#\" class=\"close\" data-dismiss=\"alert\" aria-label=\"close\">&times;</a\>" +
+									"Bagian belum diisi" +
+		                        "</div>");
+			// alert("Bagian harus diisi");
+			break;
+			default:
+			if (namapts !== "" && diag !== "" && ats !== undefined && iki !== undefined && shift !== undefined && bagian !== undefined) {
+			$.post("confedit",{
+				token: localStorage.getItem("token"),
+				nocm: nocm,
+				namapts: namapts,
+				diag: diag,
+				ats: ats,
+				iki: iki,
+				shift: shift,
+				bagian: bagian,
+				link: link
+			},
+			function(data){
+				var js = JSON.parse(data)
+				if (js.token != "OK"){
+					alert(js.script);
+				}else{
+  				    $(this).parent("tr")(js.script);
+					  alert("Data berhasil diubah");
+					//   $("#nocm").val('');
+					//   $("#datapasien").html('');
+				}
 
 
-	// 		});
-	// 		}else{
-	// 		$("#alertmsg").html("<div class=\"alert alert-danger alert-dismissable\"\>" +
-	// 	                            "<a href=\"#\" class=\"close\" data-dismiss=\"alert\" aria-label=\"close\">&times;</a\>" +
-	// 								"Ada kolom belum diisi" +
-	// 	                        "</div>");
-	// 		}
-	// 	}
+			});
+			}else{
+			$("#alertmsg").html("<div class=\"alert alert-danger alert-dismissable\"\>" +
+		                            "<a href=\"#\" class=\"close\" data-dismiss=\"alert\" aria-label=\"close\">&times;</a\>" +
+									"Ada kolom belum diisi" +
+		                        "</div>");
+			}
+		}
 		
 
 
-	// });
+	});
 
 })

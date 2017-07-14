@@ -96,6 +96,7 @@ func main() {
 	http.HandleFunc("/getcm", getCM)
 	http.HandleFunc("/inputdata", inputData)
 	http.HandleFunc("/editentri", editEntri)
+	http.HandleFunc("/confedit", confEditEntri)
 	http.ListenAndServe(":9090", nil)
 	log.Println("Listening...")
 }
@@ -109,6 +110,54 @@ func index(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Fatalf("Failed to Execute template: %v", err)
 	}
+}
+func ConvertToUbah(r *http.Request) *UbahPasien{
+	n := &UbahPasien{
+		{
+			NamaPasien: r.FormValue("namapts"),
+			Diagnosis: r.FormValue("diag"),
+			ATS: r.FormValue("ats"),
+			IKI: r.FormValue("iki"),
+			Bagian: r.FormValue("bagian"),
+			LinkID: r.FormValue("link"),
+			Shift: r.FormValue("shift")
+
+		}
+	}
+
+	return n
+}
+
+func confEditEntri(w http.ResponseWriter, r *http.Request){
+	if r.Method != "POST" {
+		http.Error(w, "Post request only", http.StatusMethodNotAllowed)
+	}
+
+	url := "http://2.igdsanglah.appspot.com/entri/confirmedit"
+	ubah := ConvertToUbah(r)
+	resp, err := sendPost(ubah, r.FormValue("token"), url)
+	if err != nil {
+		responseTemplate(w, "kesalahan-server", "")
+	}
+	res := &UbahPasien
+	json.NewDecoder(resp.Body).Decode(res)
+
+	if res.NoCM !== "OK"{
+		responseTemplate(w, res.NoCM,"")
+	}
+
+	b := new(bytes.Buffer)
+	tmp := template.Must(template.New("baristabel.html").ParseFiles("templates/baristabel.html"))
+	err = tmp.Execute(b, ubah)
+	if err != nil {
+		responseTemplate(w, "kesalahan-template", "")
+	}
+
+	mod := &Response{
+		Token: "OK"
+		Script:  b.String(),
+	}
+	json.NewEncoder(w).Encode(mod)
 }
 
 func editEntri(w http.ResponseWriter, r *http.Request) {
