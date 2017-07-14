@@ -129,6 +129,8 @@ $(document).ready(function(){
 		event.preventDefault();
 		token = localStorage.getItem("token")
 		var link = $(this).offsetParent().children().first().html();
+		var indexrow = $(this).closest("tr").index()
+		console.log("baris ini berada di : " + indexrow)
 		// var baris = $(this).parent("ul").index();
 		// console.log("Ini baris ke: " + baris);
 		$.post("editentri",{
@@ -137,7 +139,7 @@ $(document).ready(function(){
 		},
 		function(data){
 			var js = JSON.parse(data)
-			$(js.script).modal();
+			$(js.script).modal("show");
 			$("body").on('shown.bs.modal', function(){
 			var ats = 'input[name="modats"][value=' + js.content.ats + ']';
 			var iki = 'input[name="modiki"][value=' + js.content.iki + ']';
@@ -145,8 +147,9 @@ $(document).ready(function(){
 			var bagian = 'input[name="modbagian"][value=' + js.content.bagian + ']';
 			
 			$('input[name="entri"]').val(js.content.link);
-			$('input[name="namapasien"]').val(js.content.namapts);
+			$('input[name="namapasien"]').val(js.content.nama);
 			$('input[name="diagnosis"]').val(js.content.diag);
+			$('input[name="urutan"]').val(indexrow)
 			
 			if (js.content.bagian == ""){
  		    	$(ats).prop('checked', true);
@@ -161,19 +164,32 @@ $(document).ready(function(){
 
 				};
 			});
+		});
+
+
+		$("body").on("click", "#confirmedit", function(e){
+			e.preventDefault();
+			console.log("Nama pasien adalah: " + $('input[name="namapasien"]').val());
+			$(this).modal('hide');
 		})
-	});
+	
 
-	$("#modedit").on("click", "#confirmedit", function(){
 
+
+});
+
+$("body").on("click", "#confirmedit", function(e){
+		e.preventDefault();
 		var link = $("#modentri").val();
-		var namapts = $("#modnamapts").val();
-		var diag = $("#moddiag").val();
+		var namapts = $('input[name="namapasien"]').val();
+		var diag = $('input[name="diagnosis"]').val();
 		var ats = $("input[name='modats']:checked").val();
 		var bagian = $("input[name='modbagian']:checked").val();
 		var iki = $("input[name='modiki']:checked").val();
 		var shift = $("input[name='modshift']:checked").val();
-		
+		var urutan = "tbody tr:eq(" + $('input[name="urutan"]').val() + ")";
+
+
 		switch (true) {
 			case namapts === "":
 			$("#alertmodal").html("<div class=\"alert alert-danger alert-dismissable\"\>" +
@@ -232,15 +248,14 @@ $(document).ready(function(){
 			function(data){
 				var js = JSON.parse(data)
 				if (js.token != "OK"){
+					console.log(js.script);
 					alert(js.script);
 				}else{
-  				    $(this).parent("tr")(js.script);
-					  alert("Data berhasil diubah");
-					//   $("#nocm").val('');
-					//   $("#datapasien").html('');
+					console.log(urutan);
+  				    $(urutan).replaceWith(js.script);
+					$(".modal").modal("hide");
+					$(".modal").remove();
 				}
-
-
 			});
 			}else{
 			$("#alertmsg").html("<div class=\"alert alert-danger alert-dismissable\"\>" +
@@ -249,9 +264,6 @@ $(document).ready(function(){
 		                        "</div>");
 			}
 		}
-		
-
-
 	});
 
 })

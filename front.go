@@ -28,14 +28,17 @@ type NavBar struct {
 	Pasien []Pasien `json:"pasien"`
 }
 type Pasien struct {
-	TglKunjungan string `json:"tgl"`
-	ShiftJaga    string `json:"shift"`
-	NoCM         string `json:"nocm"`
-	NamaPasien   string `json:"nama"`
-	Diagnosis    string `json:"diag"`
-	IKI1         string `json:"iki1"`
-	IKI2         string `json:"iki2"`
-	LinkID       string `json:"link"`
+	StatusServer string    `json:"stat"`
+	TglKunjungan string    `json:"tgl"`
+	ShiftJaga    string    `json:"shift"`
+	ATS          string    `json:"ats"`
+	Bagian       string    `json:"bagian"`
+	NoCM         string    `json:"nocm"`
+	NamaPasien   string    `json:"nama"`
+	Diagnosis    string    `json:"diag"`
+	IKI          string    `json:"iki"`
+	LinkID       string    `json:"link"`
+	TglAsli      time.Time `json:"tglasli"`
 }
 
 type KunjunganPasien struct {
@@ -64,21 +67,9 @@ type InputPts struct {
 	*KunjunganPasien `json:"kunjungan"`
 }
 
-type UbahPasien struct {
-	NoCM       string    `json:"nocm"`
-	NamaPasien string    `json:"namapts"`
-	Diagnosis  string    `json:"diag"`
-	ATS        string    `json:"ats"`
-	Shift      string    `json:"shift"`
-	Bagian     string    `json:"bagian"`
-	IKI        string    `json:"iki"`
-	LinkID     string    `json:"link"`
-	TglAsli    time.Time `json:"tgl"`
-}
-
 type ModalTemplate struct {
-	Script  string      `json:"script"`
-	Content *UbahPasien `json:"content"`
+	Script  string  `json:"script"`
+	Content *Pasien `json:"content"`
 }
 
 func main() {
@@ -111,24 +102,21 @@ func index(w http.ResponseWriter, r *http.Request) {
 		log.Fatalf("Failed to Execute template: %v", err)
 	}
 }
-func ConvertToUbah(r *http.Request) *UbahPasien{
-	n := &UbahPasien{
-		{
-			NamaPasien: r.FormValue("namapts"),
-			Diagnosis: r.FormValue("diag"),
-			ATS: r.FormValue("ats"),
-			IKI: r.FormValue("iki"),
-			Bagian: r.FormValue("bagian"),
-			LinkID: r.FormValue("link"),
-			Shift: r.FormValue("shift")
-
-		}
+func ConvertToUbah(r *http.Request) *Pasien {
+	n := &Pasien{
+		NamaPasien: r.FormValue("namapts"),
+		Diagnosis:  r.FormValue("diag"),
+		ATS:        r.FormValue("ats"),
+		IKI:        r.FormValue("iki"),
+		Bagian:     r.FormValue("bagian"),
+		LinkID:     r.FormValue("link"),
+		ShiftJaga:  r.FormValue("shift"),
 	}
 
 	return n
 }
 
-func confEditEntri(w http.ResponseWriter, r *http.Request){
+func confEditEntri(w http.ResponseWriter, r *http.Request) {
 	if r.Method != "POST" {
 		http.Error(w, "Post request only", http.StatusMethodNotAllowed)
 	}
@@ -137,27 +125,19 @@ func confEditEntri(w http.ResponseWriter, r *http.Request){
 	ubah := ConvertToUbah(r)
 	resp, err := sendPost(ubah, r.FormValue("token"), url)
 	if err != nil {
-		responseTemplate(w, "kesalahan-server", "")
+		responseTemplate(w, "kesalahan-server", "", "")
+		return
 	}
-	res := &UbahPasien
+	res := &Pasien{}
 	json.NewDecoder(resp.Body).Decode(res)
 
-	if res.NoCM !== "OK"{
-		responseTemplate(w, res.NoCM,"")
+	if res.StatusServer != "OK" {
+		responseTemplate(w, res.StatusServer, "", GenModal(res.NoCM))
+		return
 	}
-
-	b := new(bytes.Buffer)
-	tmp := template.Must(template.New("baristabel.html").ParseFiles("templates/baristabel.html"))
-	err = tmp.Execute(b, ubah)
-	if err != nil {
-		responseTemplate(w, "kesalahan-template", "")
-	}
-
-	mod := &Response{
-		Token: "OK"
-		Script:  b.String(),
-	}
-	json.NewEncoder(w).Encode(mod)
+	fmt.Print(GenTemplate(res, "baristabel"))
+	fmt.Print(res)
+	responseTemplate(w, "OK", GenTemplate(res, "baristabel"), GenModal("Data berhasil diubah"))
 }
 
 func editEntri(w http.ResponseWriter, r *http.Request) {
@@ -173,23 +153,23 @@ func editEntri(w http.ResponseWriter, r *http.Request) {
 
 	resp, err := sendPost(pts, r.FormValue("token"), url)
 	if err != nil {
-		responseTemplate(w, "kesalahan-server", "")
+		responseTemplate(w, "kesalahan-server", "", "")
 	}
-	kun := &UbahPasien{}
+	kun := &Pasien{}
 	json.NewDecoder(resp.Body).Decode(kun)
 
 	b := new(bytes.Buffer)
 	tmp := template.Must(template.New("modedit.html").ParseFiles("templates/modedit.html"))
 	err = tmp.Execute(b, nil)
 	if err != nil {
-		responseTemplate(w, "kesalahan-template", "")
+		responseTemplate(w, "kesalahan-template", "", "")
 	}
 
 	mod := &ModalTemplate{
 		Script:  b.String(),
 		Content: kun,
 	}
-	fmt.Print(mod.Content)
+	// fmt.Print(mod.Content)
 	json.NewEncoder(w).Encode(mod)
 
 }
@@ -225,22 +205,22 @@ func inputData(w http.ResponseWriter, r *http.Request) {
 
 	resp, err := sendPost(input, r.FormValue("token"), url)
 	if err != nil {
-		responseTemplate(w, "kesalahan-server", "")
+		responseTemplate(w, "kesalahan-server", "", "")
 	}
 
 	pts := &Pasien{}
 
 	json.NewDecoder(resp.Body).Decode(pts)
 	if pts.NoCM == "kesalahan-database" {
-		responseTemplate(w, "kesalahan-database", "")
+		responseTemplate(w, "kesalahan-database", "", "")
 	}
 	b := new(bytes.Buffer)
 	tmp := template.Must(template.New("baristabel.html").ParseFiles("templates/baristabel.html"))
 	err = tmp.Execute(b, pts)
 	if err != nil {
-		responseTemplate(w, "kesalahan-template", "")
+		responseTemplate(w, "kesalahan-template", "", "")
 	}
-	responseTemplate(w, "OK", b.String())
+	responseTemplate(w, "OK", b.String(), "")
 
 }
 
@@ -271,7 +251,7 @@ func getCM(w http.ResponseWriter, r *http.Request) {
 	resp, err := sendPost(pts, token, url)
 	if err != nil {
 		// fmt.Print(err)
-		responseTemplate(w, "kesalahan-server", "")
+		responseTemplate(w, "kesalahan-server", "", "")
 	}
 
 	json.NewDecoder(resp.Body).Decode(pts)
@@ -279,9 +259,9 @@ func getCM(w http.ResponseWriter, r *http.Request) {
 	tmp := template.Must(template.New("inputpts.html").ParseFiles("templates/inputpts.html"))
 	err = tmp.Execute(b, pts)
 	if err != nil {
-		responseTemplate(w, "kesalahan-template", "")
+		responseTemplate(w, "kesalahan-template", "", "")
 	}
-	responseTemplate(w, "OK", b.String())
+	responseTemplate(w, "OK", b.String(), "")
 
 }
 
@@ -300,10 +280,11 @@ func sendPost(n interface{}, token, url string) (*http.Response, error) {
 	return resp, nil
 }
 
-func responseTemplate(w http.ResponseWriter, token, script string) {
+func responseTemplate(w http.ResponseWriter, token, script, modal string) {
 	res := &Response{
 		Token:  token,
 		Script: script,
+		Modal:  modal,
 	}
 	enc := json.NewEncoder(w)
 	enc.SetEscapeHTML(false)
@@ -314,6 +295,33 @@ func responseTemplate(w http.ResponseWriter, token, script string) {
 	}
 }
 
+func GenModal(msg string) string {
+	b := new(bytes.Buffer)
+	modal := map[string]string{
+		"msg": msg,
+	}
+
+	tmp := template.Must(template.New("modalwarning.html").ParseFiles("templates/modalwarning.html"))
+	err := tmp.Execute(b, modal)
+	if err != nil {
+		fmt.Print(err)
+		return ""
+	}
+
+	return b.String()
+}
+
+func GenTemplate(n interface{}, temp string) string {
+	b := new(bytes.Buffer)
+	tmp := template.Must(template.New(temp + ".html").ParseFiles("templates/" + temp + ".html"))
+	err := tmp.Execute(b, n)
+	if err != nil {
+		fmt.Print(err)
+		return ""
+	}
+
+	return b.String()
+}
 func mainContent(w http.ResponseWriter, r *http.Request) {
 	if r.Method != "GET" {
 		fmt.Fprintln(w, "Akses ditolak")
@@ -337,7 +345,7 @@ func mainContent(w http.ResponseWriter, r *http.Request) {
 		fmt.Print(err)
 	}
 
-	responseTemplate(w, web.Token, b.String())
+	responseTemplate(w, web.Token, b.String(), "")
 
 	// res := &Response{
 	// 	Token:  web.Token,

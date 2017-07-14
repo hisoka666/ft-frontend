@@ -23,10 +23,10 @@
 			      {{if $n.NoCM}}
 				     <tr>
                         <td>{{$n.TglKunjungan}}</td>
-                        <td><a href="/getdetail/{{$n.NoCM}}">{{$n.NoCM}}</a></td>
+                        <td>{{$n.NoCM}}</td>
                         <td class="text-capitalize">{{$n.NamaPasien}}</td>
                         <td class="text-capitalize">{{$n.Diagnosis}}</td>
-                           {{if .IKI1}}
+                           {{if .IKI}}
 			                  <td class="text-center checkmark">&#x2714;</td>
                               <td class="text-center checkmark"></td>
 			               {{else}}
@@ -41,7 +41,7 @@
                         </button>
                         <ul class="dropdown-menu">
                           <li id="link" hidden>{{$n.LinkID}}</li>
-                          <li><a id="editbut" data-toggle="modal" href="#edit">Edit</a></li>
+                          <li><a id="editbut" >Edit</a></li>
                           <li><a id="delbut" data-toggle="modal" href="#modhapus">Hapus</a></li>
                           <li><a id="tglbut" data-toggle="modal" href="#modtgl">Ubah Tanggal</a></li>
                           <li class="divider"></li>
