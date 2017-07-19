@@ -89,7 +89,6 @@ $(document).ready(function(){
 			// alert("Bagian harus diisi");
 			break;
 			default:
-			// if (namapts !== "" && diag !== "" && ats !== undefined && iki !== undefined && shift !== undefined && bagian !== undefined) {
 			$.post("inputdata",{
 				token: localStorage.getItem("token"),
 				nocm: nocm,
@@ -217,7 +216,6 @@ $("body").on("click", "#confirmedit", function(e){
 					$(urutan).replaceWith(js.script);
 					console.log("Editing jalan")
 					refreshNumber();
-					// removeModal("#mymodal");
 					$("#mymodal").modal('hide');
 					popModalWarning("Edit Entri", "Berhasil mengubah entri", "");
 					
@@ -254,7 +252,6 @@ $("#navbar").on("click", "#delbut", function(e){
 		var indexrow = $(this).closest("tr").index();
 		var urutan = "tbody tr:eq(" + indexrow + ")";
 		var token = localStorage.getItem("token");
-		// console.log("Index adalah: " + indexrow);
 		popModalWarning("Hapus Entri", "Yakin ingin menghapus entri ini?", "Hapus");
 		$("body").one("click", "#extrabut", function(){
 			
@@ -304,15 +301,3 @@ $("#navbar").on("click", "#homebutton", function(e){
 
 });
 
-// jQuery.fn.simulateClick = function() {
-//     return this.each(function() {
-//         if('createEvent' in document) {
-//             var doc = this.ownerDocument,
-//                 evt = doc.createEvent('MouseEvents');
-//             evt.initMouseEvent('click', true, true, doc.defaultView, 1, 0, 0, 0, 0, false, false, false, false, 0, null);
-//             this.dispatchEvent(evt);
-//         } else {
-//             this.click(); // IE Boss!
-//         }
-//     });
-// }
