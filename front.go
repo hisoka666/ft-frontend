@@ -88,6 +88,9 @@ func main() {
 	http.HandleFunc("/inputdata", inputData)
 	http.HandleFunc("/editentri", editEntri)
 	http.HandleFunc("/confedit", confEditEntri)
+	http.HandleFunc("/delentri", deleteEntri)
+	http.HandleFunc("/confdel", confDelete)
+	http.HandleFunc("/firstentries", firstEntries)
 	http.ListenAndServe(":9090", nil)
 	log.Println("Listening...")
 }
@@ -116,6 +119,58 @@ func ConvertToUbah(r *http.Request) *Pasien {
 	return n
 }
 
+////////////////////////////////////////////////////////////////////////////////////
+func firstEntries(w http.ResponseWriter, r *http.Request) {
+	if r.Method != "POST" {
+		http.Error(w, "Post request only", http.StatusMethodNotAllowed)
+	}
+
+	url := "http://2.igdsanglah.appspot.com/entri/firstitems"
+
+	send := &MainView{
+		User: r.FormValue("email"),
+	}
+
+	resp, err := sendPost(send, r.FormValue("token"), url)
+
+	if err != nil {
+		responseTemplate(w, "kesalahan-client", "", "")
+		return
+	}
+
+	json.NewDecoder(resp.Body).Decode(send)
+	responseTemplate(w, "OK", GenTemplate(send.Pasien, "contentrefresh"), "")
+
+}
+
+/////////////////////////////////////////////////////////////////////////////////////
+func confDelete(w http.ResponseWriter, r *http.Request) {
+	if r.Method != "POST" {
+		http.Error(w, "Post request only", http.StatusMethodNotAllowed)
+	}
+
+	url := "http://2.igdsanglah.appspot.com/entri/delentri"
+	del := &Pasien{
+		LinkID: r.FormValue("link"),
+	}
+
+	resp, err := sendPost(del, r.FormValue("token"), url)
+
+	if err != nil {
+		responseTemplate(w, "kesalahan-client", "", "")
+		return
+	}
+
+	json.NewDecoder(resp.Body).Decode(del)
+
+	if del.StatusServer != "OK" {
+		responseTemplate(w, "kesalahan-server", "", "")
+		return
+	}
+
+	responseTemplate(w, "OK", "", "")
+}
+
 func confEditEntri(w http.ResponseWriter, r *http.Request) {
 	if r.Method != "POST" {
 		http.Error(w, "Post request only", http.StatusMethodNotAllowed)
@@ -132,14 +187,22 @@ func confEditEntri(w http.ResponseWriter, r *http.Request) {
 	json.NewDecoder(resp.Body).Decode(res)
 
 	if res.StatusServer != "OK" {
-		responseTemplate(w, res.StatusServer, "", GenModal(res.NoCM))
+		responseTemplate(w, res.StatusServer, "", GenModal("Peringatan", res.NoCM, ""))
 		return
 	}
 	fmt.Print(GenTemplate(res, "baristabel"))
 	fmt.Print(res)
-	responseTemplate(w, "OK", GenTemplate(res, "baristabel"), GenModal("Data berhasil diubah"))
+	responseTemplate(w, "OK", GenTemplate(res, "baristabel"), GenModal("Sukses", "Data berhasil diubah", ""))
 }
 
+func deleteEntri(w http.ResponseWriter, r *http.Request) {
+	if r.Method != "POST" {
+		http.Error(w, "Post request only", http.StatusMethodNotAllowed)
+	}
+	fmt.Print(GenModal("Hapus Entri", "Yakin ingin menghapus entri ini?", "Hapus"))
+	responseTemplate(w, "OK", "", GenModal("Hapus Entri", "Yakin ingin menghapus entri ini?", "Hapus"))
+
+}
 func editEntri(w http.ResponseWriter, r *http.Request) {
 	if r.Method != "POST" {
 		http.Error(w, "Post request only", http.StatusMethodNotAllowed)
@@ -163,6 +226,7 @@ func editEntri(w http.ResponseWriter, r *http.Request) {
 	err = tmp.Execute(b, nil)
 	if err != nil {
 		responseTemplate(w, "kesalahan-template", "", "")
+		fmt.Print(err)
 	}
 
 	mod := &ModalTemplate{
@@ -295,13 +359,15 @@ func responseTemplate(w http.ResponseWriter, token, script, modal string) {
 	}
 }
 
-func GenModal(msg string) string {
+func GenModal(title, msg, butname string) string {
 	b := new(bytes.Buffer)
 	modal := map[string]string{
-		"msg": msg,
+		"title":  title,
+		"msg":    msg,
+		"button": butname,
 	}
 
-	tmp := template.Must(template.New("modalwarning.html").ParseFiles("templates/modalwarning.html"))
+	tmp := template.Must(template.New("modalpopup.html").ParseFiles("templates/modalpopup.html"))
 	err := tmp.Execute(b, modal)
 	if err != nil {
 		fmt.Print(err)
@@ -311,10 +377,35 @@ func GenModal(msg string) string {
 	return b.String()
 }
 
-func GenTemplate(n interface{}, temp string) string {
+func GenTemplate(n interface{}, temp ...string) string {
 	b := new(bytes.Buffer)
-	tmp := template.Must(template.New(temp + ".html").ParseFiles("templates/" + temp + ".html"))
-	err := tmp.Execute(b, n)
+	funcs := template.FuncMap{"inc": func(i int) int {
+		return i + 1
+	},
+	}
+
+	tmpl := template.New("")
+
+	for k, v := range temp {
+		if k == 0 {
+			tmp := template.Must(template.New(v + ".html").Funcs(funcs).ParseFiles("templates/" + v + ".html"))
+			tmpl = tmp
+
+		}
+	}
+
+	for k, v := range temp {
+		if k != 0 {
+			temp, err := template.Must(tmpl.Clone()).ParseFiles("templates/" + v + ".html")
+			if err != nil {
+				fmt.Print(err)
+				break
+			}
+			tmpl = temp
+		}
+	}
+	// template.Must(template.New(temp + ".html").Funcs(funcs).ParseFiles("templates/" + temp + ".html"))
+	err := tmpl.Execute(b, n)
 	if err != nil {
 		fmt.Print(err)
 		return ""
@@ -338,14 +429,14 @@ func mainContent(w http.ResponseWriter, r *http.Request) {
 
 	json.NewDecoder(resp.Body).Decode(&web)
 
-	var b bytes.Buffer
-	tmp := template.Must(template.New("main.html").ParseFiles("templates/main.html", "templates/input.html", "templates/content.html"))
-	err = tmp.Execute(&b, web)
-	if err != nil {
-		fmt.Print(err)
-	}
+	// var b bytes.Buffer
+	// tmp := template.Must(template.New("main.html").ParseFiles("templates/main.html", "templates/input.html", "templates/content.html"))
+	// err = tmp.Execute(&b, web)
+	// if err != nil {
+	// 	fmt.Print(err)
+	// }
 
-	responseTemplate(w, web.Token, b.String(), "")
+	responseTemplate(w, web.Token, GenTemplate(web, "main", "input", "content"), "")
 
 	// res := &Response{
 	// 	Token:  web.Token,

@@ -35,7 +35,7 @@ $(document).ready(function(){
 
 	});
 	
-	$("#navbar").on("click", "#btnsub", function(event){
+	$("#navbar").on("click", "#btnsub", function(event){		
 		event.preventDefault();
 		
 		var nocm = $("#nocm").val();
@@ -89,7 +89,7 @@ $(document).ready(function(){
 			// alert("Bagian harus diisi");
 			break;
 			default:
-			if (namapts !== "" && diag !== "" && ats !== undefined && iki !== undefined && shift !== undefined && bagian !== undefined) {
+			// if (namapts !== "" && diag !== "" && ats !== undefined && iki !== undefined && shift !== undefined && bagian !== undefined) {
 			$.post("inputdata",{
 				token: localStorage.getItem("token"),
 				nocm: nocm,
@@ -107,79 +107,70 @@ $(document).ready(function(){
 				if (js.token != "OK"){
 					alert(js.script);
 				}else{
-  				    $("tbody").prepend(js.script);
-					  alert("Data berhasil diinput");
-					  $("#nocm").val('');
-					  $("#datapasien").html('');
+					$("tbody").prepend(js.script);
+					refreshNumber();
+					$("#nocm").val('');
+					$("#datapasien").html('');
+					$("tbody tr:eq(101)").remove();
+					popModalWarning("Sukses", "Berhasil menambahkan data", "")
+					
 				}
-
-
 			});
-			}else{
-			$("#alertmsg").html("<div class=\"alert alert-danger alert-dismissable\"\>" +
-		                            "<a href=\"#\" class=\"close\" data-dismiss=\"alert\" aria-label=\"close\">&times;</a\>" +
-									"Ada kolom belum diisi" +
-		                        "</div>");
-			}
 		}
-		// alert("Form belum lengkap!")		
 	});
 
 	$("#navbar").on("click", "#editbut", function(event){
 		event.preventDefault();
-		token = localStorage.getItem("token")
 		var link = $(this).offsetParent().children().first().html();
-		var indexrow = $(this).closest("tr").index()
-		console.log("baris ini berada di : " + indexrow)
-		// var baris = $(this).parent("ul").index();
-		// console.log("Ini baris ke: " + baris);
-		$.post("editentri",{
-			token: token,
-			link: link
-		},
-		function(data){
-			var js = JSON.parse(data)
-			$(js.script).modal("show");
-			$("body").on('shown.bs.modal', function(){
-			var ats = 'input[name="modats"][value=' + js.content.ats + ']';
-			var iki = 'input[name="modiki"][value=' + js.content.iki + ']';
-			var shift = 'input[name="modshift"][value=' + js.content.shift + ']';
-			var bagian = 'input[name="modbagian"][value=' + js.content.bagian + ']';
+		var indexrow = $(this).closest("tr").index();
+		token = localStorage.getItem("token");
+			console.log("before show mymodal works");
+
+			$.post("editentri",{
+				token: token,
+				link: link
+			},
+			function(data){
+				var js = JSON.parse(data);
+				$("#mymodal").html(js.script);
+				var ats = 'input[name="modats"][value=' + js.content.ats + ']';
+				var iki = 'input[name="modiki"][value=' + js.content.iki + ']';
+				var shift = 'input[name="modshift"][value=' + js.content.shift + ']';
+				var bagian = 'input[name="modbagian"][value=' + js.content.bagian + ']';
 			
-			$('input[name="entri"]').val(js.content.link);
-			$('input[name="namapasien"]').val(js.content.nama);
-			$('input[name="diagnosis"]').val(js.content.diag);
-			$('input[name="urutan"]').val(indexrow)
+				$('input[name="entri"]').val(js.content.link);
+				$('input[name="namapasien"]').val(js.content.nama);
+				$('input[name="diagnosis"]').val(js.content.diag);
+				$('input[name="urutan"]').val(indexrow)
 			
-			if (js.content.bagian == ""){
- 		    	$(ats).prop('checked', true);
-   				$(iki).prop('checked', true);
-   				$(shift).prop('checked', true);	
+				if (js.content.bagian == ""){
+ 		    		$(ats).prop('checked', true);
+   					$(iki).prop('checked', true);
+   					$(shift).prop('checked', true);	
 			
-			}else{
- 		    	$(ats).prop('checked', true);
-   				$(iki).prop('checked', true);
-   				$(shift).prop('checked', true);
-   				$(bagian).prop('checked', true);
+				}else{
+ 		    		$(ats).prop('checked', true);
+   					$(iki).prop('checked', true);
+   					$(shift).prop('checked', true);
+   					$(bagian).prop('checked', true);
 
 				};
+				$("#mymodal").modal();
 			});
-		});
+	});
 
-
-		$("body").on("click", "#confirmedit", function(e){
-			e.preventDefault();
-			console.log("Nama pasien adalah: " + $('input[name="namapasien"]').val());
-			$(this).modal('hide');
-		})
-	
-
-
-
-});
+$('body').on('hide.bs.modal', "#mymodal" , function(){
+	console.log("Removal mymodal works");
+	$(this).removeData('bs.modal').find(".modal-content").empty();
+	});
+$('body').on('hide.bs.modal', "#modwarning" , function(){
+	console.log("removal modwarning works");
+	$(this).removeData('bs.modal');
+	});
 
 $("body").on("click", "#confirmedit", function(e){
 		e.preventDefault();
+		
 		var link = $("#modentri").val();
 		var namapts = $('input[name="namapasien"]').val();
 		var diag = $('input[name="diagnosis"]').val();
@@ -187,53 +178,26 @@ $("body").on("click", "#confirmedit", function(e){
 		var bagian = $("input[name='modbagian']:checked").val();
 		var iki = $("input[name='modiki']:checked").val();
 		var shift = $("input[name='modshift']:checked").val();
+		var indexrow = $('input[name="urutan"]').val();
 		var urutan = "tbody tr:eq(" + $('input[name="urutan"]').val() + ")";
 
-
+		
 		switch (true) {
 			case namapts === "":
-			$("#alertmodal").html("<div class=\"alert alert-danger alert-dismissable\"\>" +
-		                            "<a href=\"#\" class=\"close\" data-dismiss=\"alert\" aria-label=\"close\">&times;</a\>" +
-									"Nama pasien belum diisi" +
-		                        "</div>");
+			popModalWarning();
 			break;
 			case diag === "":
-			$("#alertmodal").html("<div class=\"alert alert-danger alert-dismissable\"\>" +
-		                            "<a href=\"#\" class=\"close\" data-dismiss=\"alert\" aria-label=\"close\">&times;</a\>" +
-									"Diagnosis belum diisi" +
-		                        "</div>");
-			// alert("Diagnosis harus diisi");
+			popModalWarning();
 			break;
 			case ats == null :
-			$("#alertmodal").html("<div class=\"alert alert-danger alert-dismissable\"\>" +
-		                            "<a href=\"#\" class=\"close\" data-dismiss=\"alert\" aria-label=\"close\">&times;</a\>" +
-									"ATS belum diisi" +
-		                        "</div>");
-			// alert("ATS harus diisi");
 			break;
 			case iki == null :
-			$("#alertmodal").html("<div class=\"alert alert-danger alert-dismissable\"\>" +
-		                            "<a href=\"#\" class=\"close\" data-dismiss=\"alert\" aria-label=\"close\">&times;</a\>" +
-									"Golongan IKI belum diisi" +
-		                        "</div>");
-			// alert("Golongan IKI harus diisi");
 			break;
 			case shift == null :
-			$("#alertmodal").html("<div class=\"alert alert-danger alert-dismissable\"\>" +
-		                            "<a href=\"#\" class=\"close\" data-dismiss=\"alert\" aria-label=\"close\">&times;</a\>" +
-									"Shift belum diisi" +
-		                        "</div>");
-			// alert("Shift harus diisi");
 			break;
 			case bagian == null:
-			$("#alertmodal").html("<div class=\"alert alert-danger alert-dismissable\"\>" +
-		                            "<a href=\"#\" class=\"close\" data-dismiss=\"alert\" aria-label=\"close\">&times;</a\>" +
-									"Bagian belum diisi" +
-		                        "</div>");
-			// alert("Bagian harus diisi");
 			break;
 			default:
-			if (namapts !== "" && diag !== "" && ats !== undefined && iki !== undefined && shift !== undefined && bagian !== undefined) {
 			$.post("confedit",{
 				token: localStorage.getItem("token"),
 				nocm: nocm,
@@ -248,22 +212,107 @@ $("body").on("click", "#confirmedit", function(e){
 			function(data){
 				var js = JSON.parse(data)
 				if (js.token != "OK"){
-					console.log(js.script);
-					alert(js.script);
+					popModalWarning("Kesalahan Pada Server", "Telah terjadi kesalahan pada server. Mohon ulangi proses sebelumnya");
 				}else{
-					console.log(urutan);
-  				    $(urutan).replaceWith(js.script);
-					$(".modal").modal("hide");
-					$(".modal").remove();
+					$(urutan).replaceWith(js.script);
+					console.log("Editing jalan")
+					refreshNumber();
+					// removeModal("#mymodal");
+					$("#mymodal").modal('hide');
+					popModalWarning("Edit Entri", "Berhasil mengubah entri", "");
+					
 				}
 			});
-			}else{
-			$("#alertmsg").html("<div class=\"alert alert-danger alert-dismissable\"\>" +
-		                            "<a href=\"#\" class=\"close\" data-dismiss=\"alert\" aria-label=\"close\">&times;</a\>" +
-									"Ada kolom belum diisi" +
-		                        "</div>");
-			}
 		}
+
 	});
 
-})
+var refreshNumber = function(){
+	
+$("tr").find(".nourut").each(function(index, elem){
+		num = index + 1;
+		$(elem).html(num)
+	})
+}
+
+var popModalWarning = function(title, msg, prop){
+		$(".modal-title").html(title);
+		$("#message").html(msg);
+		if (prop == ""){
+			$("#extrabut").hide();
+			$("#modwarning").modal();
+		} else {
+			$("#extrabut").html(prop);
+			$("#extrabut").show();
+			$("#modwarning").modal();
+		}			
+};
+
+$("#navbar").on("click", "#delbut", function(e){
+		e.preventDefault();
+		var link = $(this).offsetParent().children().first().html();
+		var indexrow = $(this).closest("tr").index();
+		var urutan = "tbody tr:eq(" + indexrow + ")";
+		var token = localStorage.getItem("token");
+		// console.log("Index adalah: " + indexrow);
+		popModalWarning("Hapus Entri", "Yakin ingin menghapus entri ini?", "Hapus");
+		$("body").one("click", "#extrabut", function(){
+			
+			$.post("confdel", {
+				link: link,
+				token: token
+			}, function(data){
+				var js = JSON.parse(data);
+				if (js.token == "OK"){
+					$(urutan).remove();
+					console.log("Removed : "+ urutan);
+					refreshNumber();
+					$("#modwarning").modal('hide');
+				}else{
+					alert("Terjadi kesalahan");
+				}
+			});
+		});
+	});
+
+
+
+
+
+
+$("#navbar").on("click", "#homebutton", function(e){
+		token = localStorage.getItem("token");
+		email = $("#email").val();
+		e.preventDefault();
+		$.post("/firstentries", {
+			token: token,
+			email: email
+		},function(data){
+			var js = JSON.parse(data);
+			// console.log(js.script);
+			if (js.token == "OK") {
+				$("#tabelutama").html(js.script);
+				// removeModal("#modwarning")
+			}else{
+				popModalWarning("Peringatan", "Terjadi kesalahan pada server. Hubungi admin");
+			}
+			
+
+		})
+
+	});
+
+});
+
+// jQuery.fn.simulateClick = function() {
+//     return this.each(function() {
+//         if('createEvent' in document) {
+//             var doc = this.ownerDocument,
+//                 evt = doc.createEvent('MouseEvents');
+//             evt.initMouseEvent('click', true, true, doc.defaultView, 1, 0, 0, 0, 0, false, false, false, false, 0, null);
+//             this.dispatchEvent(evt);
+//         } else {
+//             this.click(); // IE Boss!
+//         }
+//     });
+// }

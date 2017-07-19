@@ -1,12 +1,13 @@
 <html lang="en">
   <head>
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    
     <meta name="google-signin-scope" content="profile email">
     <meta name="google-signin-client_id" content="10718751586-vfcuu6r4jcn6ge5l6dh28jmr4p7fesa0.apps.googleusercontent.com">
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>  
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
     <script src="https://apis.google.com/js/platform.js"></script>
     <script src="script/googlescript.js"></script>
     <script src="script/main.js"></script>
@@ -24,5 +25,31 @@
     <input type="hidden" id="email">
     <a id="signoutbut" class="btn btn-danger" href="#" onclick="signOut();">Sign out</a>
     <div id="navbar"></div>
+
+    <div id="mymodal" class="modal fade" tabindex="-1" role="dialog"></div>
+
+    <div id="modwarning" class="modal fade" tabindex="-1" role="dialog">
+
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">&times;</button>
+                <h4 class="modal-title"></h4>
+            </div>
+
+
+            <div class="modal-body">
+                <div id="message"></div>
+            </div>
+
+
+            <div class="modal-footer">
+                <button type="button" id="modalbutton" class="btn btn-default" data-dismiss="modal">Tutup</button>
+                <button type="button" id="extrabut" class="btn btn-default"></button>
+                <!-- <span id="extrabut"></span> -->
+            </div>
+        </div>
+    </div>
+</div>
   </body>
 </html>
