@@ -91,16 +91,13 @@ func main() {
 	http.HandleFunc("/delentri", deleteEntri)
 	http.HandleFunc("/confdel", confDelete)
 	http.HandleFunc("/firstentries", firstEntries)
-	http.ListenAndServe(":9090", nil)
+	http.ListenAndServe(":8001", nil)
 	log.Println("Listening...")
 }
 
 func index(w http.ResponseWriter, r *http.Request) {
-	tmpl, err := template.New("index.html").ParseFiles("index.html")
-	if err != nil {
-		log.Fatalf("Failed to ParseFile: %v", err)
-	}
-	err = tmpl.Execute(w, nil)
+	tmpl := template.Must(template.New("index.html").ParseFiles("templates/index.html"))
+	err := tmpl.Execute(w, nil)
 	if err != nil {
 		log.Fatalf("Failed to Execute template: %v", err)
 	}
