@@ -91,6 +91,7 @@ func main() {
 	http.HandleFunc("/delentri", deleteEntri)
 	http.HandleFunc("/confdel", confDelete)
 	http.HandleFunc("/firstentries", firstEntries)
+	http.HandleFunc("/edittgl", editTanggal)
 	http.ListenAndServe(":8001", nil)
 	log.Println("Listening...")
 }
@@ -117,6 +118,34 @@ func ConvertToUbah(r *http.Request) *Pasien {
 }
 
 ////////////////////////////////////////////////////////////////////////////////////
+func editTanggal(w http.ResponseWriter, r *http.Request) {
+	if r.Method != "POST" {
+		http.Error(w, "Post request only", http.StatusMethodNotAllowed)
+	}
+
+	url := "http://2.igdsanglah.appspot.com/entri/ubahtanggal"
+
+	pts := &Pasien{
+		LinkID: r.FormValue("link"),
+	}
+
+	resp, err := sendPost(pts, r.FormValue("token"), url)
+	if err != nil {
+		responseTemplate(w, "not-OK", "", GenModal("Kesalahan Server", "Terjadi kesalahan server. Hubungi admin", ""))
+		log.Print("Terjadi kesalahan server")
+		return
+	}
+
+	json.NewDecoder(resp.Body).Decode(pts)
+	pts.TglKunjungan = pts.TglAsli.Format("Mon 02/01/2006 15:04:05")
+
+	script := GenTemplate(pts, "modubahtgl")
+	log.Println(pts)
+	responseTemplate(w, "OK", script, "")
+
+}
+
+////////////////////////////////////////////////////////////////////////////////////
 func firstEntries(w http.ResponseWriter, r *http.Request) {
 	if r.Method != "POST" {
 		http.Error(w, "Post request only", http.StatusMethodNotAllowed)
@@ -140,7 +169,6 @@ func firstEntries(w http.ResponseWriter, r *http.Request) {
 
 }
 
-/////////////////////////////////////////////////////////////////////////////////////
 func confDelete(w http.ResponseWriter, r *http.Request) {
 	if r.Method != "POST" {
 		http.Error(w, "Post request only", http.StatusMethodNotAllowed)

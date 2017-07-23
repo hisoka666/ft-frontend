@@ -299,5 +299,24 @@ $("#navbar").on("click", "#homebutton", function(e){
 
 	});
 
+$("#navbar").on("click", "#tglbut", function(e){
+	token = localStorage.getItem("token");
+	var link = $(this).offsetParent().children().first().html();
+	e.preventDefault();
+	console.log(link);
+
+	$.post("edittgl", {
+		token: token,
+		link: link
+	}, function(data){
+		var js = JSON.parse(data)
+		$("#mymodal").html(js.script)
+		$("#mymodal").modal()
+		console.log(js.script)
+
+	})
 });
+
+});
+
 
