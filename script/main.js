@@ -123,8 +123,6 @@ $(document).ready(function(){
 		var link = $(this).offsetParent().children().first().html();
 		var indexrow = $(this).closest("tr").index();
 		token = localStorage.getItem("token");
-			console.log("before show mymodal works");
-
 			$.post("editentri",{
 				token: token,
 				link: link
@@ -309,13 +307,32 @@ $("#navbar").on("click", "#tglbut", function(e){
 		token: token,
 		link: link
 	}, function(data){
-		var js = JSON.parse(data)
-		$("#mymodal").html(js.script)
-		$("#mymodal").modal()
-		console.log(js.script)
-
+		var js = JSON.parse(data);
+		if (js.token != "OK") {
+			$("#mymodal").html(js.modal);
+		}else{
+			$("#mymodal").html(js.script);
+		}
+		$("#mymodal").modal();
 	})
 });
+
+$("body").on("click", "#ubahtglbut", function(e){
+	e.preventDefault();
+	var token = localStorage.getItem("token");
+	var tanggal = $("#inputdate").val();
+	var link = $(this).find("#linkubahtgl").html();
+	$.post("confedittgl", {
+		token: token,
+		link: link,
+		tanggal: tanggal
+	}, function(data){
+		var js = JSON.parse(data)
+
+	})
+	// console.log(jQuery.type(tanggal));
+	$("#mymodal").modal('hide');
+})
 
 });
 

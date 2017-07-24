@@ -11,19 +11,18 @@
                 <p>No.CM: {{.NoCM}}</p>
                 <p>Diagnosis: {{.Diagnosis}}</p>
                 <p>Tanggal Kunjungan: {{.TglKunjungan}}</p>
-            </div>
-            <div class="col-sm-12">
+                <div class="col-sm-12">
                 <div class="form-group">
                     <label for="">Ubah Tanggal: </label><br>
-                    <input type="date" name="tanggal" id=""><br>
-                    <input type="hidden" name="jam" id="" value={{.TglAsli}}>
+                    <input type="date" name="tanggal" id="inputdate"><br>
+                    <input type="hidden" name="jam" id="inputdateasli" value={{.TglAsli}}>
+                    <input type="hidden" name="link" id="linkubahtgl" value={{.LinkID}}>
+                </div>
                 </div>
             </div>
-
-
             <div class="modal-footer">
                 <button type="button" id="modalbutton" class="btn btn-default" data-dismiss="modal">Tutup</button>
-                <button type="button" id="ubahtglbut" class="btn btn-default" data-dismiss="modal" >Ubah</button>
+                <button type="button" id="ubahtglbut" class="btn btn-default" >Ubah</button>
             </div>
         </div>
     </div>
