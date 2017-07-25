@@ -117,8 +117,9 @@ func ConvertToUbah(r *http.Request) *Pasien {
 
 	return n
 }
+
 ////////////////////////////////////////////////////////////////////////////////////
-func confEditTanggal(w http.ResponseWriter, r *http.Request){
+func confEditTanggal(w http.ResponseWriter, r *http.Request) {
 	if r.Method != "POST" {
 		http.Error(w, "Post request only", http.StatusMethodNotAllowed)
 	}
@@ -127,21 +128,28 @@ func confEditTanggal(w http.ResponseWriter, r *http.Request){
 
 	pts := &Pasien{
 		TglKunjungan: r.FormValue("tanggal"),
-		LinkID: r.FormValue("link"),
+		LinkID:       r.FormValue("link"),
 	}
 
 	resp, err := sendPost(pts, r.FormValue("token"), url)
 	if err != nil {
 		responseTemplate(w, "not-OK", "", GenModal("Kesalahan Server", "Terjadi kesalahan server. Hubungi admin", ""))
-		log.Fatalf("Terjadi kesalahan server")
+		log.Fatalf("Terjadi kesalahan pengiriman ke server")
 	}
 
-	list := []Pasien
-	json.NewDecoder(resp.Body).Decode(list)
+	list := MainView{}
+	json.NewDecoder(resp.Body).Decode(&list)
 
+	fmt.Printf("Isi dari token adalah: %v", list.Token)
+	if list.Token != "OK" {
+		log.Fatalf("Terjadi kesalahan server")
+		responseTemplate(w, "not-OK", "", GenModal("Kesalahan Server", "Terjadi kesalahan server. Hubungi admin", ""))
+		return
+	}
+
+	responseTemplate(w, "OK", GenTemplate(list.Pasien, "contentrefresh"), "")
 
 }
-
 
 ////////////////////////////////////////////////////////////////////////////////////
 func editTanggal(w http.ResponseWriter, r *http.Request) {
@@ -150,9 +158,9 @@ func editTanggal(w http.ResponseWriter, r *http.Request) {
 	}
 
 	url := "http://2.igdsanglah.appspot.com/entri/ubahtanggal"
-
+	link := r.FormValue("link")
 	pts := &Pasien{
-		LinkID: r.FormValue("link"),
+		LinkID: link,
 	}
 
 	resp, err := sendPost(pts, r.FormValue("token"), url)
@@ -164,6 +172,7 @@ func editTanggal(w http.ResponseWriter, r *http.Request) {
 
 	json.NewDecoder(resp.Body).Decode(pts)
 	pts.TglKunjungan = pts.TglAsli.Format("Mon 02/01/2006 15:04:05")
+	pts.LinkID = link
 
 	script := GenTemplate(pts, "modubahtgl")
 	responseTemplate(w, "OK", script, "")
@@ -404,7 +413,7 @@ func responseTemplate(w http.ResponseWriter, token, script, modal string) {
 	err := enc.Encode(&res)
 
 	if err != nil {
-		fmt.Print(err)
+		log.Print(err)
 	}
 }
 

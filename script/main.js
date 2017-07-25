@@ -289,7 +289,7 @@ $("#navbar").on("click", "#homebutton", function(e){
 				$("#tabelutama").html(js.script);
 				// removeModal("#modwarning")
 			}else{
-				popModalWarning("Peringatan", "Terjadi kesalahan pada server. Hubungi admin");
+				popModalWarning("Peringatan", "Terjadi kesalahan pada server. Hubungi admin", "");
 			}
 			
 
@@ -321,17 +321,27 @@ $("body").on("click", "#ubahtglbut", function(e){
 	e.preventDefault();
 	var token = localStorage.getItem("token");
 	var tanggal = $("#inputdate").val();
-	var link = $(this).find("#linkubahtgl").html();
+	var link = $("#linkubahtgl").val();
+	console.log("link adalah : " + link);
+	// var tglasli = $(this).find("#tglasli").html();
 	$.post("confedittgl", {
 		token: token,
 		link: link,
 		tanggal: tanggal
 	}, function(data){
-		var js = JSON.parse(data)
+		var js = JSON.parse(data);
+		// console.log("Isi dari script adalah: " + data.script)
+		$("#mymodal").modal('hide');
+		if (js.token != "OK") {			
+			popModalWarning("Peringatan", "Terjadi kesalahan pada server. Hubungi admin","");
+		} else {
+			$("#tabelutama").html(js.script);
+			popModalWarning("Sukses", "Berhasil mengubah tanggal","");
+		}
 
 	})
 	// console.log(jQuery.type(tanggal));
-	$("#mymodal").modal('hide');
+	// $("#mymodal").modal('hide');
 })
 
 });
