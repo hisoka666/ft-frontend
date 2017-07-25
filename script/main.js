@@ -342,6 +342,42 @@ $("body").on("click", "#ubahtglbut", function(e){
 	})
 	// console.log(jQuery.type(tanggal));
 	// $("#mymodal").modal('hide');
+});
+
+$("#navbar").on("click", "#makeresep", function(e){
+	e.preventDefault();
+
+	$.get("getptspage")
+	.done(function(data){
+		var js = JSON.parse(data);
+		$("#mymodal").html(js.script);
+		$("#mymodal").modal();
+	});
+
+	$("body").on("click", "#rspnextbut", function(e){
+		e.preventDefault();
+		var nama = $("#namapts").val();
+		var diag = $("#diag").val();
+		var umur = $("#umur").val();
+		var almt = $("#almt").val();
+		var bb = $("#bb").val();
+		var alergi = $("#alergi").val();
+		$("#mymodal").modal();
+		$.get("getprespage")
+		.done(function(resep){
+			var jso = JSON.parse(resep);
+			$("#mymodal").html(jso.script);
+			$("#rspnamapts").html(nama);
+			$("#rspdiag").html(diag);
+			$("#rspumur").html(umur);
+			$("#rspbb").html(bb);
+			$("#rspalmt").html(almt);
+			$("#rspalergi").html(alergi);
+			$("#mymodal").modal();
+		})
+		
+		
+	})
 })
 
 });

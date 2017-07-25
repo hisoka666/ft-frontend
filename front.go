@@ -93,6 +93,8 @@ func main() {
 	http.HandleFunc("/firstentries", firstEntries)
 	http.HandleFunc("/edittgl", editTanggal)
 	http.HandleFunc("/confedittgl", confEditTanggal)
+	http.HandleFunc("/getptspage", getPtsPage)
+	http.HandleFunc("/getprespage", getPresPage)
 	http.ListenAndServe(":8001", nil)
 	log.Println("Listening...")
 }
@@ -119,6 +121,25 @@ func ConvertToUbah(r *http.Request) *Pasien {
 }
 
 ////////////////////////////////////////////////////////////////////////////////////
+func getPresPage(w http.ResponseWriter, r *http.Request) {
+	if r.Method != "GET" {
+		http.Error(w, "Get request please", http.StatusMethodNotAllowed)
+		return
+	}
+
+	responseTemplate(w, "OK", GenTemplate(nil, "modlistresep"), "")
+}
+
+////////////////////////////////////////////////////////////////////////////////////
+
+func getPtsPage(w http.ResponseWriter, r *http.Request) {
+	if r.Method != "GET" {
+		http.Error(w, "Get request please", http.StatusMethodNotAllowed)
+		return
+	}
+	responseTemplate(w, "OK", GenTemplate(nil, "modresep"), "")
+}
+
 func confEditTanggal(w http.ResponseWriter, r *http.Request) {
 	if r.Method != "POST" {
 		http.Error(w, "Post request only", http.StatusMethodNotAllowed)
@@ -151,7 +172,6 @@ func confEditTanggal(w http.ResponseWriter, r *http.Request) {
 
 }
 
-////////////////////////////////////////////////////////////////////////////////////
 func editTanggal(w http.ResponseWriter, r *http.Request) {
 	if r.Method != "POST" {
 		http.Error(w, "Post request only", http.StatusMethodNotAllowed)

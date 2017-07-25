@@ -22,6 +22,7 @@ function onSignIn(googleUser) {
   var profile = googleUser.getBasicProfile();
   $("#dokter").html(profile.getName());
   $("#email").attr({"value" : profile.getEmail()});
+  $("#welcome").show();
   $("#signoutbut").show();
   $("#signinbut").hide();
 };
@@ -34,5 +35,6 @@ function signOut() {
    $("#welcome").hide();
    $("#signoutbut").hide();
    $("#navbar").html("");
+   $("#signinbut").show();
    });
 };
