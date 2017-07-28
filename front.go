@@ -95,8 +95,9 @@ func main() {
 	http.HandleFunc("/confedittgl", confEditTanggal)
 	http.HandleFunc("/getptspage", getPtsPage)
 	http.HandleFunc("/getprespage", getPresPage)
-	http.ListenAndServe(":8001", nil)
 	log.Println("Listening...")
+	log.Fatal(http.ListenAndServe(":8001", nil))
+
 }
 
 func index(w http.ResponseWriter, r *http.Request) {
