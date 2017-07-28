@@ -312,6 +312,11 @@ $("#navbar").on("click", "#tglbut", function(e){
 			$("#mymodal").html(js.modal);
 		}else{
 			$("#mymodal").html(js.script);
+			$("#inputdate").datepicker({
+				dateFormat: "dd-mm-yy",
+				altField: "#datesend",
+				altFormat: "yy-mm-dd"
+			})
 		}
 		$("#mymodal").modal();
 	})
@@ -320,9 +325,9 @@ $("#navbar").on("click", "#tglbut", function(e){
 $("body").on("click", "#ubahtglbut", function(e){
 	e.preventDefault();
 	var token = localStorage.getItem("token");
-	var tanggal = $("#inputdate").val();
+	var tanggal = $("#datesend").val();
 	var link = $("#linkubahtgl").val();
-	console.log("link adalah : " + link);
+	console.log("tanggal adalah : " + tanggal);
 	// var tglasli = $(this).find("#tglasli").html();
 	$.post("confedittgl", {
 		token: token,
@@ -352,16 +357,33 @@ $("#navbar").on("click", "#makeresep", function(e){
 		var js = JSON.parse(data);
 		$("#mymodal").html(js.script);
 		$("#mymodal").modal();
+		$("#tgllahir").datepicker({
+			dateFormat:"dd-mm-yy",
+			changeMonth: true,
+			changeYear: true,
+			yearRange: "1900:2035",
+			onSelect: function(value, ui){
+				var today = new Date();
+				// console.log("Tahun ini adalah: " + today.getFullYear());
+				// console.log("Tahun yang dipilih adalah : " + ui.selectedYear)
+				var umur = today.getFullYear() - ui.selectedYear;
+				// console.log("Umur adalah: " + umur);
+				$("#umur").val(umur);
+			}
+		});
 	});
 
 	$("body").on("click", "#rspnextbut", function(e){
 		e.preventDefault();
+		
 		var nama = $("#namapts").val();
 		var diag = $("#diag").val();
 		var umur = $("#umur").val();
 		var almt = $("#almt").val();
 		var bb = $("#bb").val();
 		var alergi = $("#alergi").val();
+
+
 		$("#mymodal").modal();
 		$.get("getprespage")
 		.done(function(resep){
@@ -378,7 +400,17 @@ $("#navbar").on("click", "#makeresep", function(e){
 		
 		
 	})
-})
+});
+
+// Datepicker setting
+// $("#mymodal").on("focus", "#tgllahir", (function(){
+// 	$("#tgllahir").datepicker('show');
+// }));
+// $("").find("#tgllahir").datepicker({
+// 	format: "dd/mm/yyyy",
+// 	autoclose: true
+// });
+// $("#tgllahir").datepicker();
 
 });
 
