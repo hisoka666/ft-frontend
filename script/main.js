@@ -402,15 +402,20 @@ $("#navbar").on("click", "#makeresep", function(e){
 	})
 });
 
-// Datepicker setting
-// $("#mymodal").on("focus", "#tgllahir", (function(){
-// 	$("#tgllahir").datepicker('show');
-// }));
-// $("").find("#tgllahir").datepicker({
-// 	format: "dd/mm/yyyy",
-// 	autoclose: true
-// });
-// $("#tgllahir").datepicker();
+$("#navbar").on("click", "#inputobat", function(e){
+	e.preventDefault();
+	$.get("getinputobat")
+	.done(function(data){
+		var js = JSON.parse(data);
+		if (js.token != "OK"){
+			popModalWarning("Peringatan", "Gagal memperoleh template", "")
+		}else{
+			$("#mymodal").html(js.script)
+			$("#mymodal").modal();
+		}
+
+	})
+})
 
 });
 

@@ -95,6 +95,7 @@ func main() {
 	http.HandleFunc("/confedittgl", confEditTanggal)
 	http.HandleFunc("/getptspage", getPtsPage)
 	http.HandleFunc("/getprespage", getPresPage)
+	http.HandleFunc("/getinputobat", getInputObat)
 	log.Println("Listening...")
 	log.Fatal(http.ListenAndServe(":8001", nil))
 
@@ -122,6 +123,16 @@ func ConvertToUbah(r *http.Request) *Pasien {
 }
 
 ////////////////////////////////////////////////////////////////////////////////////
+func getInputObat(w http.ResponseWriter, r *http.Request) {
+	if r.Method != "GET" {
+		http.Error(w, "Get request please", http.StatusMethodNotAllowed)
+		return
+	}
+
+	responseTemplate(w, "OK", GenTemplate(nil, "modinputobat"), "")
+}
+
+////////////////////////////////////////////////////////////////////////////////////
 func getPresPage(w http.ResponseWriter, r *http.Request) {
 	if r.Method != "GET" {
 		http.Error(w, "Get request please", http.StatusMethodNotAllowed)
@@ -130,8 +141,6 @@ func getPresPage(w http.ResponseWriter, r *http.Request) {
 
 	responseTemplate(w, "OK", GenTemplate(nil, "modlistresep"), "")
 }
-
-////////////////////////////////////////////////////////////////////////////////////
 
 func getPtsPage(w http.ResponseWriter, r *http.Request) {
 	if r.Method != "GET" {
