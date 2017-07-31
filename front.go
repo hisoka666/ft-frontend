@@ -56,6 +56,18 @@ type DataPasien struct {
 	TglDaftar, Umur                     time.Time
 }
 
+type Obat struct {
+	Merk        string `json:"merk"`
+	Kandungan   string `json:"kandungan"`
+	PerkiloMin  int    `json:"kgmin"`
+	PerkiloMax  int    `json:"kgmax"`
+	Tablet      []int  `json:"tablet"`
+	Sirop       []int  `json:"sirop"`
+	Drop        []int  `drop:"drop"`
+	Rekomendasi string `json:"rekom"`
+	InputBy     string `json:"inputby"`
+}
+
 type Response struct {
 	Token  string `json:"token"`
 	Script string `json:"script"`
@@ -96,6 +108,7 @@ func main() {
 	http.HandleFunc("/getptspage", getPtsPage)
 	http.HandleFunc("/getprespage", getPresPage)
 	http.HandleFunc("/getinputobat", getInputObat)
+	http.HandleFunc("/inputobat", inputObat)
 	log.Println("Listening...")
 	log.Fatal(http.ListenAndServe(":8001", nil))
 
@@ -123,6 +136,29 @@ func ConvertToUbah(r *http.Request) *Pasien {
 }
 
 ////////////////////////////////////////////////////////////////////////////////////
+func inputObat(w http.ResponseWriter, r *http.Request) {
+	if r.Method != "POST" {
+		http.Error(w, "Post request please", http.StatusMethodNotAllowed)
+		return
+	}
+
+	// obat := &Obat{
+	// 	Merk:        r.FormValue("merk"),
+	// 	Kandungan:   r.FormValue("kand"),
+	// 	PerkiloMin:  r.FormValue("mindose"),
+	// 	PerkiloMax:  r.FormValue("maxdose"),
+	// 	Tablet:      r.FormValue("tab"),
+	// 	Sirop:       r.FormValue("syr"),
+	// 	Drop:        r.FormValue("drop"),
+	// 	Rekomendasi: r.FormValue("rekom"),
+	// 	InputBy:     r.FormValue("doc"),
+	// }
+
+	fmt.Print(r.Body)
+
+}
+
+////////////////////////////////////////////////////////////////////////////////////
 func getInputObat(w http.ResponseWriter, r *http.Request) {
 	if r.Method != "GET" {
 		http.Error(w, "Get request please", http.StatusMethodNotAllowed)
@@ -132,7 +168,6 @@ func getInputObat(w http.ResponseWriter, r *http.Request) {
 	responseTemplate(w, "OK", GenTemplate(nil, "modinputobat"), "")
 }
 
-////////////////////////////////////////////////////////////////////////////////////
 func getPresPage(w http.ResponseWriter, r *http.Request) {
 	if r.Method != "GET" {
 		http.Error(w, "Get request please", http.StatusMethodNotAllowed)

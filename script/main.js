@@ -417,6 +417,114 @@ $("#navbar").on("click", "#inputobat", function(e){
 	})
 })
 
+$("body").on("click", ".btn.tablet.tambah", function(e){
+	tambahElement("tablet", this)
+	// $("div.tablet.col-sm-9").last().clone().appendTo(".form-group.tablet");
+	// $("div.tablet.col-sm-3").last().clone().appendTo(".form-group.tablet");
+	// $("input.form-control.tablet").each(function(){
+	// 	$(this).prop("disabled",true);
+	// });
+	// $("input.form-control.tablet").last().val("").prop("disabled", false);
+	// $(this).html("Hapus").removeClass("tambah").addClass("hapus");
+});
+
+$("body").on("click", ".btn.tablet.hapus", function(e){
+	e.preventDefault();
+	hapusElement("tablet", this);
+	// var index = $(".tablet.col-sm-3").index($(this).parent());
+	// console.log("index adalah : " + index);
+	// $(".tablet.col-sm-9").eq(index).remove();
+	// $(".tablet.col-sm-3").eq(index).remove();
+});
+
+$("body").on("click", ".btn.sirop.tambah", function(e){
+	e.preventDefault();
+	tambahElement("sirop", this);
+});
+
+$("body").on("click", ".btn.sirop.hapus", function(e){
+	e.preventDefault();
+	hapusElement("sirop",this)
+});
+
+$("body").on("click", ".btn.drop.tambah", function(e){
+	e.preventDefault();
+	tambahElement("drop", this);
+});
+
+$("body").on("click", ".btn.drop.hapus", function(e){
+	e.preventDefault();
+	hapusElement("drop",this)
+});
+var tambahElement = function(selector, elem){
+	$("div."+ selector + ".col-sm-9").last().clone().appendTo(".form-group."+selector);
+	$("div."+ selector + ".col-sm-3").last().clone().appendTo(".form-group."+selector);
+	$("input.form-control."+selector).each(function(index, elem){
+		// $(this).prop("disabled",true);
+		$(elem).attr("name", index);
+	});
+	$("input.form-control."+selector).last().val("");
+	$(elem).html("Hapus").removeClass("tambah").addClass("hapus");
+
+}
+
+var hapusElement = function(sel, elem){
+	var index = $("."+sel+".col-sm-3").index($(elem).parent());
+	$("."+sel+".col-sm-9").eq(index).remove();
+	$("."+sel+".col-sm-3").eq(index).remove();
+}
+
+
+$("body").on("click", "#savdrug", function(e){
+	e.preventDefault();
+	if ($("#mrkdgng").val() == ""||
+		$("#kand").val() == ""||
+		$("#mindose").val() == undefined || 
+		$("#maxdose").val() == undefined || 
+		$("input.tablet").serializeArray().length == 0 || 
+		$("input.sirop").serializeArray().length == 0 ||
+		$("input.drop").serializeArray().length == 0 ||
+		$("#rekom").val() == "" ) {
+			$("#alertmsg").html("<div class=\"alert alert-danger alert-dismissable\"\>" +
+		    	                "<a href=\"#\" class=\"close\" data-dismiss=\"alert\" aria-label=\"close\">&times;</a\>" +
+								"Form tidak boleh kosong" +
+		                        "</div>");
+		}else{
+			$.post("inputobat", {
+				merk: $("#mrkdgng").val(),
+				kand: $("#kand").val(),
+				mindose: $("#mindose").val(),
+				maxdose: $("#maxdose").val(),
+				tab : $("input.tablet").serializeArray(),
+				syr : $("input.sirop").serializeArray(),
+				drop: $("input.drop").serializeArray(),
+				rekom : $("#rekom").val(),
+				doc : $("#email").val()
+			}, function(data){
+				var js = JSON.parse(data);
+			})
+		}
+	// var merk = $("#mrkdgng").val();
+	// var kandungan = $("#kand").val();
+	// var mindose = $("#mindose").val();
+	// var maxdose = $("#maxdose").val();
+	// var tablet = $("inputtablet").val();
+	// console.log(string($("input").serializeArray()));
+	var tablet = $("input.tablet").serializeArray();
+	var sirop = $("input.sirop").serializeArray();
+	var drop = $("input.drop").serializeArray();
+	var tab = JSON.stringify(tablet);
+	var syr = JSON.stringify(sirop);
+	var gtt = JSON.stringify(drop);
+	console.log(tab);
+	console.log(syr);
+	console.log(gtt);	
+	// jQuery.each(obat, function(k, v){
+	// 	console.log(k + " adalah " + v);
+	// })
+
+});
+
 });
 
 

@@ -10,68 +10,70 @@
                 <div class="form-group">
                     <div class="col-sm-12">
                     <label for="">Merk Dagang Obat</label>
-                    <input type="text" name="" id="mrkdgng" class="form-control text-capitalize">
+                    <input type="text" name="merk" id="mrkdgng" class="form-control obat text-capitalize" required>
                     </div>
                 </div>
                 <div class="form-group">
                     <div class="col-sm-12">
                     <label for="">Kandungan</label>
-                    <input type="text" name="" id="kand" class="form-control text-capitalize">
+                    <input type="text" name="kandungan" id="kand" class="form-control obat text-capitalize" required>
                     </div>
                 </div>
                 <div class="form-group">
                     <div class="col-sm-12">
                     <label for="">Minimal Dosis PerKG Berat Badan PerKali Pemberian</label>
-                    <input type="number" name="" id="mindose" class="form-control" > 
+                    <input type="number" name="mindose" id="mindose" class="form-control obat" > 
                     </div>
                 </div>
                 <div class="form-group">
                     <div class="col-sm-12">
                     <label for="">Maksimal Dosis PerKG Berat Badan PerKali Pemberian</label>
-                    <input type="number" name="" id="maxdose" class="form-control">
+                    <input type="number" name="maxdose" id="maxdose" class="form-control obat" required>
                     </div>
                 </div>
-                <div class="form-group">
-                    <div class="col-sm-12">
+                <div class="form-group tablet">
+                    <div class="tablet col-sm-12">
                         <label for="">Sediaan Tablet</label>
                     </div>
-                    <div class="col-sm-9">
-                        <input type="number" name="" id="tablet" class="form-control">
+                    <div class="tablet col-sm-9">
+                        <input type="number" name="tablet" id="tablet" class="form-control obat tablet">
                     </div>
-                    <div class="col-sm-3">
-                        <button class="btn">Tambah</button>
+                    <div class="tablet col-sm-3">
+                        <button class="btn tablet tambah">Tambah</button>
                     </div>
                 </div>
 
-                <div class="form-group">
-                    <div class="col-sm-12">
+                <div class="form-group sirop">
+                    <div class="sirop col-sm-12">
                         <label for="">Sediaan Sirop Per 5 ML</label>
                     </div>
-                    <div class="col-sm-9">
-                        <input type="number" name="" id="syr" class="form-control">
+                    <div class="sirop col-sm-9">
+                        <input type="number" name="sirop" id="syr" class="form-control obat sirop">
                     </div>
-                    <div class="col-sm-3">
-                        <button class="btn">Tambah</button>
+                    <div class="sirop col-sm-3">
+                        <button class="btn sirop tambah">Tambah</button>
                     </div>
                 
                 </div>
-                <div class="form-group">
-                    <div class="col-sm-12">
+                <div class="form-group drop">
+                    <div class="drop col-sm-12">
                         <label for="">Sediaan Drop Per 1 ML</label>
                     </div>
-                    <div class="col-sm-9">
-                        <input type="number" name="" id="drop" class="form-control">
+                    <div class="drop col-sm-9">
+                        <input type="number" name="drop" id="drop" class="form-control obat drop">
                     </div>
-                    <div class="col-sm-3">
-                        <button class="btn">Tambah</button>
+                    <div class="drop col-sm-3">
+                        <button class="btn drop tambah">Tambah</button>
                     </div>
                 
                 </div>
                 <div class="form-group">
                     <div class="col-sm-12">
                     <label for="">Rekomendasi Pemberian</label>
-                    <input type="text" name="" id="drop" class="form-control">
+                    <input type="text" name="rekom" id="rekom" class="form-control obat" required>
                     <input type="hidden" name="" id="inputby">
+                    <div class="col-sm-12" id="alertmsg"> </div>
+
                     </div>
                 </div>
             </div>
