@@ -3,13 +3,13 @@
 			<div class="navbar-header"><a href="" class="navbar-brand">FastTrack</a></div>
 			<ul class="nav navbar-nav">
 				<li class="active"><a id="homebutton" href="">Home</a></li>
-				<li><a href="/bulanini">BCP Bulan Ini</a></li>
+				<li><a id="bulanini" href="/bulanini">BCP Bulan Ini</a></li>
 				<li class="dropdown">
 				   <a class="dropdown-toggle" data-toggle="dropdown" href="/getlaporan">Laporan BCP Perbulan<span class="caret"></span></a>
 					  <ul class="dropdown-menu">
 						{{with .Bulan}}
 							{{range .}}
-						<li><a href="/getlaporan/{{.}}">{{.}}</a></li>
+						<li><a href="#" class="bcptgl" data-select-tanggal="{{.}}">{{.}}</a></li>
 			                  {{end}}
  			            {{end}}
 					</ul>

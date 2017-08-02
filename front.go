@@ -7,6 +7,7 @@ import (
 	"html/template"
 	"log"
 	"net/http"
+	"strconv"
 	"time"
 )
 
@@ -19,14 +20,9 @@ type MainView struct {
 	User   string   `json:"user"`
 	Bulan  []string `json:"bulan"`
 	Pasien []Pasien `json:"pasien"`
-	//IKI      []List    `json:"list"`
+	// IKI    []List   `json:"list"`
 }
-type NavBar struct {
-	Token  string   `json:"token"`
-	User   string   `json:"user"`
-	Bulan  []string `json:"bulan"`
-	Pasien []Pasien `json:"pasien"`
-}
+
 type Pasien struct {
 	StatusServer string    `json:"stat"`
 	TglKunjungan string    `json:"tgl"`
@@ -109,6 +105,7 @@ func main() {
 	http.HandleFunc("/getprespage", getPresPage)
 	http.HandleFunc("/getinputobat", getInputObat)
 	http.HandleFunc("/inputobat", inputObat)
+	http.HandleFunc("/getmonthly", getMonthly)
 	log.Println("Listening...")
 	log.Fatal(http.ListenAndServe(":8001", nil))
 
@@ -136,6 +133,35 @@ func ConvertToUbah(r *http.Request) *Pasien {
 }
 
 ////////////////////////////////////////////////////////////////////////////////////
+func getMonthly(w http.ResponseWriter, r *http.Request) {
+	if r.Method != "POST" {
+		http.Error(w, "Post request please", http.StatusMethodNotAllowed)
+		return
+	}
+	url := "http://2.igdsanglah.appspot.com/getbulan"
+	month, _ := strconv.Atoi(r.FormValue("month"))
+	strmon := fmt.Sprintf("%02d", month)
+	gettgl := r.FormValue("year") + "/" + strmon
+	// fmt.Print(reflect.TypeOf(month))
+
+	// fmt.Print(year)
+	// fmt.Printf("%02d", int(r.FormValue("month"))
+	fmt.Printf("Tanggal adalah : %v", gettgl)
+	send := &MainView{
+		User:  r.FormValue("email"),
+		Bulan: []string{gettgl},
+	}
+	resp, err := sendPost(send, r.FormValue("token"), url)
+	if err != nil {
+		log.Fatalf("Terjadi kesalahan di server: %v", err)
+	}
+	pts := []Pasien{}
+	json.NewDecoder(resp.Body).Decode(&pts)
+	responseTemplate(w, "OK", GenTemplate(pts, "contentrefresh"), "")
+
+}
+
+////////////////////////////////////////////////////////////////////////////////////
 func inputObat(w http.ResponseWriter, r *http.Request) {
 	if r.Method != "POST" {
 		http.Error(w, "Post request please", http.StatusMethodNotAllowed)
@@ -158,7 +184,6 @@ func inputObat(w http.ResponseWriter, r *http.Request) {
 
 }
 
-////////////////////////////////////////////////////////////////////////////////////
 func getInputObat(w http.ResponseWriter, r *http.Request) {
 	if r.Method != "GET" {
 		http.Error(w, "Get request please", http.StatusMethodNotAllowed)

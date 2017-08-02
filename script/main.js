@@ -525,6 +525,59 @@ $("body").on("click", "#savdrug", function(e){
 
 });
 
+$("#navbar").on("click", "#bulanini", function(e){
+	e.preventDefault();
+	var now = new Date();
+	var dateone = new Date(now.getFullYear(),now.getMonth(),1,8,0,0);
+	var token = localStorage.getItem("token");
+	console.log("Waktu hari ini adalah: " + now);
+	console.log("Tanggal 1 adalah: " + dateone);
+	console.log("Kondisi sekarang : " + (now > dateone))
+	console.log($("#email").val());
+	if (now > dateone){
+		// console.log("Tanggal aktif adalah: " + new Date(now.getFullYear(),now.getMonth(),1));
+		$.post("getmonthly", {
+			token: token,
+			month: now.getMonth() + 1,
+			year: now.getFullYear(),
+			email: $("#email").val()
+		}, function(data){
+			var js = JSON.parse(data);
+			console.log(js.parse);
+			$("#main").html(js.script);
+		})
+	}else{
+		var blnlalu = new Date(now.getFullYear(), now.getMonth() - 1, 1)
+		// console.log("Tanggal aktif adalah: " + new Date(now.getFullYear(),(now.getMonth() - 1), 1));
+		$.post("getmonthly", {
+			token: token,
+			month: blnlalu.getMonth() + 1,
+			year: blnlalu.getFullYear(),
+			email: $("#email").val()
+		}, function(data){
+			var js = JSON.parse(data);
+			console.log(js.parse);
+			$("#main").html(js.script);
+		})
+	}
+
+});
+
+$("#navbar").on("click", ".bcptgl", function(e){
+	e.preventDefault();
+	var token = localStorage.getItem("token");
+	var tgl = $(this).html();
+	console.log(tgl)
+	$.post("getbcpmonth", {
+		token: token,
+		tgl: tgl,
+		email: $("#email").val()
+	}, function(data){
+		var js = JSON.parse(data);
+	})
+})
+
+
 });
 
 
