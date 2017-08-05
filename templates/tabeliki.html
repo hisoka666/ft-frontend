@@ -52,7 +52,7 @@
             {{with .}}
                 {{range $m, $n := .}}
                     {{if lt $m 16}}
-                        <td class="smallcell" id="f-1-{{.Tanggal}}"> {{.SumIKI1}} </td>
+                        <td class="smallcell jml" id="f-1-{{.Tanggal}}"> {{.SumIKI1}} </td>
                     {{end}}
                 {{end}}
             {{end}}
@@ -71,7 +71,7 @@
             {{with .}}
                 {{range $m, $n := .}}
                         {{if lt $m 16}}
-                        <td class="smallcell" id="f-2-{{.Tanggal}}"> {{.SumIKI2}} </td>
+                        <td class="smallcell jml" id="f-2-{{.Tanggal}}"> {{.SumIKI2}} </td>
                         {{end}}
                     {{end}}
                 {{end}}
@@ -111,7 +111,7 @@
                                     <td class="smallcell" > 29</td>
                                     <td class="smallcell" > 30</td>
                                     <td class="smallcell" > 31</td>
-                                    <td class="jmlpts" > Jumlah Poin</td>
+                                    <td class="smallcell" > Jumlah Poin</td>
                                 </tr>
                             </table>
                         </td>
@@ -130,11 +130,11 @@
             {{with .}}
                 {{range $m, $n := .}}
                         {{if ge $m 16}}
-                        <td class="smallcell" id="f-1-{{.Tanggal}}">{{.SumIKI2}}</td>
+                        <td class="smallcell jml" id="f-1-{{.Tanggal}}">{{.SumIKI1}}</td>
                         {{end}}
                     {{end}}
                 {{end}}
-                        <td class="jmlpts" id="f-1-32"></td>
+                        <td class="smallcell" id="jmlpoin-2-1"></td>
                     </tr>
                 </table>
             </td>
@@ -152,11 +152,11 @@
             {{with .}}
                 {{range $m, $n := .}}
                         {{if ge $m 16}}
-                        <td class="smallcell" id="f-2-{{.Tanggal}}">{{.SumIKI2}}</td>
+                        <td class="smallcell jml" id="f-2-{{.Tanggal}}">{{.SumIKI2}}</td>
                         {{end}}
                     {{end}}
                 {{end}}
-                        <td class="jmlpts" id="f-2-32"></td>
+                        <td class="smallcell" id="jmlpoin-2-2"></td>
                     </tr>
                 </table>
             </td>

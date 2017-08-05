@@ -547,6 +547,7 @@ $("#navbar").on("click", "#bulanini", function(e){
 			var js = JSON.parse(data);
 			$("#inputnocm").hide();
 			$("#tabeliki").html(js.modal).show();
+			getSum();
 			$("#tabelutama").html(js.script);
 		})
 	}else{
@@ -561,9 +562,12 @@ $("#navbar").on("click", "#bulanini", function(e){
 			var js = JSON.parse(data);
 			$("#inputnocm").hide();
 			$("#tabeliki").html(js.modal).show();
+			getSum();
 			$("#tabelutama").html(js.script);
 		})
 	}
+
+	
 	// var total11 = 0;
 	// var total12 = 0;
 	// for(i=1;i<16;i++){
@@ -601,6 +605,30 @@ $("#navbar").on("click", "#bulanini", function(e){
 
 });
 
+var getSum = function(){
+	var sum = 0;
+	var iki11 = 0;
+	var iki12 = 0;
+	for (i=0;i<16;i++){
+		iki11 = iki11 + parseInt($("td.jml").eq(i).html())
+	}
+	for (i=16;i<32;i++){
+		iki12 = iki12 + parseInt($("td.jml").eq(i).html())
+	}
+	var iki21 = iki11;
+	var iki22 = iki12;
+	for (i=32;i<46;i++){
+		iki21 = iki21 + parseInt($("td.jml").eq(i).html())
+	}
+	for (i=48;i<52;i++){
+		iki22 = iki22 + parseInt($("td.jml").eq(i).html())
+	}
+	$("#jmlpoin-1-1").html(iki11)
+	$("#jmlpoin-1-2").html(iki12)
+	$("#jmlpoin-2-1").html(iki21)
+	$("#jmlpoin-2-2").html(iki22)
+}
+
 $("#navbar").on("click", ".bcptgl", function(e){
 	e.preventDefault();
 	var token = localStorage.getItem("token");
@@ -615,6 +643,7 @@ $("#navbar").on("click", ".bcptgl", function(e){
 		$("#inputnocm").hide();
 
 		$("#tabeliki").html(js.modal).show();
+		getSum()
 		$("div.tabtitle").html("Tabel IKI " + tgl);
 		$("#tabelutama").html(js.script);
 	})

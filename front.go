@@ -161,8 +161,8 @@ func getBCPMonth(w http.ResponseWriter, r *http.Request) {
 	pts := []Pasien{}
 	json.NewDecoder(resp.Body).Decode(&pts)
 
-	bl := countDaysOfMonth(r.FormValue("year"), r.FormValue("month"))
-	iki := countIKI(pts, bl)
+	// bl := countDaysOfMonth(r.FormValue("year"), r.FormValue("month"))
+	iki := countIKI(pts)
 	// fmt.Printf("LIst iki adalah: %v", iki)
 
 	responseTemplate(w, "OK", GenTemplate(pts, "contentrefresh"), GenTemplate(iki, "tabeliki"))
@@ -193,19 +193,19 @@ func getMonthly(w http.ResponseWriter, r *http.Request) {
 	pts := []Pasien{}
 	json.NewDecoder(resp.Body).Decode(&pts)
 
-	bl := countDaysOfMonth(r.FormValue("year"), r.FormValue("month"))
-	iki := countIKI(pts, bl)
+	// bl := countDaysOfMonth(r.FormValue("year"), r.FormValue("month"))
+	iki := countIKI(pts)
 	// fmt.Printf("LIst iki adalah: %v", iki)
 
 	responseTemplate(w, "OK", GenTemplate(pts, "contentrefresh"), GenTemplate(iki, "tabeliki"))
 
 }
 
-func countIKI(n []Pasien, bl int) []ListIKI {
+func countIKI(n []Pasien) []ListIKI {
 
 	g := []ListIKI{}
 
-	for h := 1; h <= bl; h++ {
+	for h := 1; h <= 31; h++ {
 		var u1, u2 int
 		for _, v := range n {
 			tgl, _ := strconv.Atoi(v.TglKunjungan[:2])
