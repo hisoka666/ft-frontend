@@ -16,11 +16,17 @@ import (
 // }
 
 type MainView struct {
-	Token  string   `json:"token"`
-	User   string   `json:"user"`
-	Bulan  []string `json:"bulan"`
-	Pasien []Pasien `json:"pasien"`
-	// IKI    []List   `json:"list"`
+	Token  string    `json:"token"`
+	User   string    `json:"user"`
+	Bulan  []string  `json:"bulan"`
+	Pasien []Pasien  `json:"pasien"`
+	IKI    []ListIKI `json:"list"`
+}
+
+type ListIKI struct {
+	Tanggal int `json:"tgl"`
+	SumIKI1 int `json:"iki1"`
+	SumIKI2 int `json:"iki2"`
 }
 
 type Pasien struct {
@@ -106,6 +112,7 @@ func main() {
 	http.HandleFunc("/getinputobat", getInputObat)
 	http.HandleFunc("/inputobat", inputObat)
 	http.HandleFunc("/getmonthly", getMonthly)
+	http.HandleFunc("/getbcpmonth", getBCPMonth)
 	log.Println("Listening...")
 	log.Fatal(http.ListenAndServe(":8001", nil))
 
@@ -133,20 +140,16 @@ func ConvertToUbah(r *http.Request) *Pasien {
 }
 
 ////////////////////////////////////////////////////////////////////////////////////
-func getMonthly(w http.ResponseWriter, r *http.Request) {
+func getBCPMonth(w http.ResponseWriter, r *http.Request) {
 	if r.Method != "POST" {
 		http.Error(w, "Post request please", http.StatusMethodNotAllowed)
 		return
 	}
-	url := "http://2.igdsanglah.appspot.com/getbulan"
-	month, _ := strconv.Atoi(r.FormValue("month"))
-	strmon := fmt.Sprintf("%02d", month)
-	gettgl := r.FormValue("year") + "/" + strmon
-	// fmt.Print(reflect.TypeOf(month))
 
-	// fmt.Print(year)
-	// fmt.Printf("%02d", int(r.FormValue("month"))
-	fmt.Printf("Tanggal adalah : %v", gettgl)
+	url := "http://2.igdsanglah.appspot.com/getbulan"
+
+	gettgl := r.FormValue("tgl")
+
 	send := &MainView{
 		User:  r.FormValue("email"),
 		Bulan: []string{gettgl},
@@ -157,11 +160,84 @@ func getMonthly(w http.ResponseWriter, r *http.Request) {
 	}
 	pts := []Pasien{}
 	json.NewDecoder(resp.Body).Decode(&pts)
-	responseTemplate(w, "OK", GenTemplate(pts, "contentrefresh"), "")
+
+	bl := countDaysOfMonth(r.FormValue("year"), r.FormValue("month"))
+	iki := countIKI(pts, bl)
+	// fmt.Printf("LIst iki adalah: %v", iki)
+
+	responseTemplate(w, "OK", GenTemplate(pts, "contentrefresh"), GenTemplate(iki, "tabeliki"))
 
 }
 
 ////////////////////////////////////////////////////////////////////////////////////
+func getMonthly(w http.ResponseWriter, r *http.Request) {
+	if r.Method != "POST" {
+		http.Error(w, "Post request please", http.StatusMethodNotAllowed)
+		return
+	}
+	url := "http://2.igdsanglah.appspot.com/getbulanini"
+	// month di sini dikirim dalam bentuk int satu digit
+	month, _ := strconv.Atoi(r.FormValue("month"))
+	// diubah menjadi 2 digit untuk bisa mengambil kursor
+	strmon := fmt.Sprintf("%02d", month)
+	gettgl := r.FormValue("year") + "/" + strmon
+
+	send := &MainView{
+		User:  r.FormValue("email"),
+		Bulan: []string{gettgl},
+	}
+	resp, err := sendPost(send, r.FormValue("token"), url)
+	if err != nil {
+		log.Fatalf("Terjadi kesalahan di server: %v", err)
+	}
+	pts := []Pasien{}
+	json.NewDecoder(resp.Body).Decode(&pts)
+
+	bl := countDaysOfMonth(r.FormValue("year"), r.FormValue("month"))
+	iki := countIKI(pts, bl)
+	// fmt.Printf("LIst iki adalah: %v", iki)
+
+	responseTemplate(w, "OK", GenTemplate(pts, "contentrefresh"), GenTemplate(iki, "tabeliki"))
+
+}
+
+func countIKI(n []Pasien, bl int) []ListIKI {
+
+	g := []ListIKI{}
+
+	for h := 1; h <= bl; h++ {
+		var u1, u2 int
+		for _, v := range n {
+			tgl, _ := strconv.Atoi(v.TglKunjungan[:2])
+			if tgl != h {
+				continue
+			}
+			if v.IKI == "1" {
+				u1++
+			} else {
+				u2++
+			}
+		}
+
+		f := ListIKI{
+			Tanggal: h,
+			SumIKI1: u1,
+			SumIKI2: u2,
+		}
+
+		g = append(g, f)
+
+	}
+	return g
+}
+
+func countDaysOfMonth(y, m string) int {
+	yr, _ := strconv.Atoi(y)
+	mo, _ := strconv.Atoi(m)
+
+	return time.Date(yr, time.Month(mo), 0, 0, 0, 0, 0, time.UTC).Day()
+}
+
 func inputObat(w http.ResponseWriter, r *http.Request) {
 	if r.Method != "POST" {
 		http.Error(w, "Post request please", http.StatusMethodNotAllowed)

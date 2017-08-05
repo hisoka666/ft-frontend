@@ -176,7 +176,7 @@ $("body").on("click", "#confirmedit", function(e){
 		var iki = $("input[name='modiki']:checked").val();
 		var shift = $("input[name='modshift']:checked").val();
 		var indexrow = $('input[name="urutan"]').val();
-		var urutan = "tbody tr:eq(" + $('input[name="urutan"]').val() + ")";
+		var urutan = "tbody.dafpts tr:eq(" + $('input[name="urutan"]').val() + ")";
 
 		
 		switch (true) {
@@ -286,6 +286,8 @@ $("#navbar").on("click", "#homebutton", function(e){
 			var js = JSON.parse(data);
 			// console.log(js.script);
 			if (js.token == "OK") {
+				$("#inputnocm").show();
+				$("#tabeliki").hide();
 				$("#tabelutama").html(js.script);
 				// removeModal("#modwarning")
 			}else{
@@ -530,10 +532,10 @@ $("#navbar").on("click", "#bulanini", function(e){
 	var now = new Date();
 	var dateone = new Date(now.getFullYear(),now.getMonth(),1,8,0,0);
 	var token = localStorage.getItem("token");
-	console.log("Waktu hari ini adalah: " + now);
-	console.log("Tanggal 1 adalah: " + dateone);
-	console.log("Kondisi sekarang : " + (now > dateone))
-	console.log($("#email").val());
+	// console.log("Waktu hari ini adalah: " + now);
+	// console.log("Tanggal 1 adalah: " + dateone);
+	// console.log("Kondisi sekarang : " + (now > dateone))
+	// console.log($("#email").val());
 	if (now > dateone){
 		// console.log("Tanggal aktif adalah: " + new Date(now.getFullYear(),now.getMonth(),1));
 		$.post("getmonthly", {
@@ -543,8 +545,9 @@ $("#navbar").on("click", "#bulanini", function(e){
 			email: $("#email").val()
 		}, function(data){
 			var js = JSON.parse(data);
-			console.log(js.parse);
-			$("#main").html(js.script);
+			$("#inputnocm").hide();
+			$("#tabeliki").html(js.modal).show();
+			$("#tabelutama").html(js.script);
 		})
 	}else{
 		var blnlalu = new Date(now.getFullYear(), now.getMonth() - 1, 1)
@@ -556,10 +559,45 @@ $("#navbar").on("click", "#bulanini", function(e){
 			email: $("#email").val()
 		}, function(data){
 			var js = JSON.parse(data);
-			console.log(js.parse);
-			$("#main").html(js.script);
+			$("#inputnocm").hide();
+			$("#tabeliki").html(js.modal).show();
+			$("#tabelutama").html(js.script);
 		})
 	}
+	// var total11 = 0;
+	// var total12 = 0;
+	// for(i=1;i<16;i++){
+	// 	var id1 = "#f-1-" + i.toString();
+	// 	var id2 = "#f-2-" + i.toString();
+	// 	console.log(id1);
+		// console.log($(id1).html())
+		// var iki1 = parseInt($(id1).html());
+		// var iki2 = parseInt($(id2).html());
+		// total11 = total11 + iki1;
+		// total12 = total12 + iki2;
+
+	// $("#jmlpoin-1-1").html(total11);
+	// $("#jmlpoin-1-2").html(total12);
+	// var total21 = 0;
+	// var total22 = 0;
+	// for(i=16;i<32;i++){
+	// 	var id1 = "#f-1-" + i.toString();
+	// 	var id2 = "#f-2-" + i.toString();
+	// 	var iki1 = parseInt($(id1).html());
+	// 	var iki2 = parseInt($(id2).html());
+	// 	console.log(total21.toString());
+	// 	total21 = total21 + iki1;
+	// 	total22 = total22 + iki2;
+	// }
+	// $("#f-1-32").html(total21);
+	// $("#f-2-32").html(total22);
+
+	// console.log("Total adalah: " + total21);
+	// $("#jmlxpoin1").html(total11 + total21);
+	// $("#jmlxpoin2").html(total12 + total22);
+	
+	
+
 
 });
 
@@ -574,6 +612,11 @@ $("#navbar").on("click", ".bcptgl", function(e){
 		email: $("#email").val()
 	}, function(data){
 		var js = JSON.parse(data);
+		$("#inputnocm").hide();
+
+		$("#tabeliki").html(js.modal).show();
+		$("div.tabtitle").html("Tabel IKI " + tgl);
+		$("#tabelutama").html(js.script);
 	})
 })
 

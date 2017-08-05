@@ -9,3 +9,34 @@
 .modal-body {
     overflow-y: auto;
 }
+   
+          .maintable{
+            border: 1px solid black;
+            width: 100%;
+
+        }
+        .num {
+            width: 3%;
+        }
+        .uraian{
+            width: 15%;
+        }
+        .poin{
+            width: 5%;
+        }
+        .jmlend{
+            width: 5%;
+        } 
+
+        .jmlend{
+             width: 10%; 
+            text-align: center;
+        }
+        .jmlpts{
+              width: 75px;  
+            text-align: center;
+        }
+        .smallcell{
+              width: 60px;  
+            text-align: center;
+        }    
