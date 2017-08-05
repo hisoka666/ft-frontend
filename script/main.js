@@ -617,16 +617,23 @@ var getSum = function(){
 	}
 	var iki21 = iki11;
 	var iki22 = iki12;
-	for (i=32;i<46;i++){
+	for (i=32;i<47;i++){
 		iki21 = iki21 + parseInt($("td.jml").eq(i).html())
 	}
-	for (i=48;i<52;i++){
+	for (i=47;i<62;i++){
 		iki22 = iki22 + parseInt($("td.jml").eq(i).html())
 	}
-	$("#jmlpoin-1-1").html(iki11)
-	$("#jmlpoin-1-2").html(iki12)
-	$("#jmlpoin-2-1").html(iki21)
-	$("#jmlpoin-2-2").html(iki22)
+	
+	var tot1 = iki21 * 0.0032;
+	var tot2 = iki22 * 0.01;
+	var totfinal = tot1 + tot2;
+	$("#jmlpoin-1-1").html(iki11);
+	$("#jmlpoin-1-2").html(iki12);
+	$("#jmlpoin-2-1").html(iki21);
+	$("#jmlpoin-2-2").html(iki22);
+	$("#jmlxpoin1").html(tot1.toFixed(4));
+	$("#jmlxpoin2").html(tot2.toFixed(2));
+	$("#totalpoin").html("Keterangan: Total Poin untuk perhitungan IKI adalah: " + totfinal.toFixed(4));
 }
 
 $("#navbar").on("click", ".bcptgl", function(e){
