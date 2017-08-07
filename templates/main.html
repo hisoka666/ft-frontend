@@ -14,11 +14,11 @@
  			            {{end}}
 					</ul>
           </li>
-          <li class="dropdown"><a href="/createpdf" class="dropdown-toggle" data-toggle="dropdown">Buat Laporan (PDF)<span class="caret"></span></a>
+          <li class="dropdown"><a href="" class="dropdown-toggle" data-toggle="dropdown">Buat Laporan (PDF)<span class="caret"></span></a>
           <ul class="dropdown-menu">
             {{with .Bulan}}
               {{range .}}
-            <li><a href="/createpdf/{{.}}">{{.}}</a></li>
+            <li><a class="createpdf" href="">{{.}}</a></li>
                         {{end}}
                   {{end}}
           </ul>

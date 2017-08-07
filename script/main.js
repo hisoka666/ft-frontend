@@ -654,7 +654,46 @@ $("#navbar").on("click", ".bcptgl", function(e){
 		$("div.tabtitle").html("Tabel IKI " + tgl);
 		$("#tabelutama").html(js.script);
 	})
-})
+});
+
+$("#navbar").on("click", ".createpdf", function(e){
+		e.preventDefault();
+	var token = localStorage.getItem("token");
+	var tgl = $(this).html();
+	var email = $("#email").val();
+	$("#namapdf").val(email);
+	$("#tglpdf").val(tgl);
+	$("#tokenpdf").val(token);
+	$("#getpdf").submit();
+	// console.log($("#namapdf").val())
+
+	// var xhr = new XMLHttpRequest();
+	// xhr.open("POST", "getpdf", true);
+	// xhr.setRequestHeader('Content-Type', 'application/json');
+	// xhr.send(JSON.stringify({
+	// 	token: localStorage.getItem("token"),
+	// 	email: $("#email").val(),
+	// 	tgl: "tanggal"
+	// }));
+
+	// console.log("Link Fired, yeah");
+	// var token = localStorage.getItem("token");
+	// var tgl = $(this).html();
+	// console.log("This is tgl: " + tgl)
+	// $.post("getpdf", {
+	// 	token: token,
+	// 	tgl: tgl,
+	// 	email : $("#email").val()
+	// },function(data){
+    //         var win = window.open();
+    //         win.document.write(data);
+		// console.log("This should works right?")
+
+		// console.log("This is data: " + data)
+		// $("iframe").attr('src', data)
+		// $("#mymodal").modal();
+
+});
 
 
 });

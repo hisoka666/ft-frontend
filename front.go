@@ -8,7 +8,10 @@ import (
 	"log"
 	"net/http"
 	"strconv"
+	"strings"
 	"time"
+
+	"github.com/jung-kurt/gofpdf"
 )
 
 // type ReturnError struct {
@@ -113,6 +116,7 @@ func main() {
 	http.HandleFunc("/inputobat", inputObat)
 	http.HandleFunc("/getmonthly", getMonthly)
 	http.HandleFunc("/getbcpmonth", getBCPMonth)
+	http.HandleFunc("/getpdf", getPDF)
 	log.Println("Listening...")
 	log.Fatal(http.ListenAndServe(":8001", nil))
 
@@ -140,6 +144,171 @@ func ConvertToUbah(r *http.Request) *Pasien {
 }
 
 ////////////////////////////////////////////////////////////////////////////////////
+func getPDF(w http.ResponseWriter, r *http.Request) {
+	if r.Method != "POST" {
+		http.Error(w, "Post request please", http.StatusMethodNotAllowed)
+		return
+	}
+	fmt.Print("Request masuk")
+	url := "http://2.igdsanglah.appspot.com/getbulan"
+
+	gettgl := r.FormValue("tgl")
+	fmt.Print(gettgl)
+	send := &MainView{
+		User:  r.FormValue("email"),
+		Bulan: []string{gettgl},
+	}
+	resp, err := sendPost(send, r.FormValue("token"), url)
+	if err != nil {
+		log.Fatalf("Terjadi kesalahan di server: %v", err)
+	}
+	pts := []Pasien{}
+	json.NewDecoder(resp.Body).Decode(&pts)
+	defer resp.Body.Close()
+	// bl := countDaysOfMonth(r.FormValue("year"), r.FormValue("month"))
+	// iki := countIKI(pts)
+
+	// fmt.Printf("Method adalah %v")
+	// dec := json.NewDecoder(r.Body)
+	// if dec == nil {
+	// 	fmt.Print("gagal membaca json")
+	// }
+
+	// jsMap := make(map[string]string)
+	// err := dec.Decode(&jsMap)
+	// if err != nil {
+	// 	log.Fatalf("Terjadi kesalahan decode: %v", err)
+	// }
+
+	// fmt.Printf("%v\n", jsMap)
+	// b, err := ioutil.ReadAll(r.Body)
+	// if err != nil {
+	// 	log.Fatalf("terjadi kesalahan : %v", err)
+	// 	return
+	// }
+	// r.Body.Close()
+	// fmt.Printf("%#v\n", b)
+	// log.Printf("Isi dari body adalah %v", b)
+	// var dat map[string]string
+	// if err := json.Unmarshal(b, &dat); err != nil {
+	// 	log.Fatalf("terjadi kesalahan : %v", err)
+	// 	return
+	// }
+
+	// fmt.Print(dat["email"])
+
+	// user, token := ft.CekStaff(ctx, dat["email"])
+
+	createPDF(w, pts, gettgl, r.FormValue("email"))
+}
+
+func createPDF(w http.ResponseWriter, p []Pasien, tgl, email string) {
+	// wdStr, err := os.Getwd()
+	// path := wdStr + "\\pdf.pdf"
+	// if err != nil {
+	// 	log.Fatal(err)
+	// }
+	pdf := gofpdf.New("P", "mm", "A4", "")
+	pdf.AddPage()
+	pdf.SetFont("Arial", "B", 16)
+	wd := pdf.GetStringWidth("Buku Catatan Pribadi")
+	pdf.SetX((210 - wd) / 2)
+	pdf.Cell(wd, 9, "Buku Catatan Pribadi")
+	pdf.Ln(10)
+	pdf.SetFont("Arial", "", 12)
+	pdf.Cell(20, 5, "Nama")
+	pdf.Cell(105, 5, (": " + email))
+	pdf.Ln(-1)
+	pdf.Cell(20, 5, "Bulan")
+	pdf.Cell(105, 5, (": " + tgl))
+	pdf.Ln(-1)
+	pdf.Ln(-1)
+	pdf.SetFont("Arial", "", 10)
+	pdf.CellFormat(9, 20, "No", "1", 0, "C", false, 0, "")
+	pdf.CellFormat(18, 20, "Tanggal", "1", 0, "C", false, 0, "")
+	pdf.CellFormat(17, 20, "No. CM", "1", 0, "C", false, 0, "")
+	pdf.CellFormat(60, 20, "Nama", "1", 0, "C", false, 0, "")
+	pdf.CellFormat(40, 20, "Diagnosis", "1", 0, "C", false, 0, "")
+
+	pdf.MultiCell(20, 5, "Melakukan pelayanan medik umum", "1", "C", false)
+	// fmt.Println(pdf.GetXY())
+	pdf.SetXY(174, 35)
+	pdf.MultiCell(25, 4, "Melakukan tindakan medik umum tingkat sederhana", "1", "C", false)
+	// diag := []string{"a","a","a"}
+	pdf.SetFont("Arial", "", 8)
+	for k, v := range p {
+		diag := ProperCapital(v.Diagnosis)
+		if len(diag) > 20 {
+			diag = diag[:21]
+		}
+		// 11/02/1987
+		tang := v.TglKunjungan[:10]
+		num := strconv.Itoa(k + 1)
+		nocm := v.NoCM
+		nam := ProperCapital(v.NamaPasien)
+		if len(nam) > 25 {
+			nam = nam[:26]
+		}
+		pdf.CellFormat(9, 7, num, "1", 0, "C", false, 0, "")
+		pdf.CellFormat(18, 7, tang, "1", 0, "C", false, 0, "")
+		pdf.CellFormat(17, 7, nocm, "1", 0, "C", false, 0, "")
+		pdf.CellFormat(60, 7, nam, "1", 0, "L", false, 0, "")
+		pdf.CellFormat(40, 7, diag, "1", 0, "L", false, 0, "")
+		if v.IKI == "1" {
+			pdf.CellFormat(20, 7, "a", "1", 0, "C", false, 0, "")
+			pdf.CellFormat(25, 7, "", "1", 0, "C", false, 0, "")
+			pdf.Ln(-1)
+		} else {
+			pdf.CellFormat(20, 7, "", "1", 0, "C", false, 0, "")
+			pdf.CellFormat(25, 7, "a", "1", 0, "C", false, 0, "")
+			pdf.Ln(-1)
+		}
+
+	}
+	////////////////////////////////////////////////
+	// diag := "aaaaa"
+	// for i := 1; i < 40; i++ {
+	// 	diag = diag + "a"
+	// 	if len(diag) > 10 {
+	// 		diag = diag[:10]
+	// 	}
+	// 	num := strconv.Itoa(i)
+	// 	pdf.CellFormat(9, 7, num, "1", 0, "C", false, 0, "")
+	// 	pdf.CellFormat(15, 7, fmt.Sprintf("tanggal %v", i), "1", 0, "C", false, 0, "")
+	// 	pdf.CellFormat(20, 7, "aaaaa", "1", 0, "C", false, 0, "")
+	// 	pdf.CellFormat(60, 7, "aaaaa", "1", 0, "C", false, 0, "")
+	// 	pdf.CellFormat(40, 7, diag, "1", 0, "C", false, 0, "")
+	// 	pdf.CellFormat(20, 7, "aaa", "1", 0, "C", false, 0, "")
+	// 	pdf.CellFormat(25, 7, "aaa", "1", 0, "C", false, 0, "")
+	// 	pdf.Ln(-1)
+	// }
+
+	b := new(bytes.Buffer)
+	err := pdf.Output(b)
+	if err != nil {
+		log.Fatalf("Error reading pdf %v", err)
+	}
+	// fmt.Print("It's working!")
+	// stream, err := ioutil.ReadAll(b)
+	// if err != nil {
+	// 	log.Fatal(err)
+	// 	os.Exit(1)
+	// }
+
+	// b := bytes.NewBuffer(stream)
+
+	w.Header().Set("Content-type", "application/pdf")
+	if _, err := b.WriteTo(w); err != nil {
+		fmt.Fprintf(w, "%s", err)
+	}
+	// err = pdf.OutputFileAndClose(path)
+	// if err != nil {
+	// 	log.Fatal(err)
+	// }
+
+}
+
+////////////////////////////////////////////////////////////////////////////////////
 func getBCPMonth(w http.ResponseWriter, r *http.Request) {
 	if r.Method != "POST" {
 		http.Error(w, "Post request please", http.StatusMethodNotAllowed)
@@ -160,7 +329,7 @@ func getBCPMonth(w http.ResponseWriter, r *http.Request) {
 	}
 	pts := []Pasien{}
 	json.NewDecoder(resp.Body).Decode(&pts)
-
+	defer resp.Body.Close()
 	// bl := countDaysOfMonth(r.FormValue("year"), r.FormValue("month"))
 	iki := countIKI(pts)
 	// fmt.Printf("LIst iki adalah: %v", iki)
@@ -169,7 +338,6 @@ func getBCPMonth(w http.ResponseWriter, r *http.Request) {
 
 }
 
-////////////////////////////////////////////////////////////////////////////////////
 func getMonthly(w http.ResponseWriter, r *http.Request) {
 	if r.Method != "POST" {
 		http.Error(w, "Post request please", http.StatusMethodNotAllowed)
@@ -192,7 +360,7 @@ func getMonthly(w http.ResponseWriter, r *http.Request) {
 	}
 	pts := []Pasien{}
 	json.NewDecoder(resp.Body).Decode(&pts)
-
+	defer resp.Body.Close()
 	// bl := countDaysOfMonth(r.FormValue("year"), r.FormValue("month"))
 	iki := countIKI(pts)
 	// fmt.Printf("LIst iki adalah: %v", iki)
@@ -306,7 +474,7 @@ func confEditTanggal(w http.ResponseWriter, r *http.Request) {
 
 	list := MainView{}
 	json.NewDecoder(resp.Body).Decode(&list)
-
+	defer resp.Body.Close()
 	fmt.Printf("Isi dari token adalah: %v", list.Token)
 	if list.Token != "OK" {
 		log.Fatalf("Terjadi kesalahan server")
@@ -342,7 +510,7 @@ func editTanggal(w http.ResponseWriter, r *http.Request) {
 
 	script := GenTemplate(pts, "modubahtgl")
 	responseTemplate(w, "OK", script, "")
-
+	defer resp.Body.Close()
 }
 
 func firstEntries(w http.ResponseWriter, r *http.Request) {
@@ -365,7 +533,7 @@ func firstEntries(w http.ResponseWriter, r *http.Request) {
 
 	json.NewDecoder(resp.Body).Decode(send)
 	responseTemplate(w, "OK", GenTemplate(send.Pasien, "contentrefresh"), "")
-
+	defer resp.Body.Close()
 }
 
 func confDelete(w http.ResponseWriter, r *http.Request) {
@@ -391,7 +559,7 @@ func confDelete(w http.ResponseWriter, r *http.Request) {
 		responseTemplate(w, "kesalahan-server", "", "")
 		return
 	}
-
+	defer resp.Body.Close()
 	responseTemplate(w, "OK", "", "")
 }
 
@@ -414,8 +582,7 @@ func confEditEntri(w http.ResponseWriter, r *http.Request) {
 		responseTemplate(w, res.StatusServer, "", GenModal("Peringatan", res.NoCM, ""))
 		return
 	}
-	fmt.Print(GenTemplate(res, "baristabel"))
-	fmt.Print(res)
+	defer resp.Body.Close()
 	responseTemplate(w, "OK", GenTemplate(res, "baristabel"), GenModal("Sukses", "Data berhasil diubah", ""))
 }
 
@@ -444,7 +611,7 @@ func editEntri(w http.ResponseWriter, r *http.Request) {
 	}
 	kun := &Pasien{}
 	json.NewDecoder(resp.Body).Decode(kun)
-
+	defer resp.Body.Close()
 	b := new(bytes.Buffer)
 	tmp := template.Must(template.New("modedit.html").ParseFiles("templates/modedit.html"))
 	err = tmp.Execute(b, nil)
@@ -499,6 +666,7 @@ func inputData(w http.ResponseWriter, r *http.Request) {
 	pts := &Pasien{}
 
 	json.NewDecoder(resp.Body).Decode(pts)
+	defer resp.Body.Close()
 	if pts.NoCM == "kesalahan-database" {
 		responseTemplate(w, "kesalahan-database", "", "")
 	}
@@ -543,6 +711,7 @@ func getCM(w http.ResponseWriter, r *http.Request) {
 	}
 
 	json.NewDecoder(resp.Body).Decode(pts)
+	defer resp.Body.Close()
 	b := new(bytes.Buffer)
 	tmp := template.Must(template.New("inputpts.html").ParseFiles("templates/inputpts.html"))
 	err = tmp.Execute(b, pts)
@@ -652,6 +821,7 @@ func mainContent(w http.ResponseWriter, r *http.Request) {
 	var web MainView
 
 	json.NewDecoder(resp.Body).Decode(&web)
+	defer resp.Body.Close()
 
 	// var b bytes.Buffer
 	// tmp := template.Must(template.New("main.html").ParseFiles("templates/main.html", "templates/input.html", "templates/content.html"))
@@ -675,4 +845,18 @@ func mainContent(w http.ResponseWriter, r *http.Request) {
 
 	// fmt.Fprintln(w, string(data))
 
+}
+
+func ProperCapital(input string) string {
+	words := strings.Fields(input)
+	smallwords := " dan atau dr. "
+
+	for index, word := range words {
+		if strings.Contains(smallwords, " "+word+" ") {
+			words[index] = word
+		} else {
+			words[index] = strings.Title(word)
+		}
+	}
+	return strings.Join(words, " ")
 }
