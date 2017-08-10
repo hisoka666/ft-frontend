@@ -167,12 +167,140 @@ func getPDF(w http.ResponseWriter, r *http.Request) {
 	json.NewDecoder(resp.Body).Decode(&pts)
 	defer resp.Body.Close()
 
-	createPDF(w, pts, gettgl, r.FormValue("email"))
+	createPDF(w, pts, countIKI(pts), gettgl, r.FormValue("nama"))
 }
+func countTotalIKI(l []ListIKI) (int, int, int, int, float32, float32, float32) {
+	var a, b, c, d int
 
-func createPDF(w http.ResponseWriter, p []Pasien, tgl, email string) {
+	for k, v := range l {
+		switch {
+		case k < 16:
+			a = a + v.SumIKI1
+			b = b + v.SumIKI2
+		case k >= 16:
+			c = c + v.SumIKI1
+			d = d + v.SumIKI2
+		}
+	}
 
+	e := float32(a+c)*0.032 + float32(b+d)*0.01
+	// m := a.(float32)
+	// n := c.(float32)
+	// // n := b.(float32) + d.(float32)
+	// // e = (a.(float32)+c.(float32))*g + (b.(float32)+d.(float32))*h
+	return a, b, a + c, b + d, float32(a+c) * 0.0032, float32(b+d) * 0.01, e
+}
+func createPDF(w http.ResponseWriter, p []Pasien, l []ListIKI, tgl, email string) {
+	a, b, c, d, e, f, g := countTotalIKI(l)
 	pdf := gofpdf.New("P", "mm", "A4", "")
+	pdf.SetFont("Arial", "", 12)
+	// Tabel IKI //////////////////////////////////////////////////////////
+	pdf.AddPageFormat("L", gofpdf.SizeType{Wd: 210, Ht: 297})
+	pdf.Cell(160, 6, "Bukti Kegiatan Harian")
+	pdf.Cell(120, 6, ("Nama Pegawai: " + email))
+	pdf.Ln(-1)
+	pdf.Cell(160, 6, "Pegawai RSUP Sanglah Denpasar")
+	pdf.Cell(120, 6, "NIP/Gol: ")
+	pdf.Ln(-1)
+	pdf.Cell(160, 6, ("Bulan: " + tgl))
+	pdf.Cell(120, 6, "Tempat Tugas: IGD RSUP Sanglah")
+	pdf.Ln(-1)
+	pdf.SetFont("Arial", "B", 9)
+	pdf.CellFormat(10, 20, "No", "1", 0, "C", false, 0, "")
+	pdf.CellFormat(50, 20, "Uraian", "1", 0, "C", false, 0, "")
+	pdf.CellFormat(20, 20, "Poin", "1", 0, "C", false, 0, "")
+	pdf.CellFormat(176, 10, "Jumlah Kegiatan Harian", "1", 2, "C", false, 0, "")
+	// range list iki
+
+	for i := 1; i < 17; i++ {
+		pdf.CellFormat(11, 10, strconv.Itoa(i), "1", 0, "C", false, 0, "")
+	}
+	pdf.SetXY(266, 28)
+	pdf.CellFormat(25, 20, "Jumlah Poin", "1", 0, "C", false, 0, "")
+	pdf.Ln(-1)
+	pdf.SetFont("Arial", "", 9)
+	pdf.CellFormat(10, 24, "1", "1", 0, "C", false, 0, "")
+
+	pdf.MultiCell(50, 6, "Melakukan pelayanan medik umum (per pasien : pemeriksaan rawat jalan, IGD, visite rawat inap, tim medis diskusi", "1", "L", false)
+	pdf.SetXY(70, 48)
+	pdf.CellFormat(20, 24, "0,0032", "1", 0, "C", false, 0, "")
+	for k, v := range l {
+		if k < 16 {
+			pdf.CellFormat(11, 24, strconv.Itoa(v.SumIKI1), "1", 0, "C", false, 0, "")
+		}
+	}
+	// for i := 1; i < 17; i++ {
+	// 	pdf.CellFormat(11, 24, strconv.Itoa(i), "1", 0, "C", false, 0, "")
+	// }
+	pdf.CellFormat(25, 24, strconv.Itoa(a), "1", 0, "C", false, 0, "")
+	pdf.Ln(-1)
+	pdf.CellFormat(10, 12, "2", "1", 0, "C", false, 0, "")
+	pdf.MultiCell(50, 6, "Melakukan tindakan medik umum tingkat sederhana (per tindakan)", "1", "L", false)
+	pdf.SetXY(70, 72)
+	pdf.CellFormat(20, 12, "0,01", "1", 0, "C", false, 0, "")
+	for k, v := range l {
+		if k < 16 {
+			pdf.CellFormat(11, 12, strconv.Itoa(v.SumIKI2), "1", 0, "C", false, 0, "")
+		}
+	}
+	// for i := 1; i < 17; i++ {
+	// 	pdf.CellFormat(11, 12, strconv.Itoa(i), "1", 0, "C", false, 0, "")
+	// }
+	pdf.CellFormat(25, 12, strconv.Itoa(b), "1", 0, "C", false, 0, "")
+	pdf.Ln(-1)
+	pdf.Ln(-1)
+	// Baris ke dua
+	pdf.SetFont("Arial", "B", 9)
+	pdf.CellFormat(10, 20, "No", "1", 0, "C", false, 0, "")
+	pdf.CellFormat(50, 20, "Uraian", "1", 0, "C", false, 0, "")
+	pdf.CellFormat(20, 20, "Poin", "1", 0, "C", false, 0, "")
+	pdf.CellFormat(176, 10, "Jumlah Kegiatan Harian", "1", 2, "C", false, 0, "")
+	for i := 1; i < 16; i++ {
+		pdf.CellFormat(11, 10, strconv.Itoa(i), "1", 0, "C", false, 0, "")
+	}
+	pdf.SetFont("Arial", "B", 7)
+	pdf.MultiCell(11, 5, "Jumlah Poin", "1", "C", false)
+	pdf.SetFont("Arial", "B", 9)
+	pdf.SetXY(266, 96)
+	pdf.MultiCell(25, 20, "Jumlah X Poin", "1", "C", false)
+	pdf.SetFont("Arial", "", 9)
+	pdf.CellFormat(10, 24, "1", "1", 0, "C", false, 0, "")
+
+	pdf.MultiCell(50, 6, "Melakukan pelayanan medik umum (per pasien : pemeriksaan rawat jalan, IGD, visite rawat inap, tim medis diskusi", "1", "L", false)
+	pdf.SetXY(70, 116)
+	pdf.CellFormat(20, 24, "0,0032", "1", 0, "C", false, 0, "")
+	for k, v := range l {
+		if k >= 16 {
+			pdf.CellFormat(11, 24, strconv.Itoa(v.SumIKI1), "1", 0, "C", false, 0, "")
+		}
+	}
+	// for i := 17; i <= 32; i++ {
+	// 	pdf.CellFormat(11, 24, strconv.Itoa(i), "1", 0, "C", false, 0, "")
+	// }
+	pdf.CellFormat(11, 24, strconv.Itoa(c), "1", 0, "C", false, 0, "")
+
+	pdf.CellFormat(25, 24, fmt.Sprintf("%.4f", e), "1", 0, "C", false, 0, "")
+	pdf.Ln(-1)
+	pdf.CellFormat(10, 12, "2", "1", 0, "C", false, 0, "")
+	pdf.MultiCell(50, 6, "Melakukan tindakan medik umum tingkat sederhana (per tindakan)", "1", "L", false)
+	pdf.SetXY(70, 140)
+	pdf.CellFormat(20, 12, "0,01", "1", 0, "C", false, 0, "")
+	for k, v := range l {
+		if k >= 16 {
+			pdf.CellFormat(11, 12, strconv.Itoa(v.SumIKI2), "1", 0, "C", false, 0, "")
+		}
+	}
+	// for i := 17; i <= 32; i++ {
+	// 	pdf.CellFormat(11, 12, strconv.Itoa(i), "1", 0, "C", false, 0, "")
+	// }
+	pdf.CellFormat(11, 12, strconv.Itoa(d), "1", 0, "C", false, 0, "")
+	pdf.CellFormat(25, 12, fmt.Sprintf("%.4f", f), "1", 0, "C", false, 0, "")
+	pdf.Ln(-1)
+	pdf.CellFormat(256, 6, "Jumlah Point X Volume kegiatan pelayanan", "1", 0, "R", false, 0, "")
+	pdf.CellFormat(25, 6, fmt.Sprintf("%.4f", g), "1", 1, "C", false, 0, "")
+	pdf.CellFormat(256, 6, "Target Point kegiatan pelayanan", "1", 0, "R", false, 0, "")
+	pdf.CellFormat(25, 6, "1,111", "1", 1, "C", false, 0, "")
+	////////////////// Buku Catatan Pasien ///////////////////////////////
 	pdf.AddPage()
 	pdf.SetFont("Arial", "B", 16)
 	wd := pdf.GetStringWidth("Buku Catatan Pribadi")
@@ -230,14 +358,14 @@ func createPDF(w http.ResponseWriter, p []Pasien, tgl, email string) {
 		}
 	}
 
-	b := new(bytes.Buffer)
-	err := pdf.Output(b)
+	t := new(bytes.Buffer)
+	err := pdf.Output(t)
 	if err != nil {
 		log.Fatalf("Error reading pdf %v", err)
 	}
 
 	w.Header().Set("Content-type", "application/pdf")
-	if _, err := b.WriteTo(w); err != nil {
+	if _, err := t.WriteTo(w); err != nil {
 		fmt.Fprintf(w, "%s", err)
 	}
 

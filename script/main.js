@@ -627,8 +627,10 @@ $("#navbar").on("click", ".createpdf", function(e){
 	e.preventDefault();
 	var token = localStorage.getItem("token");
 	var tgl = $(this).html();
+	var nama = "dr. " + $("#dokter").html();
 	var email = $("#email").val();
-	$("#namapdf").val(email);
+	$("#emailpdf").val(email);
+	$("#namapdf").val(nama);
 	$("#tglpdf").val(tgl);
 	$("#tokenpdf").val(token);
 	$("#getpdf").submit();
