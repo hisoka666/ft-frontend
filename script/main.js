@@ -108,10 +108,10 @@ $(document).ready(function(){
 					alert(js.script);
 				}else{
 					$("tbody").prepend(js.script);
-					refreshNumber();
 					$("#nocm").val('');
 					$("#datapasien").html('');
-					$("tbody tr:eq(101)").remove();
+					$("tbody tr:eq(100)").remove();
+					refreshNumber();
 					popModalWarning("Sukses", "Berhasil menambahkan data", "")
 					
 				}
