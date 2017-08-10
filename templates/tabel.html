@@ -4,236 +4,273 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+     <!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.7.1/css/bootstrap-datepicker.css">  -->
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js" integrity="sha256-T0Vest3yCU7pafRw9r+settMBX6JkKN06dqBnpQ8d30=" crossorigin="anonymous"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <!-- <script src="script/chart.js"></script> -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
     <title>Document</title>
     <style>
-        .maintable{
-            border: 1px solid black;
-            width: 100%;
 
-        }
-        .num {
+        .tab-no{
             width: 3%;
+            height: 200px;
         }
-        .uraian{
-            width: 15%;
+        .tab-uraian{
+            width: 20%;
+            height: 200px;
+        } 
+        .keg{
+            width: 100%;
+        }  
+        .tab-poin{
+            width: 3%;
+            height: 200px;
         }
-        .poin{
-            width: 5%;
-        }
-        .jmlend{
-            width: 5%;
+        .tab-jum{
+            width: 3%;
+            height: 200px;
+        }  
+        .maincell{
+            width: 100%;
         }
 
-        .jmlend{
-            width: 10%;
+        .cell {
             text-align: center;
         }
-        .jmlpts{
-            width: 75px;
-            text-align: center;
+        .row-01{
+            height: 100px;
         }
-        .smallcell{
-            width: 60px;
-            text-align: center;
+        .row-02{
+            height: 100px;
         }
+        .umum{
+            height: 100px;
+        }
+        .khusus{
+            height: 46px;
+        }
+
 
     </style>
 </head>
 <body>
+<table class="table table-bordered table-condensed maintable">
+    <tr>
+        <td class="tab-no">
+            <table class="table tab-inside">
+                <tr>
+                    <th class="umum bg-success">No</th>
+                </tr>
+                <tr>
+                    <td class="row-01">1</td>
+                </tr>
+                <tr>
+                    <td class="row-02">2</td>
+                </tr>
+            </table>
+        </td>
+        <td class="tab-uraian">
+            <table class="table tab-inside">
+                <tr>
+                    <th class="umum bg-success">Uraian</th>
+                </tr>
+                <tr>
+                    <td class="row-01">Melakukan pelayanan medik umum (per pasien : pemeriksaan rawat jalan, IGD, visite rawat inap, tim medis diskusi	</td>
+                </tr>
+                <tr>
+                    <td class="row-02">Melakukan tindakan medik umum tingkat sederhana (per tindakan)</td>
+                </tr>
+            </table>
+        </td>
+        <td class="tab-poin">
+            <table class="table tab-inside">
+                <tr>
+                    <th class="umum bg-success">Poin</th>
+                </tr>
+                <tr>
+                    <td class="row-01">0,0032</td>
+                </tr>
+                <tr>
+                    <td class="row-02">0,01</td>
+                </tr>
+            </table>
+        </td>
+        <td class="tab-keg">
+            <table class="table keg tab-inside">
+                <tr>
+                    <th class="khusus bg-success">Jumlah Kegiatan Harian</th>
+                </tr>
+                <tr>
+                    <td>
+                        <table class="table maincell">
+                            <tr>
+                                <th class="cell khusus bg-success"> 1</th>
+                                <th class="cell khusus bg-success"> 2</th>
+                                <th class="cell khusus bg-success"> 3</th>
+                                <th class="cell khusus bg-success"> 4</th>
+                                <th class="cell khusus bg-success"> 5</th>
+                                <th class="cell khusus bg-success"> 6</th>
+                                <th class="cell khusus bg-success"> 7</th>
+                                <th class="cell khusus bg-success"> 8</th>
+                                <th class="cell khusus bg-success"> 9</th>
+                                <th class="cell khusus bg-success"> 10</th>
+                                <th class="cell khusus bg-success"> 11</th>
+                                <th class="cell khusus bg-success"> 12</th>
+                                <th class="cell khusus bg-success"> 13</th>
+                                <th class="cell khusus bg-success"> 14</th>
+                                <th class="cell khusus bg-success"> 15</th>
+                                <th class="cell khusus bg-success"> 16</th>
+                            </tr>
+                            <tr class="row-01">
+                            {{with .}}
+                                {{range $m, $n := .}}
+                                    {{if lt $m 16}}
+                                        <td class="cell jml">{{.SumIKI1}} </td>
+                                    {{end}}
+                                {{end}}
+                            {{end}}
+                            </tr>
+                            <tr class="row-02">
+                            {{with .}}
+                                {{range $m, $n := .}}
+                                    {{if lt $m 16}}
+                                        <td class="cell jml">{{.SumIKI2}}</td>
+                                    {{end}}
+                                {{end}}
+                            {{end}}
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+            </table>
+        </td>
+        <td class="tab-jum">
+            <table class="table tab-inside">
+                <tr>
+                    <th class="umum bg-success">Jumlah Poin</th>
+                </tr>
+                <tr>
+                    <td class="row-01"><span id="jmlpoin-1-1"></td>
+                </tr>
+                <tr>
+                    <td class="row-02"><span id="jmlpoin-1-2"></td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+</table>
+<div></div>
 
-    <table class="maintable">
-        <tr>
-            <th class="num">No</th>
-            <th class="uraian">Uraian</th>
-            <th class="poin">Poin</th>
-            <th class="keg">
-                <table>
-                    <tr>
-                        <td>Jumlah Kegiatan Harian</td>
-                    </tr>
-                    <tr class="maxedwidth">
-                        <td>
-                            <table class="smallblock">
-                                <tr>
-                                    <td class="smallcell"> 1</td>
-                                    <td class="smallcell"> 2</td>
-                                    <td class="smallcell"> 3</td>
-                                    <td class="smallcell"> 4</td>
-                                    <td class="smallcell"> 5</td>
-                                    <td class="smallcell"> 6</td>
-                                    <td class="smallcell"> 7</td>
-                                    <td class="smallcell"> 8</td>
-                                    <td class="smallcell"> 9</td>
-                                    <td class="smallcell"> 10</td>
-                                    <td class="smallcell"> 11</td>
-                                    <td class="smallcell"> 12</td>
-                                    <td class="smallcell"> 13</td>
-                                    <td class="smallcell"> 14</td>
-                                    <td class="smallcell"> 15</td>
-                                    <td class="smallcell"> 16</td>
-                                </tr>
-                            </table>
-                        </td>
-                    </tr>
-                </table>
-            </th>
-            <th class="jmlend">Jumlah Poin</th>
-        </tr>
-        <tr>
-            <td class="num">1</td>
-            <td class="uraian">Melakukan pelayanan medik umum (per pasien : pemeriksaan rawat jalan, IGD, visite rawat inap, tim medis diskusi</td>
-            <td class="poin">0,0032</td>
-            <td class="keg">
-                <table class="smallblock">
-                    <tr>
-                        <td class="smallcell"> 1</td>
-                        <td class="smallcell"> 2</td>
-                        <td class="smallcell"> 3</td>
-                        <td class="smallcell"> 4</td>
-                        <td class="smallcell"> 5</td>
-                        <td class="smallcell"> 6</td>
-                        <td class="smallcell"> 7</td>
-                        <td class="smallcell"> 8</td>
-                        <td class="smallcell"> 9</td>
-                        <td class="smallcell"> 10</td>
-                        <td class="smallcell"> 11</td>
-                        <td class="smallcell"> 12</td>
-                        <td class="smallcell"> 13</td>
-                        <td class="smallcell"> 14</td>
-                        <td class="smallcell"> 15</td>
-                        <td class="smallcell"> 16</td>
-                    </tr>
-                </table>
-            </td>
-            <td class="jmlend"> <span id="jmlpoin"></span></td>
-        </tr>
-        <tr>
-            <td class="num">2</td>
-            <td class="uraian">Melakukan tindakan medik umum tingkat sederhana (per tindakan)</td>
-            <td class="poin">0,01</td>
-            <td class="keg">
-                <table class="smallblock">
-                    <tr>
-                        <td class="smallcell"> 1</td>
-                        <td class="smallcell"> 2</td>
-                        <td class="smallcell"> 3</td>
-                        <td class="smallcell"> 4</td>
-                        <td class="smallcell"> 5</td>
-                        <td class="smallcell"> 6</td>
-                        <td class="smallcell"> 7</td>
-                        <td class="smallcell"> 8</td>
-                        <td class="smallcell"> 9</td>
-                        <td class="smallcell"> 10</td>
-                        <td class="smallcell"> 11</td>
-                        <td class="smallcell"> 12</td>
-                        <td class="smallcell"> 13</td>
-                        <td class="smallcell"> 14</td>
-                        <td class="smallcell"> 15</td>
-                        <td class="smallcell"> 16</td>
-                    </tr>
-                </table>
-            </td>
-            <td class="jmlend"> <span id="jmlpoin"></span></td>
-        </tr>
-    </table>
+<table class="table table-bordered table-condensed maintable">
+    <tr>
+        <td class="tab-no">
+            <table class="table tab-inside">
+                <tr>
+                    <th class="umum bg-success">No</th>
+                </tr>
+                <tr>
+                    <td class="row-01">1</td>
+                </tr>
+                <tr>
+                    <td class="row-02">2</td>
+                </tr>
+            </table>
+        </td>
+        <td class="tab-uraian">
+            <table class="table tab-inside">
+                <tr>
+                    <th class="umum bg-success">Uraian</th>
+                </tr>
+                <tr>
+                    <td class="row-01">Melakukan pelayanan medik umum (per pasien : pemeriksaan rawat jalan, IGD, visite rawat inap, tim medis diskusi	</td>
+                </tr>
+                <tr>
+                    <td class="row-02">Melakukan tindakan medik umum tingkat sederhana (per tindakan)</td>
+                </tr>
+            </table>
+        </td>
+        <td class="tab-poin">
+            <table class="table tab-inside">
+                <tr>
+                    <th class="umum bg-success">Poin</th>
+                </tr>
+                <tr>
+                    <td class="row-01">0,0032</td>
+                </tr>
+                <tr>
+                    <td class="row-02">0,01</td>
+                </tr>
+            </table>
+        </td>
+        <td class="tab-keg">
+            <table class="table keg tab-inside">
+                <tr>
+                    <th class="khusus bg-success">Jumlah Kegiatan Harian</th>
+                </tr>
+                <tr>
+                    <td>
+                        <table class="table maincell">
+                            <tr>
+                                <th class="cell khusus bg-success"> 1</th>
+                                <th class="cell khusus bg-success"> 2</th>
+                                <th class="cell khusus bg-success"> 3</th>
+                                <th class="cell khusus bg-success"> 4</th>
+                                <th class="cell khusus bg-success"> 5</th>
+                                <th class="cell khusus bg-success"> 6</th>
+                                <th class="cell khusus bg-success"> 7</th>
+                                <th class="cell khusus bg-success"> 8</th>
+                                <th class="cell khusus bg-success"> 9</th>
+                                <th class="cell khusus bg-success"> 10</th>
+                                <th class="cell khusus bg-success"> 11</th>
+                                <th class="cell khusus bg-success"> 12</th>
+                                <th class="cell khusus bg-success"> 13</th>
+                                <th class="cell khusus bg-success"> 14</th>
+                                <th class="cell khusus bg-success"> 15</th>
+                                <th class="cell khusus bg-success">Jumlah Poin</th>
+                            </tr>
+                            <tr class="row-01">
+                                {{with .}}
+                                    {{range $m, $n := .}}
+                                        {{if ge $m 16}}
+                                            <td class="cell jml">{{.SumIKI1}}</td>
+                                        {{end}}
+                                    {{end}}
+                                {{end}}
+                                <td class="cell"><span id="jmlpoin-2-1"></span></td>
+                            </tr>
+                            <tr class="row-02">
+                                {{with .}}
+                                    {{range $m, $n := .}}
+                                        {{if ge $m 16}}
+                                            <td class="cell jml">{{.SumIKI2}}</td>
+                                        {{end}}
+                                    {{end}}
+                                {{end}}
+                                <td class="cell"><span id="jmlpoin-2-2"></span></td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+            </table>
+        </td>
+        <td class="tab-jum">
+            <table class="table tab-inside">
+                <tr>
+                    <th class="umum bg-success">Jumlah Poin</th>
+                </tr>
+                <tr>
+                    <td class="row-01">xxx</td>
+                </tr>
+                <tr>
+                    <td class="row-02">xxx</td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+</table>
 
 
-    <table class="maintable">
-        <tr>
-            <th class="num">No</th>
-            <th class="uraian">Uraian</th>
-            <th class="poin">Poin</th>
-            <th class="keg">
-                <table>
-                    <tr>
-                        <td>Jumlah Kegiatan</td>
-                    </tr>
-                    <tr class="maxedwidth">
-                        <td>
-                            <table class="smallblock">
-                                <tr>
-                                    <td class="smallcell"> 17</td>
-                                    <td class="smallcell"> 18</td>
-                                    <td class="smallcell"> 19</td>
-                                    <td class="smallcell"> 20</td>
-                                    <td class="smallcell"> 21</td>
-                                    <td class="smallcell"> 22</td>
-                                    <td class="smallcell"> 23</td>
-                                    <td class="smallcell"> 24</td>
-                                    <td class="smallcell"> 25</td>
-                                    <td class="smallcell"> 26</td>
-                                    <td class="smallcell"> 27</td>
-                                    <td class="smallcell"> 28</td>
-                                    <td class="smallcell"> 29</td>
-                                    <td class="smallcell"> 30</td>
-                                    <td class="smallcell"> 31</td>
-                                    <td class="jmlpts"> Jumlah Poin</td>
-                                </tr>
-                            </table>
-                        </td>
-                    </tr>
-                </table>
-            </th>
-            <th class="jmlend">Jumlah X Poin</th>
-        </tr>
-        <tr>
-            <td class="num">1</td>
-            <td class="uraian">Melakukan pelayanan medik umum (per pasien : pemeriksaan rawat jalan, IGD, visite rawat inap, tim medis diskusi</td>
-            <td class="poin">0,0032</td>
-            <td class="keg">
-                <table class="smallblock">
-                    <tr>
-                        <td class="smallcell"> 17</td>
-                        <td class="smallcell"> 18</td>
-                        <td class="smallcell"> 19</td>
-                        <td class="smallcell"> 20</td>
-                        <td class="smallcell"> 21</td>
-                        <td class="smallcell"> 22</td>
-                        <td class="smallcell"> 23</td>
-                        <td class="smallcell"> 24</td>
-                        <td class="smallcell"> 25</td>
-                        <td class="smallcell"> 26</td>
-                        <td class="smallcell"> 27</td>
-                        <td class="smallcell"> 28</td>
-                        <td class="smallcell"> 29</td>
-                        <td class="smallcell"> 30</td>
-                        <td class="smallcell"> 31</td>
-                        <td class="jmlpts"> 32</td>
-                    </tr>
-                </table>
-            </td>
-            <td class="jmlend">
-                <span id="jmlkeg"></span>
-            </td>
-        </tr>
-        <tr>
-            <td class="num">2</td>
-            <td class="uraian">Melakukan tindakan medik umum tingkat sederhana (per tindakan)</td>
-            <td class="poin">0,01</td>
-            <td class="keg">
-                <table class="smallblock">
-                    <tr>
-                        <td class="smallcell"> 17</td>
-                        <td class="smallcell"> 18</td>
-                        <td class="smallcell"> 19</td>
-                        <td class="smallcell"> 20</td>
-                        <td class="smallcell"> 21</td>
-                        <td class="smallcell"> 22</td>
-                        <td class="smallcell"> 23</td>
-                        <td class="smallcell"> 24</td>
-                        <td class="smallcell"> 25</td>
-                        <td class="smallcell"> 26</td>
-                        <td class="smallcell"> 27</td>
-                        <td class="smallcell"> 28</td>
-                        <td class="smallcell"> 29</td>
-                        <td class="smallcell"> 30</td>
-                        <td class="smallcell"> 31</td>
-                        <td class="jmlpts"> 32</td>
-                    </tr>
-                </table>
-            </td>
-            <td class="jmlend"> <span id="jmlxpoin"></span></td>
-        </tr>
-    </table>
 </body>
 </html>

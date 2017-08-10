@@ -1,3 +1,4 @@
+
 $(document).ready(function(){
 	var nocm = $("#nocm").val()
 	
@@ -288,6 +289,7 @@ $("#navbar").on("click", "#homebutton", function(e){
 			if (js.token == "OK") {
 				$("#inputnocm").show();
 				$("#tabeliki").hide();
+				$(".diagram").hide();
 				$("#tabelutama").html(js.script);
 				// removeModal("#modwarning")
 			}else{
@@ -532,12 +534,7 @@ $("#navbar").on("click", "#bulanini", function(e){
 	var now = new Date();
 	var dateone = new Date(now.getFullYear(),now.getMonth(),1,8,0,0);
 	var token = localStorage.getItem("token");
-	// console.log("Waktu hari ini adalah: " + now);
-	// console.log("Tanggal 1 adalah: " + dateone);
-	// console.log("Kondisi sekarang : " + (now > dateone))
-	// console.log($("#email").val());
 	if (now > dateone){
-		// console.log("Tanggal aktif adalah: " + new Date(now.getFullYear(),now.getMonth(),1));
 		$.post("getmonthly", {
 			token: token,
 			month: now.getMonth() + 1,
@@ -545,14 +542,15 @@ $("#navbar").on("click", "#bulanini", function(e){
 			email: $("#email").val()
 		}, function(data){
 			var js = JSON.parse(data);
+			pieChart(js.data, "")
 			$("#inputnocm").hide();
+			$(".diagram").show();
 			$("#tabeliki").html(js.modal).show();
 			getSum();
 			$("#tabelutama").html(js.script);
 		})
 	}else{
 		var blnlalu = new Date(now.getFullYear(), now.getMonth() - 1, 1)
-		// console.log("Tanggal aktif adalah: " + new Date(now.getFullYear(),(now.getMonth() - 1), 1));
 		$.post("getmonthly", {
 			token: token,
 			month: blnlalu.getMonth() + 1,
@@ -560,47 +558,14 @@ $("#navbar").on("click", "#bulanini", function(e){
 			email: $("#email").val()
 		}, function(data){
 			var js = JSON.parse(data);
+			pieChart(js.data, "")
+			$(".diagram").show();
 			$("#inputnocm").hide();
 			$("#tabeliki").html(js.modal).show();
 			getSum();
 			$("#tabelutama").html(js.script);
 		})
 	}
-
-	
-	// var total11 = 0;
-	// var total12 = 0;
-	// for(i=1;i<16;i++){
-	// 	var id1 = "#f-1-" + i.toString();
-	// 	var id2 = "#f-2-" + i.toString();
-	// 	console.log(id1);
-		// console.log($(id1).html())
-		// var iki1 = parseInt($(id1).html());
-		// var iki2 = parseInt($(id2).html());
-		// total11 = total11 + iki1;
-		// total12 = total12 + iki2;
-
-	// $("#jmlpoin-1-1").html(total11);
-	// $("#jmlpoin-1-2").html(total12);
-	// var total21 = 0;
-	// var total22 = 0;
-	// for(i=16;i<32;i++){
-	// 	var id1 = "#f-1-" + i.toString();
-	// 	var id2 = "#f-2-" + i.toString();
-	// 	var iki1 = parseInt($(id1).html());
-	// 	var iki2 = parseInt($(id2).html());
-	// 	console.log(total21.toString());
-	// 	total21 = total21 + iki1;
-	// 	total22 = total22 + iki2;
-	// }
-	// $("#f-1-32").html(total21);
-	// $("#f-2-32").html(total22);
-
-	// console.log("Total adalah: " + total21);
-	// $("#jmlxpoin1").html(total11 + total21);
-	// $("#jmlxpoin2").html(total12 + total22);
-	
-	
 
 
 });
@@ -647,8 +612,10 @@ $("#navbar").on("click", ".bcptgl", function(e){
 		email: $("#email").val()
 	}, function(data){
 		var js = JSON.parse(data);
+		// console.log("Jumlah interna adalah : " + JSON.stringify(js.data.data1))
+		pieChart(js.data, tgl)
 		$("#inputnocm").hide();
-
+		$(".diagram").show();
 		$("#tabeliki").html(js.modal).show();
 		getSum()
 		$("div.tabtitle").html("Tabel IKI " + tgl);
@@ -657,7 +624,7 @@ $("#navbar").on("click", ".bcptgl", function(e){
 });
 
 $("#navbar").on("click", ".createpdf", function(e){
-		e.preventDefault();
+	e.preventDefault();
 	var token = localStorage.getItem("token");
 	var tgl = $(this).html();
 	var email = $("#email").val();
@@ -665,35 +632,79 @@ $("#navbar").on("click", ".createpdf", function(e){
 	$("#tglpdf").val(tgl);
 	$("#tokenpdf").val(token);
 	$("#getpdf").submit();
-	// console.log($("#namapdf").val())
-
-	// var xhr = new XMLHttpRequest();
-	// xhr.open("POST", "getpdf", true);
-	// xhr.setRequestHeader('Content-Type', 'application/json');
-	// xhr.send(JSON.stringify({
-	// 	token: localStorage.getItem("token"),
-	// 	email: $("#email").val(),
-	// 	tgl: "tanggal"
-	// }));
-
-	// console.log("Link Fired, yeah");
-	// var token = localStorage.getItem("token");
-	// var tgl = $(this).html();
-	// console.log("This is tgl: " + tgl)
-	// $.post("getpdf", {
-	// 	token: token,
-	// 	tgl: tgl,
-	// 	email : $("#email").val()
-	// },function(data){
-    //         var win = window.open();
-    //         win.document.write(data);
-		// console.log("This should works right?")
-
-		// console.log("This is data: " + data)
-		// $("iframe").attr('src', data)
-		// $("#mymodal").modal();
 
 });
+
+var pieChart = function(list, tgl){
+
+
+	google.charts.load('current', {packages: ['corechart', 'bar']});
+	google.charts.setOnLoadCallback(drawChart);
+	google.charts.setOnLoadCallback(barChart);
+	function drawChart(){
+		var data = google.visualization.arrayToDataTable([
+          ['Bagian', 'Jumlah Pasien'],
+          ['Interna', list.data0.interna],
+          ['Bedah', list.data0.bedah],
+          ['Anak',  list.data0.anak],
+          ['OBGYN', list.data0.obgyn],
+          ['Saraf', list.data0.saraf],
+          ['Anestesi', list.data0.anes],
+          ['Psikiatri', list.data0.psik],
+          ['THT', list.data0.tht],
+          ['Kulit dan Kelamin', list.data0.kulit],
+          ['Jantung', list.data0.jant],
+          ['Umum', list.data0.um],
+          ['Mata', list.data0.mata],
+          ['MOD', list.data0.mod],
+        ]);
+
+        var options = {
+		  title: 'Jumlah Pasien PerBagian',
+		  width: 800,
+		  height: 400,
+        };
+
+        var chart = new google.visualization.PieChart(document.getElementById('piechart'));
+
+        chart.draw(data, options);
+	}
+
+	function barChart(){
+		var data = new google.visualization.DataTable();
+	    data.addColumn('number', 'Tanggal Jaga');
+		data.addColumn('number', 'Jumlah IKI 1');
+		data.addColumn('number', 'Jumlah IKI 2');
+		// var title = [['Tanggal Jaga', 'Jumlah IKI 1', 'Jumlah IKI 2']]
+		// var js = JSON.parse(list.data1)
+		var isi = []
+		for (i=0;i<31;i++){
+			// var isi = array[awal.tgl, awal.iki1, awal.iki2]
+			var awal = list.data1[i]
+			console.log("Awal adalah : " + awal.tgl)
+			data.addRows([
+				[awal.tgl, awal.iki1, awal.iki2]
+			])
+		}
+
+		
+		// var data = new google.visualization.arrayToDataTable(title);
+        var options = {
+			title: 'Jumlah Pasien Pertanggal Jaga',
+			width: 800,
+			hAxis : {
+				title: "Tanggal Jaga",
+			},
+			vAxis: {
+				title: "Jumlah Pasien"
+			}
+        };
+		var chart = new google.visualization.ColumnChart(document.getElementById('barchart'));
+
+        chart.draw(data, options);
+
+	}
+}
 
 
 });

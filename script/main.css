@@ -10,33 +10,36 @@
     overflow-y: auto;
 }
    
-          .maintable{
-            border: 1px solid black;
-            width: 100%;
-
-        }
-        .num {
-            width: 3%;
-        }
-        .uraian{
-            width: 15%;
-        }
-        .poin{
-            width: 5%;
-        }
-        .jmlend{
-            width: 5%;
-        } 
-
-        .jmlend{
-             width: 10%; 
-            text-align: center;
-        }
-        .jmlpts{
-              width: 75px;  
-            text-align: center;
-        }
-        .smallcell{
-              width: 60px;  
-            text-align: center;
-        }    
+.tab-no{
+    width: 3%;
+    }
+.tab-uraian{
+    width: 20%;
+    } 
+.keg{
+    width: 100%;
+    }  
+.tab-poin{
+    width: 3%;
+    }
+.tab-jum{
+    width: 3%;
+    }  
+.maincell{
+    width: 100%;
+    }
+.cell {
+    text-align: center;
+    }
+.row-01{
+    height: 120px;
+    }
+.row-02{
+    height: 40px;
+    }
+.umum{
+    height: 100px;
+    }
+.khusus{
+    height: 46px;
+    }  

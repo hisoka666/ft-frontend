@@ -37,7 +37,7 @@ type Pasien struct {
 	TglKunjungan string    `json:"tgl"`
 	ShiftJaga    string    `json:"shift"`
 	ATS          string    `json:"ats"`
-	Bagian       string    `json:"bagian"`
+	Dept         string    `json:"dept"`
 	NoCM         string    `json:"nocm"`
 	NamaPasien   string    `json:"nama"`
 	Diagnosis    string    `json:"diag"`
@@ -74,9 +74,10 @@ type Obat struct {
 }
 
 type Response struct {
-	Token  string `json:"token"`
-	Script string `json:"script"`
-	Modal  string `json:"modal"`
+	Token  string      `json:"token"`
+	Script string      `json:"script"`
+	Modal  string      `json:"modal"`
+	Data   interface{} `json:"data"`
 }
 
 type InputPts struct {
@@ -135,7 +136,7 @@ func ConvertToUbah(r *http.Request) *Pasien {
 		Diagnosis:  r.FormValue("diag"),
 		ATS:        r.FormValue("ats"),
 		IKI:        r.FormValue("iki"),
-		Bagian:     r.FormValue("bagian"),
+		Dept:       r.FormValue("bagian"),
 		LinkID:     r.FormValue("link"),
 		ShiftJaga:  r.FormValue("shift"),
 	}
@@ -165,49 +166,12 @@ func getPDF(w http.ResponseWriter, r *http.Request) {
 	pts := []Pasien{}
 	json.NewDecoder(resp.Body).Decode(&pts)
 	defer resp.Body.Close()
-	// bl := countDaysOfMonth(r.FormValue("year"), r.FormValue("month"))
-	// iki := countIKI(pts)
-
-	// fmt.Printf("Method adalah %v")
-	// dec := json.NewDecoder(r.Body)
-	// if dec == nil {
-	// 	fmt.Print("gagal membaca json")
-	// }
-
-	// jsMap := make(map[string]string)
-	// err := dec.Decode(&jsMap)
-	// if err != nil {
-	// 	log.Fatalf("Terjadi kesalahan decode: %v", err)
-	// }
-
-	// fmt.Printf("%v\n", jsMap)
-	// b, err := ioutil.ReadAll(r.Body)
-	// if err != nil {
-	// 	log.Fatalf("terjadi kesalahan : %v", err)
-	// 	return
-	// }
-	// r.Body.Close()
-	// fmt.Printf("%#v\n", b)
-	// log.Printf("Isi dari body adalah %v", b)
-	// var dat map[string]string
-	// if err := json.Unmarshal(b, &dat); err != nil {
-	// 	log.Fatalf("terjadi kesalahan : %v", err)
-	// 	return
-	// }
-
-	// fmt.Print(dat["email"])
-
-	// user, token := ft.CekStaff(ctx, dat["email"])
 
 	createPDF(w, pts, gettgl, r.FormValue("email"))
 }
 
 func createPDF(w http.ResponseWriter, p []Pasien, tgl, email string) {
-	// wdStr, err := os.Getwd()
-	// path := wdStr + "\\pdf.pdf"
-	// if err != nil {
-	// 	log.Fatal(err)
-	// }
+
 	pdf := gofpdf.New("P", "mm", "A4", "")
 	pdf.AddPage()
 	pdf.SetFont("Arial", "B", 16)
@@ -231,12 +195,12 @@ func createPDF(w http.ResponseWriter, p []Pasien, tgl, email string) {
 	pdf.CellFormat(40, 20, "Diagnosis", "1", 0, "C", false, 0, "")
 
 	pdf.MultiCell(20, 5, "Melakukan pelayanan medik umum", "1", "C", false)
-	// fmt.Println(pdf.GetXY())
+
 	pdf.SetXY(174, 35)
 	pdf.MultiCell(25, 4, "Melakukan tindakan medik umum tingkat sederhana", "1", "C", false)
-	// diag := []string{"a","a","a"}
-	pdf.SetFont("Arial", "", 8)
+
 	for k, v := range p {
+		pdf.SetFont("Arial", "", 8)
 		diag := ProperCapital(v.Diagnosis)
 		if len(diag) > 20 {
 			diag = diag[:21]
@@ -254,57 +218,28 @@ func createPDF(w http.ResponseWriter, p []Pasien, tgl, email string) {
 		pdf.CellFormat(17, 7, nocm, "1", 0, "C", false, 0, "")
 		pdf.CellFormat(60, 7, nam, "1", 0, "L", false, 0, "")
 		pdf.CellFormat(40, 7, diag, "1", 0, "L", false, 0, "")
+		pdf.SetFont("ZapfDingbats", "", 8)
 		if v.IKI == "1" {
-			pdf.CellFormat(20, 7, "a", "1", 0, "C", false, 0, "")
+			pdf.CellFormat(20, 7, "4", "1", 0, "C", false, 0, "")
 			pdf.CellFormat(25, 7, "", "1", 0, "C", false, 0, "")
 			pdf.Ln(-1)
 		} else {
 			pdf.CellFormat(20, 7, "", "1", 0, "C", false, 0, "")
-			pdf.CellFormat(25, 7, "a", "1", 0, "C", false, 0, "")
+			pdf.CellFormat(25, 7, "4", "1", 0, "C", false, 0, "")
 			pdf.Ln(-1)
 		}
-
 	}
-	////////////////////////////////////////////////
-	// diag := "aaaaa"
-	// for i := 1; i < 40; i++ {
-	// 	diag = diag + "a"
-	// 	if len(diag) > 10 {
-	// 		diag = diag[:10]
-	// 	}
-	// 	num := strconv.Itoa(i)
-	// 	pdf.CellFormat(9, 7, num, "1", 0, "C", false, 0, "")
-	// 	pdf.CellFormat(15, 7, fmt.Sprintf("tanggal %v", i), "1", 0, "C", false, 0, "")
-	// 	pdf.CellFormat(20, 7, "aaaaa", "1", 0, "C", false, 0, "")
-	// 	pdf.CellFormat(60, 7, "aaaaa", "1", 0, "C", false, 0, "")
-	// 	pdf.CellFormat(40, 7, diag, "1", 0, "C", false, 0, "")
-	// 	pdf.CellFormat(20, 7, "aaa", "1", 0, "C", false, 0, "")
-	// 	pdf.CellFormat(25, 7, "aaa", "1", 0, "C", false, 0, "")
-	// 	pdf.Ln(-1)
-	// }
 
 	b := new(bytes.Buffer)
 	err := pdf.Output(b)
 	if err != nil {
 		log.Fatalf("Error reading pdf %v", err)
 	}
-	// fmt.Print("It's working!")
-	// stream, err := ioutil.ReadAll(b)
-	// if err != nil {
-	// 	log.Fatal(err)
-	// 	os.Exit(1)
-	// }
-
-	// b := bytes.NewBuffer(stream)
 
 	w.Header().Set("Content-type", "application/pdf")
 	if _, err := b.WriteTo(w); err != nil {
 		fmt.Fprintf(w, "%s", err)
 	}
-	// err = pdf.OutputFileAndClose(path)
-	// if err != nil {
-	// 	log.Fatal(err)
-	// }
 
 }
 
@@ -330,14 +265,25 @@ func getBCPMonth(w http.ResponseWriter, r *http.Request) {
 	pts := []Pasien{}
 	json.NewDecoder(resp.Body).Decode(&pts)
 	defer resp.Body.Close()
+	jaga := dataJaga(perBagian(pts), countIKI(pts))
+	// bag := perBagian(pts)
 	// bl := countDaysOfMonth(r.FormValue("year"), r.FormValue("month"))
 	iki := countIKI(pts)
 	// fmt.Printf("LIst iki adalah: %v", iki)
 
-	responseTemplate(w, "OK", GenTemplate(pts, "contentrefresh"), GenTemplate(iki, "tabeliki"))
+	responseTemplate(w, "OK", GenTemplate(pts, "contentrefresh"), GenTemplate(iki, "tabeliki"), jaga)
 
 }
 
+func dataJaga(m ...interface{}) interface{} {
+	j := make(map[string]interface{})
+	for k, v := range m {
+		keymap := "data" + strconv.Itoa(k)
+		j[keymap] = v
+	}
+
+	return j
+}
 func getMonthly(w http.ResponseWriter, r *http.Request) {
 	if r.Method != "POST" {
 		http.Error(w, "Post request please", http.StatusMethodNotAllowed)
@@ -361,11 +307,11 @@ func getMonthly(w http.ResponseWriter, r *http.Request) {
 	pts := []Pasien{}
 	json.NewDecoder(resp.Body).Decode(&pts)
 	defer resp.Body.Close()
-	// bl := countDaysOfMonth(r.FormValue("year"), r.FormValue("month"))
 	iki := countIKI(pts)
+	jaga := dataJaga(perBagian(pts), countIKI(pts))
 	// fmt.Printf("LIst iki adalah: %v", iki)
 
-	responseTemplate(w, "OK", GenTemplate(pts, "contentrefresh"), GenTemplate(iki, "tabeliki"))
+	responseTemplate(w, "OK", GenTemplate(pts, "contentrefresh"), GenTemplate(iki, "tabeliki"), jaga)
 
 }
 
@@ -405,7 +351,55 @@ func countDaysOfMonth(y, m string) int {
 
 	return time.Date(yr, time.Month(mo), 0, 0, 0, 0, 0, time.UTC).Day()
 }
+func perBagian(n []Pasien) map[string]int {
+	var interna, bedah, anak, obgyn, saraf, anes, psik, tht, kulit, jant, um, mata, mod int
+	for _, v := range n {
+		switch v.Dept {
+		case "1":
+			interna++
+		case "2":
+			bedah++
+		case "3":
+			anak++
+		case "4":
+			obgyn++
+		case "5":
+			saraf++
+		case "6":
+			anes++
+		case "7":
+			psik++
+		case "8":
+			tht++
+		case "9":
+			kulit++
+		case "10":
+			jant++
+		case "11":
+			um++
+		case "12":
+			mata++
+		case "13":
+			mod++
+		}
+	}
 
+	m := make(map[string]int)
+	m["interna"] = interna
+	m["bedah"] = bedah
+	m["anak"] = anak
+	m["obgyn"] = obgyn
+	m["saraf"] = saraf
+	m["anes"] = anes
+	m["psik"] = psik
+	m["tht"] = tht
+	m["kulit"] = kulit
+	m["jant"] = jant
+	m["umum"] = um
+	m["mata"] = mata
+	m["mod"] = mod
+	return m
+}
 func inputObat(w http.ResponseWriter, r *http.Request) {
 	if r.Method != "POST" {
 		http.Error(w, "Post request please", http.StatusMethodNotAllowed)
@@ -434,7 +428,7 @@ func getInputObat(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	responseTemplate(w, "OK", GenTemplate(nil, "modinputobat"), "")
+	responseTemplate(w, "OK", GenTemplate(nil, "modinputobat"), "", nil)
 }
 
 func getPresPage(w http.ResponseWriter, r *http.Request) {
@@ -443,7 +437,7 @@ func getPresPage(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	responseTemplate(w, "OK", GenTemplate(nil, "modlistresep"), "")
+	responseTemplate(w, "OK", GenTemplate(nil, "modlistresep"), "", nil)
 }
 
 func getPtsPage(w http.ResponseWriter, r *http.Request) {
@@ -451,7 +445,7 @@ func getPtsPage(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Get request please", http.StatusMethodNotAllowed)
 		return
 	}
-	responseTemplate(w, "OK", GenTemplate(nil, "modresep"), "")
+	responseTemplate(w, "OK", GenTemplate(nil, "modresep"), "", nil)
 }
 
 func confEditTanggal(w http.ResponseWriter, r *http.Request) {
@@ -468,7 +462,7 @@ func confEditTanggal(w http.ResponseWriter, r *http.Request) {
 
 	resp, err := sendPost(pts, r.FormValue("token"), url)
 	if err != nil {
-		responseTemplate(w, "not-OK", "", GenModal("Kesalahan Server", "Terjadi kesalahan server. Hubungi admin", ""))
+		responseTemplate(w, "not-OK", "", GenModal("Kesalahan Server", "Terjadi kesalahan server. Hubungi admin", ""), nil)
 		log.Fatalf("Terjadi kesalahan pengiriman ke server")
 	}
 
@@ -478,11 +472,11 @@ func confEditTanggal(w http.ResponseWriter, r *http.Request) {
 	fmt.Printf("Isi dari token adalah: %v", list.Token)
 	if list.Token != "OK" {
 		log.Fatalf("Terjadi kesalahan server")
-		responseTemplate(w, "not-OK", "", GenModal("Kesalahan Server", "Terjadi kesalahan server. Hubungi admin", ""))
+		responseTemplate(w, "not-OK", "", GenModal("Kesalahan Server", "Terjadi kesalahan server. Hubungi admin", ""), nil)
 		return
 	}
 
-	responseTemplate(w, "OK", GenTemplate(list.Pasien, "contentrefresh"), "")
+	responseTemplate(w, "OK", GenTemplate(list.Pasien, "contentrefresh"), "", nil)
 
 }
 
@@ -499,7 +493,7 @@ func editTanggal(w http.ResponseWriter, r *http.Request) {
 
 	resp, err := sendPost(pts, r.FormValue("token"), url)
 	if err != nil {
-		responseTemplate(w, "not-OK", "", GenModal("Kesalahan Server", "Terjadi kesalahan server. Hubungi admin", ""))
+		responseTemplate(w, "not-OK", "", GenModal("Kesalahan Server", "Terjadi kesalahan server. Hubungi admin", ""), nil)
 		log.Print("Terjadi kesalahan server")
 		return
 	}
@@ -509,7 +503,7 @@ func editTanggal(w http.ResponseWriter, r *http.Request) {
 	pts.LinkID = link
 
 	script := GenTemplate(pts, "modubahtgl")
-	responseTemplate(w, "OK", script, "")
+	responseTemplate(w, "OK", script, "", nil)
 	defer resp.Body.Close()
 }
 
@@ -527,12 +521,12 @@ func firstEntries(w http.ResponseWriter, r *http.Request) {
 	resp, err := sendPost(send, r.FormValue("token"), url)
 
 	if err != nil {
-		responseTemplate(w, "kesalahan-client", "", "")
+		responseTemplate(w, "kesalahan-client", "", "", nil)
 		return
 	}
 
 	json.NewDecoder(resp.Body).Decode(send)
-	responseTemplate(w, "OK", GenTemplate(send.Pasien, "contentrefresh"), "")
+	responseTemplate(w, "OK", GenTemplate(send.Pasien, "contentrefresh"), "", nil)
 	defer resp.Body.Close()
 }
 
@@ -549,18 +543,18 @@ func confDelete(w http.ResponseWriter, r *http.Request) {
 	resp, err := sendPost(del, r.FormValue("token"), url)
 
 	if err != nil {
-		responseTemplate(w, "kesalahan-client", "", "")
+		responseTemplate(w, "kesalahan-client", "", "", nil)
 		return
 	}
 
 	json.NewDecoder(resp.Body).Decode(del)
 
 	if del.StatusServer != "OK" {
-		responseTemplate(w, "kesalahan-server", "", "")
+		responseTemplate(w, "kesalahan-server", "", "", nil)
 		return
 	}
 	defer resp.Body.Close()
-	responseTemplate(w, "OK", "", "")
+	responseTemplate(w, "OK", "", "", nil)
 }
 
 func confEditEntri(w http.ResponseWriter, r *http.Request) {
@@ -572,18 +566,18 @@ func confEditEntri(w http.ResponseWriter, r *http.Request) {
 	ubah := ConvertToUbah(r)
 	resp, err := sendPost(ubah, r.FormValue("token"), url)
 	if err != nil {
-		responseTemplate(w, "kesalahan-server", "", "")
+		responseTemplate(w, "kesalahan-server", "", "", nil)
 		return
 	}
 	res := &Pasien{}
 	json.NewDecoder(resp.Body).Decode(res)
 
 	if res.StatusServer != "OK" {
-		responseTemplate(w, res.StatusServer, "", GenModal("Peringatan", res.NoCM, ""))
+		responseTemplate(w, res.StatusServer, "", GenModal("Peringatan", res.NoCM, ""), nil)
 		return
 	}
 	defer resp.Body.Close()
-	responseTemplate(w, "OK", GenTemplate(res, "baristabel"), GenModal("Sukses", "Data berhasil diubah", ""))
+	responseTemplate(w, "OK", GenTemplate(res, "baristabel"), GenModal("Sukses", "Data berhasil diubah", ""), nil)
 }
 
 func deleteEntri(w http.ResponseWriter, r *http.Request) {
@@ -591,7 +585,7 @@ func deleteEntri(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Post request only", http.StatusMethodNotAllowed)
 	}
 	fmt.Print(GenModal("Hapus Entri", "Yakin ingin menghapus entri ini?", "Hapus"))
-	responseTemplate(w, "OK", "", GenModal("Hapus Entri", "Yakin ingin menghapus entri ini?", "Hapus"))
+	responseTemplate(w, "OK", "", GenModal("Hapus Entri", "Yakin ingin menghapus entri ini?", "Hapus"), nil)
 
 }
 func editEntri(w http.ResponseWriter, r *http.Request) {
@@ -607,7 +601,7 @@ func editEntri(w http.ResponseWriter, r *http.Request) {
 
 	resp, err := sendPost(pts, r.FormValue("token"), url)
 	if err != nil {
-		responseTemplate(w, "kesalahan-server", "", "")
+		responseTemplate(w, "kesalahan-server", "", "", nil)
 	}
 	kun := &Pasien{}
 	json.NewDecoder(resp.Body).Decode(kun)
@@ -616,7 +610,7 @@ func editEntri(w http.ResponseWriter, r *http.Request) {
 	tmp := template.Must(template.New("modedit.html").ParseFiles("templates/modedit.html"))
 	err = tmp.Execute(b, nil)
 	if err != nil {
-		responseTemplate(w, "kesalahan-template", "", "")
+		responseTemplate(w, "kesalahan-template", "", "", nil)
 		fmt.Print(err)
 	}
 
@@ -660,7 +654,7 @@ func inputData(w http.ResponseWriter, r *http.Request) {
 
 	resp, err := sendPost(input, r.FormValue("token"), url)
 	if err != nil {
-		responseTemplate(w, "kesalahan-server", "", "")
+		responseTemplate(w, "kesalahan-server", "", "", nil)
 	}
 
 	pts := &Pasien{}
@@ -668,15 +662,15 @@ func inputData(w http.ResponseWriter, r *http.Request) {
 	json.NewDecoder(resp.Body).Decode(pts)
 	defer resp.Body.Close()
 	if pts.NoCM == "kesalahan-database" {
-		responseTemplate(w, "kesalahan-database", "", "")
+		responseTemplate(w, "kesalahan-database", "", "", nil)
 	}
 	b := new(bytes.Buffer)
 	tmp := template.Must(template.New("baristabel.html").ParseFiles("templates/baristabel.html"))
 	err = tmp.Execute(b, pts)
 	if err != nil {
-		responseTemplate(w, "kesalahan-template", "", "")
+		responseTemplate(w, "kesalahan-template", "", "", nil)
 	}
-	responseTemplate(w, "OK", b.String(), "")
+	responseTemplate(w, "OK", b.String(), "", nil)
 
 }
 
@@ -707,7 +701,7 @@ func getCM(w http.ResponseWriter, r *http.Request) {
 	resp, err := sendPost(pts, token, url)
 	if err != nil {
 		// fmt.Print(err)
-		responseTemplate(w, "kesalahan-server", "", "")
+		responseTemplate(w, "kesalahan-server", "", "", nil)
 	}
 
 	json.NewDecoder(resp.Body).Decode(pts)
@@ -716,9 +710,9 @@ func getCM(w http.ResponseWriter, r *http.Request) {
 	tmp := template.Must(template.New("inputpts.html").ParseFiles("templates/inputpts.html"))
 	err = tmp.Execute(b, pts)
 	if err != nil {
-		responseTemplate(w, "kesalahan-template", "", "")
+		responseTemplate(w, "kesalahan-template", "", "", nil)
 	}
-	responseTemplate(w, "OK", b.String(), "")
+	responseTemplate(w, "OK", b.String(), "", nil)
 
 }
 
@@ -737,11 +731,12 @@ func sendPost(n interface{}, token, url string) (*http.Response, error) {
 	return resp, nil
 }
 
-func responseTemplate(w http.ResponseWriter, token, script, modal string) {
+func responseTemplate(w http.ResponseWriter, token, script, modal string, data interface{}) {
 	res := &Response{
 		Token:  token,
 		Script: script,
 		Modal:  modal,
+		Data:   data,
 	}
 	enc := json.NewEncoder(w)
 	enc.SetEscapeHTML(false)
@@ -823,28 +818,7 @@ func mainContent(w http.ResponseWriter, r *http.Request) {
 	json.NewDecoder(resp.Body).Decode(&web)
 	defer resp.Body.Close()
 
-	// var b bytes.Buffer
-	// tmp := template.Must(template.New("main.html").ParseFiles("templates/main.html", "templates/input.html", "templates/content.html"))
-	// err = tmp.Execute(&b, web)
-	// if err != nil {
-	// 	fmt.Print(err)
-	// }
-
-	responseTemplate(w, web.Token, GenTemplate(web, "main", "input", "content"), "")
-
-	// res := &Response{
-	// 	Token:  web.Token,
-	// 	Script: b.String(),
-	// }
-
-	// fmt.Println(b.String())
-	// fmt.Fprintln(w, )
-	// enc := json.NewEncoder(w)
-	// enc.SetEscapeHTML(false)
-	// err = enc.Encode(&res)
-
-	// fmt.Fprintln(w, string(data))
-
+	responseTemplate(w, web.Token, GenTemplate(web, "main", "input", "content"), "", nil)
 }
 
 func ProperCapital(input string) string {
