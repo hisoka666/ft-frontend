@@ -290,6 +290,7 @@ $("#navbar").on("click", "#homebutton", function(e){
 				$("#inputnocm").show();
 				$("#tabeliki").hide();
 				$(".diagram").hide();
+				$("#ket-bulan").hide();
 				$("#tabelutama").html(js.script);
 				// removeModal("#modwarning")
 			}else{
@@ -599,6 +600,7 @@ var getSum = function(){
 	$("#jmlxpoin1").html(tot1.toFixed(4));
 	$("#jmlxpoin2").html(tot2.toFixed(2));
 	$("#totalpoin").html("Keterangan: Total Poin untuk perhitungan IKI adalah: " + totfinal.toFixed(4));
+	$("#ket-bulan").show();
 }
 
 $("#navbar").on("click", ".bcptgl", function(e){
@@ -633,10 +635,33 @@ $("#navbar").on("click", ".createpdf", function(e){
 	$("#namapdf").val(nama);
 	$("#tglpdf").val(tgl);
 	$("#tokenpdf").val(token);
+	$("#getpdf").prop("action", "/getpdf")
 	$("#getpdf").submit();
 
 });
 
+$("#navbar").on("click", "#bul-ini-pdf", function(e){
+	e.preventDefault();
+	var token = localStorage.getItem("token");
+	// var tgl = $(this).html();
+	var nama = "dr. " + $("#dokter").html();
+	var email = $("#email").val();
+	var now = new Date();
+	var dateone = new Date(now.getFullYear(),now.getMonth(),1,8,0,0);
+	var tgl = ""
+	if ( now > dateone){
+		tgl = now.getFullYear().toString() + "/" + ("0" + (now.getMonth() + 1).toString()).slice(-2)
+	}else{
+		var blnlalu = new Date(now.getFullYear(), now.getMonth() - 1, 1)
+		tgl = blnlalu.getFullYear().toString + "/" + ("0" + (blnlalu.getMonth() + 1).toString()).slice(-2)
+	}
+	$("#emailpdf").val(email);
+	$("#namapdf").val(nama);
+	$("#tglpdf").val(tgl);
+	$("#tokenpdf").val(token);
+	$("#getpdf").prop("action", "/getpdfnow")
+	$("#getpdf").submit();
+})
 var pieChart = function(list, tgl){
 
 

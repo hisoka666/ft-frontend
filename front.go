@@ -118,6 +118,7 @@ func main() {
 	http.HandleFunc("/getmonthly", getMonthly)
 	http.HandleFunc("/getbcpmonth", getBCPMonth)
 	http.HandleFunc("/getpdf", getPDF)
+	http.HandleFunc("/getpdfnow", getPDFNow)
 	log.Println("Listening...")
 	log.Fatal(http.ListenAndServe(":8001", nil))
 
@@ -145,12 +146,40 @@ func ConvertToUbah(r *http.Request) *Pasien {
 }
 
 ////////////////////////////////////////////////////////////////////////////////////
+func getPDFNow(w http.ResponseWriter, r *http.Request) {
+	if r.Method != "POST" {
+		http.Error(w, "Post request please", http.StatusMethodNotAllowed)
+		return
+	}
+
+	url := "http://2.igdsanglah.appspot.com/getbulanini"
+
+	gettgl := r.FormValue("tgl")
+
+	send := &MainView{
+		User:  r.FormValue("email"),
+		Bulan: []string{gettgl},
+	}
+	resp, err := sendPost(send, r.FormValue("token"), url)
+	if err != nil {
+		log.Fatalf("Terjadi kesalahan di server: %v", err)
+	}
+	pts := []Pasien{}
+	json.NewDecoder(resp.Body).Decode(&pts)
+	defer resp.Body.Close()
+	iki := countIKI(pts)
+	// jaga := dataJaga(perBagian(pts), countIKI(pts))
+
+	createPDF(w, pts, iki, gettgl, r.FormValue("nama"))
+}
+
+////////////////////////////////////////////////////////////////////////////////////
 func getPDF(w http.ResponseWriter, r *http.Request) {
 	if r.Method != "POST" {
 		http.Error(w, "Post request please", http.StatusMethodNotAllowed)
 		return
 	}
-	fmt.Print("Request masuk")
+	// fmt.Print("Request masuk")
 	url := "http://2.igdsanglah.appspot.com/getbulan"
 
 	gettgl := r.FormValue("tgl")
@@ -183,7 +212,7 @@ func countTotalIKI(l []ListIKI) (int, int, int, int, float32, float32, float32) 
 		}
 	}
 
-	e := float32(a+c)*0.032 + float32(b+d)*0.01
+	e := float32(a+c)*0.0032 + float32(b+d)*0.01
 	// m := a.(float32)
 	// n := c.(float32)
 	// // n := b.(float32) + d.(float32)
@@ -255,7 +284,7 @@ func createPDF(w http.ResponseWriter, p []Pasien, l []ListIKI, tgl, email string
 	pdf.CellFormat(50, 20, "Uraian", "1", 0, "C", false, 0, "")
 	pdf.CellFormat(20, 20, "Poin", "1", 0, "C", false, 0, "")
 	pdf.CellFormat(176, 10, "Jumlah Kegiatan Harian", "1", 2, "C", false, 0, "")
-	for i := 1; i < 16; i++ {
+	for i := 17; i < 32; i++ {
 		pdf.CellFormat(11, 10, strconv.Itoa(i), "1", 0, "C", false, 0, "")
 	}
 	pdf.SetFont("Arial", "B", 7)
@@ -371,7 +400,6 @@ func createPDF(w http.ResponseWriter, p []Pasien, l []ListIKI, tgl, email string
 
 }
 
-////////////////////////////////////////////////////////////////////////////////////
 func getBCPMonth(w http.ResponseWriter, r *http.Request) {
 	if r.Method != "POST" {
 		http.Error(w, "Post request please", http.StatusMethodNotAllowed)
