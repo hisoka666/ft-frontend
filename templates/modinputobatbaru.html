@@ -1,0 +1,103 @@
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">&times;</button>
+                <h4 class="modal-title">Masukkan Data Obat</h4>
+            </div>
+
+
+            <div class="modal-body">
+                <div class="form-group">
+                    <div class="col-sm-12">
+                    <label for="">Merk Dagang Obat</label>
+                    <input type="text" name="merk" id="mrkdgng" class="form-control obat text-capitalize" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-sm-12">
+                    <label for="">Kandungan</label>
+                    <input type="text" name="kandungan" id="kand" class="form-control obat text-capitalize" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-sm-12">
+                    <label for="" class="radio-inline"><input type="radio" name="sediaan" id="tablet" value="1">Tablet</label>
+                    <label for="" class="radio-inline"><input type="radio" name="sediaan" id="sirup" value="2">Sirup</label>
+                    <label for="" class="radio-inline"><input type="radio" name="sediaan" id="lain" value="3">Lainnya</label>
+                    </div>
+                </div>
+                
+                <div class="form-group obat sirup tablet" hidden>
+                    <div class="col-sm-12">
+                    <label for="">Minimal Dosis PerKG Berat Badan PerKali Pemberian</label>
+                    <input type="number" name="mindose" id="mindose" class="form-control obat" > 
+                    </div>
+                </div>
+                <div class="form-group obat sirup tablet" hidden>
+                    <div class="col-sm-12">
+                    <label for="">Maksimal Dosis PerKG Berat Badan PerKali Pemberian</label>
+                    <input type="number" name="maxdose" id="maxdose" class="form-control obat" required>
+                    </div>
+                </div>
+                <div class="form-group obat sirup sediaan" hidden>
+                    <div class="obat sirup sediaan col-sm-12">
+                        <label for="">Sediaan Sirop Per 5 ML</label>
+                    </div>
+                    <div class="obat sirup sediaan col-sm-9">
+                        <input type="number" name="sirup" id="syr" class="form-control obat sirop">
+                    </div>
+                    <div class="obat sirup sediaan col-sm-3">
+                        <button class="btn sirup tambah">Tambah</button>
+                    </div>
+                
+                </div>
+                <div class="form-group obat sirup sediaan" hidden>
+                    <div class="drop obat sediaan col-sm-12">
+                        <label for="">Sediaan Drop Per 1 ML</label>
+                    </div>
+                    <div class="drop obat sediaan col-sm-9">
+                        <input type="number" name="drop" id="drop" class="form-control obat drop">
+                    </div>
+                    <div class="drop obat sediaan col-sm-3">
+                        <button class="btn drop tambah">Tambah</button>
+                    </div>
+                
+                </div>
+                <div class="form-group obat tablet sediaan" hidden>
+                    <div class="tablet col-sm-12">
+                        <label for="">Sediaan Tablet</label>
+                    </div>
+                    <div class="obat tablet sediaan col-sm-9">
+                        <input type="number" name="tablet" id="tablet" class="form-control obat tablet">
+                    </div>
+                    <div class="obat tablet sediaan col-sm-3">
+                        <button class="btn obat tablet tambah">Tambah</button>
+                    </div>
+                </div>
+                <div class="form-group obat lainnya sediaan" hidden>
+                    <div class="obat lainnya sediaan col-sm-12">
+                        <label for="">Sediaan Per Kemasan</label>
+                    </div>
+                    <div class="obat lainnya sediaan col-sm-9">
+                        <input type="number" name="lainnya" id="lainnya" class="form-control obat lainnya sediaan">
+                    </div>
+                    <div class="obat lainnya sediaan col-sm-3">
+                        <button class="btn lainnya tambah">Tambah</button>
+                    </div>
+                </div>
+                <div class="form-group rekom" hidden>
+                    <div class="col-sm-12">
+                    <label for="">Rekomendasi Pemberian</label>
+                    <input type="text" name="rekom" id="rekom" class="form-control obat" required>
+                    <input type="hidden" name="" id="inputby">
+                    <div class="col-sm-12" id="alertmsg"> </div>
+
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" id="modalbutton" class="btn btn-default" data-dismiss="modal">Tutup</button>
+                <button type="button" id="savdrug" class="btn btn-default">Simpan</button>
+            </div>
+        </div>
+    </div>

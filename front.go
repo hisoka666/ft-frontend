@@ -584,7 +584,7 @@ func getInputObat(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	responseTemplate(w, "OK", GenTemplate(nil, "modinputobat"), "", nil)
+	responseTemplate(w, "OK", GenTemplate(nil, "modinputobatbaru"), "", nil)
 }
 
 func getPresPage(w http.ResponseWriter, r *http.Request) {

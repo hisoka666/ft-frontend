@@ -107,7 +107,7 @@ $(document).ready(function(){
 				if (js.token != "OK"){
 					alert(js.script);
 				}else{
-					$("tbody").prepend(js.script);
+					$("tbody.dafpts").prepend(js.script);
 					$("#nocm").val('');
 					$("#datapasien").html('');
 					$("tbody tr:eq(100)").remove();
@@ -249,7 +249,7 @@ $("#navbar").on("click", "#delbut", function(e){
 		e.preventDefault();
 		var link = $(this).offsetParent().children().first().html();
 		var indexrow = $(this).closest("tr").index();
-		var urutan = "tbody tr:eq(" + indexrow + ")";
+		var urutan = "tbody.dafpts tr:eq(" + indexrow + ")";
 		var token = localStorage.getItem("token");
 		popModalWarning("Hapus Entri", "Yakin ingin menghapus entri ini?", "Hapus");
 		$("body").one("click", "#extrabut", function(){
@@ -288,10 +288,11 @@ $("#navbar").on("click", "#homebutton", function(e){
 			// console.log(js.script);
 			if (js.token == "OK") {
 				$("#inputnocm").show();
-				$("#tabeliki").hide();
+				$("#tabeliki").html("").hide();
 				$(".diagram").hide();
 				$("#ket-bulan").hide();
 				$("#tabelutama").html(js.script);
+				refreshNumber();
 				// removeModal("#modwarning")
 			}else{
 				popModalWarning("Peringatan", "Terjadi kesalahan pada server. Hubungi admin", "");
@@ -407,6 +408,21 @@ $("#navbar").on("click", "#makeresep", function(e){
 	})
 });
 
+$("body").on("change", "input:radio[name=sediaan]:checked", function(){
+	// console.log("Radio button checked");
+	if (this.value == "1"){
+
+		$("div.obat").not("tablet").hide();
+		$("div.obat.tablet").show();
+	}else if (this.value == "2"){
+		$("div.obat").not("sirup").hide();
+		$("div.obat.sirup").show();
+	}else{
+		$("div.obat").not("lainnya").hide();
+		$("div.obat.lainnya").show();
+	}
+	$("div.rekom").show();
+})
 $("#navbar").on("click", "#inputobat", function(e){
 	e.preventDefault();
 	$.get("getinputobat")
@@ -423,7 +439,7 @@ $("#navbar").on("click", "#inputobat", function(e){
 })
 
 $("body").on("click", ".btn.tablet.tambah", function(e){
-	tambahElement("tablet", this)
+	tambahElement("obat.tablet.sediaan", this)
 	// $("div.tablet.col-sm-9").last().clone().appendTo(".form-group.tablet");
 	// $("div.tablet.col-sm-3").last().clone().appendTo(".form-group.tablet");
 	// $("input.form-control.tablet").each(function(){
@@ -435,31 +451,40 @@ $("body").on("click", ".btn.tablet.tambah", function(e){
 
 $("body").on("click", ".btn.tablet.hapus", function(e){
 	e.preventDefault();
-	hapusElement("tablet", this);
+	hapusElement("obat.tablet.sediaan", this);
 	// var index = $(".tablet.col-sm-3").index($(this).parent());
 	// console.log("index adalah : " + index);
 	// $(".tablet.col-sm-9").eq(index).remove();
 	// $(".tablet.col-sm-3").eq(index).remove();
 });
 
-$("body").on("click", ".btn.sirop.tambah", function(e){
+$("body").on("click", ".btn.sirup.tambah", function(e){
 	e.preventDefault();
-	tambahElement("sirop", this);
+	tambahElement("obat.sirup.sediaan", this);
 });
 
-$("body").on("click", ".btn.sirop.hapus", function(e){
+$("body").on("click", ".btn.sirup.hapus", function(e){
 	e.preventDefault();
-	hapusElement("sirop",this)
+	hapusElement("obat.sirup.sediaan",this)
 });
 
 $("body").on("click", ".btn.drop.tambah", function(e){
 	e.preventDefault();
-	tambahElement("drop", this);
+	tambahElement("obat.drop.sediaan", this);
 });
 
 $("body").on("click", ".btn.drop.hapus", function(e){
 	e.preventDefault();
-	hapusElement("drop",this)
+	hapusElement("obat.drop.sediaan",this)
+});
+$("body").on("click", ".btn.lainnya.tambah", function(e){
+	e.preventDefault();
+	tambahElement("obat.lainnya.sediaan", this);
+});
+
+$("body").on("click", ".btn.lainnya.hapus", function(e){
+	e.preventDefault();
+	hapusElement("obat.lainnya.sediaan",this)
 });
 var tambahElement = function(selector, elem){
 	$("div."+ selector + ".col-sm-9").last().clone().appendTo(".form-group."+selector);
