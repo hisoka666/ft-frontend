@@ -412,13 +412,19 @@ $("body").on("change", "input:radio[name=sediaan]:checked", function(){
 	// console.log("Radio button checked");
 	if (this.value == "1"){
 
-		$("div.obat").not("tablet").hide();
+		// $("div.obat").not("tablet").hide();
+		$("div.obat").hide();
+		$("input.obat").val("");
 		$("div.obat.tablet").show();
 	}else if (this.value == "2"){
-		$("div.obat").not("sirup").hide();
-		$("div.obat.sirup").show();
+		// $("div.obat").not("sirup drop").hide();
+		$("div.obat").hide();
+		$("input.obat").val("");
+		$("div.obat.sirup, div.obat.drop").show();
 	}else{
-		$("div.obat").not("lainnya").hide();
+		$("div.obat").hide();
+		$("input.obat").val("");
+		// $("div.obat").not("lainnya").hide();
 		$("div.obat.lainnya").show();
 	}
 	$("div.rekom").show();
@@ -432,6 +438,7 @@ $("#navbar").on("click", "#inputobat", function(e){
 			popModalWarning("Peringatan", "Gagal memperoleh template", "")
 		}else{
 			$("#mymodal").html(js.script)
+			$("#inputby").val($("#email").val());
 			$("#mymodal").modal();
 		}
 
@@ -440,22 +447,11 @@ $("#navbar").on("click", "#inputobat", function(e){
 
 $("body").on("click", ".btn.tablet.tambah", function(e){
 	tambahElement("obat.tablet.sediaan", this)
-	// $("div.tablet.col-sm-9").last().clone().appendTo(".form-group.tablet");
-	// $("div.tablet.col-sm-3").last().clone().appendTo(".form-group.tablet");
-	// $("input.form-control.tablet").each(function(){
-	// 	$(this).prop("disabled",true);
-	// });
-	// $("input.form-control.tablet").last().val("").prop("disabled", false);
-	// $(this).html("Hapus").removeClass("tambah").addClass("hapus");
 });
 
 $("body").on("click", ".btn.tablet.hapus", function(e){
 	e.preventDefault();
 	hapusElement("obat.tablet.sediaan", this);
-	// var index = $(".tablet.col-sm-3").index($(this).parent());
-	// console.log("index adalah : " + index);
-	// $(".tablet.col-sm-9").eq(index).remove();
-	// $(".tablet.col-sm-3").eq(index).remove();
 });
 
 $("body").on("click", ".btn.sirup.tambah", function(e){
@@ -507,51 +503,94 @@ var hapusElement = function(sel, elem){
 
 $("body").on("click", "#savdrug", function(e){
 	e.preventDefault();
-	if ($("#mrkdgng").val() == ""||
-		$("#kand").val() == ""||
-		$("#mindose").val() == undefined || 
-		$("#maxdose").val() == undefined || 
-		$("input.tablet").serializeArray().length == 0 || 
-		$("input.sirop").serializeArray().length == 0 ||
-		$("input.drop").serializeArray().length == 0 ||
-		$("#rekom").val() == "" ) {
-			$("#alertmsg").html("<div class=\"alert alert-danger alert-dismissable\"\>" +
-		    	                "<a href=\"#\" class=\"close\" data-dismiss=\"alert\" aria-label=\"close\">&times;</a\>" +
-								"Form tidak boleh kosong" +
-		                        "</div>");
-		}else{
-			$.post("inputobat", {
-				merk: $("#mrkdgng").val(),
-				kand: $("#kand").val(),
-				mindose: $("#mindose").val(),
-				maxdose: $("#maxdose").val(),
-				tab : $("input.tablet").serializeArray(),
-				syr : $("input.sirop").serializeArray(),
-				drop: $("input.drop").serializeArray(),
-				rekom : $("#rekom").val(),
-				doc : $("#email").val()
-			}, function(data){
-				var js = JSON.parse(data);
-			})
-		}
+	// if ($("#mrkdgng").val() == ""||
+	// 	$("#kand").val() == ""||
+	// 	$("#mindose").val() == undefined || 
+	// 	$("#maxdose").val() == undefined || 
+	// 	$("input.tablet").serializeArray().length == 0 || 
+	// 	$("input.sirup").serializeArray().length == 0 ||
+	// 	$("input.drop").serializeArray().length == 0 ||
+	// 	$("#rekom").val() == "" ) {
+	// 		$("#alertmsg").html("<div class=\"alert alert-danger alert-dismissable\"\>" +
+	// 	    	                "<a href=\"#\" class=\"close\" data-dismiss=\"alert\" aria-label=\"close\">&times;</a\>" +
+	// 							"Form tidak boleh kosong" +
+	// 	                        "</div>");
+	// 	}else{
+	// 		$.post("inputobat", {
+	// 			merk: $("#mrkdgng").val(),
+	// 			kand: $("#kand").val(),
+	// 			mindose: $("#mindose").val(),
+	// 			maxdose: $("#maxdose").val(),
+	// 			tab : $("input.tablet").serializeArray(),
+	// 			syr : $("input.sirop").serializeArray(),
+	// 			drop: $("input.drop").serializeArray(),
+	// 			rekom : $("#rekom").val(),
+	// 			doc : $("#email").val()
+	// 		}, function(data){
+	// 			var js = JSON.parse(data);
+	// 		})
+	// 	}
 	// var merk = $("#mrkdgng").val();
 	// var kandungan = $("#kand").val();
 	// var mindose = $("#mindose").val();
 	// var maxdose = $("#maxdose").val();
 	// var tablet = $("inputtablet").val();
 	// console.log(string($("input").serializeArray()));
-	var tablet = $("input.tablet").serializeArray();
-	var sirop = $("input.sirop").serializeArray();
-	var drop = $("input.drop").serializeArray();
-	var tab = JSON.stringify(tablet);
-	var syr = JSON.stringify(sirop);
-	var gtt = JSON.stringify(drop);
-	console.log(tab);
-	console.log(syr);
-	console.log(gtt);	
-	// jQuery.each(obat, function(k, v){
-	// 	console.log(k + " adalah " + v);
-	// })
+	// var tablet = $("input.tablet").serializeArray();
+	// var sirop = $("input.sirup").serializeArray();
+	// var drop = $("input.drop").serializeArray();
+	// var tab = JSON.stringify(tablet);
+	// var syr = JSON.stringify(sirop);
+	// var gtt = JSON.stringify(drop);
+	// console.log("Merk dagang: " + $("#mrkdgng").val());
+	// console.log("Kandungan: " + $("#kand").val());
+	// console.log("Maxdose: " + $("#maxdose").val());
+	// console.log("Mindose: " + $("#mindose").val())
+	// // console.log(JSON.stringify($("input.tablet").serializeArray()));
+	// console.log($("input.tablet").serializeArray());
+	// console.log(JSON.stringify($("input.sirup").serializeArray()));
+	// console.log(JSON.stringify($("input.drop").serializeArray()));
+	// console.log(JSON.stringify($("input.lainnya.sediaan").serializeArray()));
+	// console.log("Rekomendasi Pemberian: " + $("#rekom").val());
+	// console.log("Input obat by: " + $("#inputby").val());
+
+	data = {
+		"merk": $("#mrkdgng").val(),
+		"kand": $("#kand").val(),
+		"mindose": $("#mindose").val(),
+		"maxdose": $("#maxdose").val(),
+		"tab" : $("input.tablet").serializeArray(),
+		"syr" : $("input.sirup").serializeArray(),
+		"drop": $("input.drop").serializeArray(),
+		"lainnya": $("input.lainnya.bentuk").val(),
+		"lainnya_sediaan": JSON.stringify($("input.lainnya.sediaan").serializeArray()),
+		"rekom" : $("#rekom").val(),
+		"doc" : $("#email").val()
+	}
+
+	console.log($("input.tablet").serializeArray())
+	console.log($("input.sirup").serializeArray())
+	console.log($("input.drop").serializeArray())
+	var js = JSON.parse(data)
+	console.log("String json adalah : " + JSON.stringify(js))
+	
+	$.post("inputobat", {
+		send: JSON.stringify(data)
+		// merk: $("#mrkdgng").val(),
+		// kand: $("#kand").val(),
+		// mindose: $("#mindose").val(),
+		// maxdose: $("#maxdose").val(),
+		// tab : JSON.stringify($("input.tablet").serializeArray()),
+		// syr : JSON.stringify($("input.sirup").serializeArray()),
+		// drop: JSON.stringify($("input.drop").serializeArray()),
+		// lainnya: $("input.lainnya.bentuk").val(),
+		// lainnya_sediaan: JSON.stringify($("input.lainnya.sediaan").serializeArray()),
+		// rekom : $("#rekom").val(),
+		// doc : $("#email").val()
+		}, function(data){
+			// var js = JSON.parse(data);
+		})
+
 
 });
 

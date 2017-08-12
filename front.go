@@ -145,7 +145,6 @@ func ConvertToUbah(r *http.Request) *Pasien {
 	return n
 }
 
-////////////////////////////////////////////////////////////////////////////////////
 func getPDFNow(w http.ResponseWriter, r *http.Request) {
 	if r.Method != "POST" {
 		http.Error(w, "Post request please", http.StatusMethodNotAllowed)
@@ -173,7 +172,6 @@ func getPDFNow(w http.ResponseWriter, r *http.Request) {
 	createPDF(w, pts, iki, gettgl, r.FormValue("nama"))
 }
 
-////////////////////////////////////////////////////////////////////////////////////
 func getPDF(w http.ResponseWriter, r *http.Request) {
 	if r.Method != "POST" {
 		http.Error(w, "Post request please", http.StatusMethodNotAllowed)
@@ -556,12 +554,86 @@ func perBagian(n []Pasien) map[string]int {
 	m["mod"] = mod
 	return m
 }
+
+type InputObat struct {
+	MerkDagang     string            `json:"merk`
+	Kandungan      string            `json:"kand"`
+	MinDose        string            `json:"mindose"`
+	MaxDose        string            `json:"maxdose"`
+	Tablet         map[string]string `json:"tab"`
+	Sirup          map[string]string `json:"syr"`
+	Drop           map[string]string `json:"drop"`
+	Lainnya        string            `json:"lainnya"`
+	SediaanLainnya map[string]string `json:"lainnya_sediaan"`
+	Rekomendasi    string            `json:"rekom"`
+	Dokter         string            `json:"doc"`
+}
+
 func inputObat(w http.ResponseWriter, r *http.Request) {
 	if r.Method != "POST" {
 		http.Error(w, "Post request please", http.StatusMethodNotAllowed)
 		return
 	}
 
+	var dat map[string]interface{}
+	// fmt.Println(r.FormValue("merk"))
+	// fmt.Println(r.FormValue("kand"))
+	// fmt.Println(r.FormValue("mindose"))
+	// fmt.Println(r.FormValue("maxdose"))
+	// // x := r.FormValue("tab")
+	// // fmt.Println(x[1:(len(x) - 1)])
+	// // m := []byte("{" + x[1:(len(x)-1)] + "}")
+	// fmt.Println(r.FormValue("send"))
+	m := []byte(r.FormValue("send"))
+	// // fmt.Printf("Hasil ubah byte: %v", m)
+	err := json.Unmarshal(m, &dat)
+	if err != nil {
+		fmt.Printf("Gagal mengubah json: %v", err)
+	}
+
+	// var blet []interface{}
+	tab := dat["tab"].([]interface{})
+	fmt.Println(tab)
+
+	// for k, v := range tab {
+	// 	// fmt.Println(k)
+	// 	// fmt.Println(v)
+	// 	c := v.(map[string]interface{})
+	// 	l := strconv.Itoa(k)
+	// 	fmt.Println(c[l])
+	// 	// b := v.(map[string]interface{})
+	// 	// blet[k] = b["0"]
+	// }
+
+	// fmt.Println(blet)
+	// fmt.Println(r.FormValue("tab"))
+	// fmt.Println(r.FormValue("syr"))
+	// fmt.Println(r.FormValue("drop"))
+	// fmt.Println(r.FormValue("lainnya_sediaan"))
+
+	// if err := json.Unmarshal(r.FormValue("tab"), &dat); err == nil {
+	// 	for _, v := range dat {
+	// 		fmt.Println(v)
+	// 	}
+	// }
+	// if err := json.Unmarshal(r.FormValue("syr"), &dat); err == nil {
+	// 	for _, v := range dat {
+	// 		fmt.Println(v)
+	// 	}
+	// }
+	// if err := json.Unmarshal(r.FormValue("drop"), &dat); err == nil {
+	// 	for _, v := range dat {
+	// 		fmt.Println(v)
+	// 	}
+	// }
+	// if err := json.Unmarshal(r.FormValue("lainnya_sediaan"), &dat); err == nil {
+	// 	for _, v := range dat {
+	// 		fmt.Println(v)
+	// 	}
+	// }
+	// fmt.Println(r.FormValue("lainnya"))
+	// fmt.Println(r.FormValue("rekom"))
+	// fmt.Println(r.FormValue("doc"))
 	// obat := &Obat{
 	// 	Merk:        r.FormValue("merk"),
 	// 	Kandungan:   r.FormValue("kand"),
