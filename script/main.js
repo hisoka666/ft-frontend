@@ -503,97 +503,47 @@ var hapusElement = function(sel, elem){
 
 $("body").on("click", "#savdrug", function(e){
 	e.preventDefault();
-	// if ($("#mrkdgng").val() == ""||
-	// 	$("#kand").val() == ""||
-	// 	$("#mindose").val() == undefined || 
-	// 	$("#maxdose").val() == undefined || 
-	// 	$("input.tablet").serializeArray().length == 0 || 
-	// 	$("input.sirup").serializeArray().length == 0 ||
-	// 	$("input.drop").serializeArray().length == 0 ||
-	// 	$("#rekom").val() == "" ) {
-	// 		$("#alertmsg").html("<div class=\"alert alert-danger alert-dismissable\"\>" +
-	// 	    	                "<a href=\"#\" class=\"close\" data-dismiss=\"alert\" aria-label=\"close\">&times;</a\>" +
-	// 							"Form tidak boleh kosong" +
-	// 	                        "</div>");
-	// 	}else{
-	// 		$.post("inputobat", {
-	// 			merk: $("#mrkdgng").val(),
-	// 			kand: $("#kand").val(),
-	// 			mindose: $("#mindose").val(),
-	// 			maxdose: $("#maxdose").val(),
-	// 			tab : $("input.tablet").serializeArray(),
-	// 			syr : $("input.sirop").serializeArray(),
-	// 			drop: $("input.drop").serializeArray(),
-	// 			rekom : $("#rekom").val(),
-	// 			doc : $("#email").val()
-	// 		}, function(data){
-	// 			var js = JSON.parse(data);
-	// 		})
-	// 	}
-	// var merk = $("#mrkdgng").val();
-	// var kandungan = $("#kand").val();
-	// var mindose = $("#mindose").val();
-	// var maxdose = $("#maxdose").val();
-	// var tablet = $("inputtablet").val();
-	// console.log(string($("input").serializeArray()));
-	// var tablet = $("input.tablet").serializeArray();
-	// var sirop = $("input.sirup").serializeArray();
-	// var drop = $("input.drop").serializeArray();
-	// var tab = JSON.stringify(tablet);
-	// var syr = JSON.stringify(sirop);
-	// var gtt = JSON.stringify(drop);
-	// console.log("Merk dagang: " + $("#mrkdgng").val());
-	// console.log("Kandungan: " + $("#kand").val());
-	// console.log("Maxdose: " + $("#maxdose").val());
-	// console.log("Mindose: " + $("#mindose").val())
-	// // console.log(JSON.stringify($("input.tablet").serializeArray()));
-	// console.log($("input.tablet").serializeArray());
-	// console.log(JSON.stringify($("input.sirup").serializeArray()));
-	// console.log(JSON.stringify($("input.drop").serializeArray()));
-	// console.log(JSON.stringify($("input.lainnya.sediaan").serializeArray()));
-	// console.log("Rekomendasi Pemberian: " + $("#rekom").val());
-	// console.log("Input obat by: " + $("#inputby").val());
-
 	data = {
 		"merk": $("#mrkdgng").val(),
 		"kand": $("#kand").val(),
 		"mindose": $("#mindose").val(),
 		"maxdose": $("#maxdose").val(),
-		"tab" : $("input.tablet").serializeArray(),
-		"syr" : $("input.sirup").serializeArray(),
-		"drop": $("input.drop").serializeArray(),
+		"tab" : convertSerialArray($("input.tablet").serializeArray()),
+		"syr" : convertSerialArray($("input.sirup").serializeArray()),
+		"drop": convertSerialArray($("input.drop").serializeArray()),
+		"lainnya_sediaan": convertSerialArray($("input.lainnya.sediaan").serializeArray()),
 		"lainnya": $("input.lainnya.bentuk").val(),
-		"lainnya_sediaan": JSON.stringify($("input.lainnya.sediaan").serializeArray()),
 		"rekom" : $("#rekom").val(),
 		"doc" : $("#email").val()
 	}
 
-	console.log($("input.tablet").serializeArray())
-	console.log($("input.sirup").serializeArray())
-	console.log($("input.drop").serializeArray())
-	var js = JSON.parse(data)
-	console.log("String json adalah : " + JSON.stringify(js))
+	console.log("String json adalah : " + JSON.stringify(data))
 	
 	$.post("inputobat", {
-		send: JSON.stringify(data)
-		// merk: $("#mrkdgng").val(),
-		// kand: $("#kand").val(),
-		// mindose: $("#mindose").val(),
-		// maxdose: $("#maxdose").val(),
-		// tab : JSON.stringify($("input.tablet").serializeArray()),
-		// syr : JSON.stringify($("input.sirup").serializeArray()),
-		// drop: JSON.stringify($("input.drop").serializeArray()),
-		// lainnya: $("input.lainnya.bentuk").val(),
-		// lainnya_sediaan: JSON.stringify($("input.lainnya.sediaan").serializeArray()),
-		// rekom : $("#rekom").val(),
-		// doc : $("#email").val()
+		send: JSON.stringify(data),
+		token: localStorage.getItem("token")
 		}, function(data){
-			// var js = JSON.parse(data);
+			var js = JSON.parse(data);
+			if (js.token != "OK"){
+				$("#mymodal").html(js.modal)
+				$("#mymodal").modal()
+			}else{
+				popModalWarning("Sukses", "Berhasil menambahkan obat", "")
+			}
 		})
+	$("#mymodal").modal('hide');
 
 
 });
 
+
+convertSerialArray = function(arr){
+	var r = [];
+	for (i=0;i<arr.length;i++){
+		r[i] = arr[i].value
+	}
+	return r
+}
 $("#navbar").on("click", "#bulanini", function(e){
 	e.preventDefault();
 	var now = new Date();
@@ -745,7 +695,7 @@ var pieChart = function(list, tgl){
           ['THT', list.data0.tht],
           ['Kulit dan Kelamin', list.data0.kulit],
           ['Jantung', list.data0.jant],
-          ['Umum', list.data0.um],
+          ['Umum', list.data0.umum],
           ['Mata', list.data0.mata],
           ['MOD', list.data0.mod],
         ]);
