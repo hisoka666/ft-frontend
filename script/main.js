@@ -560,6 +560,7 @@ $("#navbar").on("click", "#bulanini", function(e){
 			pieChart(js.data, "")
 			$("#inputnocm").hide();
 			$(".diagram").show();
+			$("#butpdfnow").show();
 			$("#tabeliki").html(js.modal).show();
 			getSum();
 			$("#tabelutama").html(js.script);
@@ -629,9 +630,10 @@ $("#navbar").on("click", ".bcptgl", function(e){
 	}, function(data){
 		var js = JSON.parse(data);
 		// console.log("Jumlah interna adalah : " + JSON.stringify(js.data.data1))
-		pieChart(js.data, tgl)
+		pieChart(js.data, tgl);
 		$("#inputnocm").hide();
 		$(".diagram").show();
+		$("#butpdfnow").hide();
 		$("#tabeliki").html(js.modal).show();
 		getSum()
 		$("div.tabtitle").html("Tabel IKI " + tgl);
