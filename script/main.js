@@ -134,7 +134,7 @@ $(document).ready(function(){
 				var ats = 'input[name="modats"][value=' + js.content.ats + ']';
 				var iki = 'input[name="modiki"][value=' + js.content.iki + ']';
 				var shift = 'input[name="modshift"][value=' + js.content.shift + ']';
-				var bagian = 'input[name="modbagian"][value=' + js.content.bagian + ']';
+				var bagian = 'input[name="modbagian"][value=' + js.content.dept + ']';
 			
 				$('input[name="entri"]').val(js.content.link);
 				$('input[name="namapasien"]').val(js.content.nama);
@@ -251,6 +251,7 @@ $("#navbar").on("click", "#delbut", function(e){
 		var indexrow = $(this).closest("tr").index();
 		var urutan = "tbody.dafpts tr:eq(" + indexrow + ")";
 		var token = localStorage.getItem("token");
+		console.log("Link adalah: " + link)
 		popModalWarning("Hapus Entri", "Yakin ingin menghapus entri ini?", "Hapus");
 		$("body").one("click", "#extrabut", function(){
 			
@@ -724,7 +725,6 @@ var pieChart = function(list, tgl){
 		for (i=0;i<31;i++){
 			// var isi = array[awal.tgl, awal.iki1, awal.iki2]
 			var awal = list.data1[i]
-			console.log("Awal adalah : " + awal.tgl)
 			data.addRows([
 				[awal.tgl, awal.iki1, awal.iki2]
 			])

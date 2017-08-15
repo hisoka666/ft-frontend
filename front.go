@@ -105,8 +105,7 @@ type InputObat struct {
 }
 
 type ServerResponse struct {
-	Error  string `json:"error"`
-	Pasien `json:"pasien"`
+	Error string `json:"error"`
 }
 
 func main() {
@@ -170,7 +169,7 @@ func getPDFNow(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	url := "http://2.igdsanglah.appspot.com/getbulanini"
+	url := "https://get-bulan-dot-igdsanglah.appspot.com/bulanini"
 
 	gettgl := r.FormValue("tgl")
 
@@ -197,7 +196,7 @@ func getPDF(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	// fmt.Print("Request masuk")
-	url := "http://2.igdsanglah.appspot.com/getbulan"
+	url := "https://get-bulan-dot-igdsanglah.appspot.com/"
 
 	gettgl := r.FormValue("tgl")
 	fmt.Print(gettgl)
@@ -423,7 +422,7 @@ func getBCPMonth(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	url := "http://2.igdsanglah.appspot.com/getbulan"
+	url := "https://get-bulan-dot-igdsanglah.appspot.com/"
 
 	gettgl := r.FormValue("tgl")
 
@@ -462,7 +461,7 @@ func getMonthly(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Post request please", http.StatusMethodNotAllowed)
 		return
 	}
-	url := "http://2.igdsanglah.appspot.com/getbulanini"
+	url := "https://get-bulan-dot-igdsanglah.appspot.com/bulanini"
 	// month di sini dikirim dalam bentuk int satu digit
 	month, _ := strconv.Atoi(r.FormValue("month"))
 	// diubah menjadi 2 digit untuk bisa mengambil kursor
@@ -588,7 +587,7 @@ func inputObat(w http.ResponseWriter, r *http.Request) {
 		fmt.Printf("Gagal mengubah json: %v", err)
 	}
 
-	url := "http://2.igdsanglah.appspot.com/inputobat"
+	url := "https://input-obat-dot-igdsanglah.appspot.com/"
 	resp, err := sendPost(dat, r.FormValue("token"), url)
 	if err != nil {
 		responseTemplate(w, "not-OK", "", GenModal("Kesalahan Server", "Terjadi kesalahan server. Hubungi admin", ""), nil)
@@ -635,7 +634,7 @@ func confEditTanggal(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Post request only", http.StatusMethodNotAllowed)
 	}
 
-	url := "http://2.igdsanglah.appspot.com/entri/confubahtanggal"
+	url := "https://update-tanggal-dot-igdsanglah.appspot.com/"
 
 	pts := &Pasien{
 		TglKunjungan: r.FormValue("tanggal"),
@@ -667,7 +666,7 @@ func editTanggal(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Post request only", http.StatusMethodNotAllowed)
 	}
 
-	url := "http://2.igdsanglah.appspot.com/entri/ubahtanggal"
+	url := "https://ubah-tanggal-dot-igdsanglah.appspot.com/"
 	link := r.FormValue("link")
 	pts := &Pasien{
 		LinkID: link,
@@ -694,7 +693,7 @@ func firstEntries(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Post request only", http.StatusMethodNotAllowed)
 	}
 
-	url := "http://2.igdsanglah.appspot.com/entri/firstitems"
+	url := "https://first-entries-dot-igdsanglah.appspot.com/"
 
 	send := &MainView{
 		User: r.FormValue("email"),
@@ -717,7 +716,7 @@ func confDelete(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Post request only", http.StatusMethodNotAllowed)
 	}
 
-	url := "http://2.igdsanglah.appspot.com/entri/delentri"
+	url := "https://delete-entri-dot-igdsanglah.appspot.com/"
 	del := &Pasien{
 		LinkID: r.FormValue("link"),
 	}
@@ -744,7 +743,7 @@ func confEditEntri(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Post request only", http.StatusMethodNotAllowed)
 	}
 
-	url := "http://2.igdsanglah.appspot.com/entri/confirmedit"
+	url := "https://update-entri-dot-igdsanglah.appspot.com/"
 	ubah := ConvertToUbah(r)
 	resp, err := sendPost(ubah, r.FormValue("token"), url)
 	if err != nil {
@@ -770,12 +769,13 @@ func deleteEntri(w http.ResponseWriter, r *http.Request) {
 	responseTemplate(w, "OK", "", GenModal("Hapus Entri", "Yakin ingin menghapus entri ini?", "Hapus"), nil)
 
 }
+
 func editEntri(w http.ResponseWriter, r *http.Request) {
 	if r.Method != "POST" {
 		http.Error(w, "Post request only", http.StatusMethodNotAllowed)
 	}
 
-	url := "http://2.igdsanglah.appspot.com/entri/edit"
+	url := "https://get-edit-entri-dot-igdsanglah.appspot.com/"
 
 	pts := Pasien{
 		LinkID: r.FormValue("link"),
@@ -832,7 +832,7 @@ func inputData(w http.ResponseWriter, r *http.Request) {
 
 	input := InputPts{data, kun}
 
-	url := "http://2.igdsanglah.appspot.com/inputpts"
+	url := "https://add-pasien-dot-igdsanglah.appspot.com/"
 
 	resp, err := sendPost(input, r.FormValue("token"), url)
 	if err != nil {
@@ -878,7 +878,7 @@ func getCM(w http.ResponseWriter, r *http.Request) {
 		NoCM: r.FormValue("nocm"),
 	}
 
-	url := "http://2.igdsanglah.appspot.com/getcm"
+	url := "https://get-data-pasien-dot-igdsanglah.appspot.com/"
 
 	resp, err := sendPost(pts, token, url)
 	if err != nil {
@@ -989,7 +989,7 @@ func mainContent(w http.ResponseWriter, r *http.Request) {
 	}
 
 	token := r.FormValue("idtoken")
-	resp, err := http.Get("http://2.igdsanglah.appspot.com/login?token=" + token)
+	resp, err := http.Get("https://igdsanglah.appspot.com/login?token=" + token)
 	if err != nil {
 		log.Fatal(err)
 		return
