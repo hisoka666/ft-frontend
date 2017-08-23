@@ -119,6 +119,7 @@ type ObatView struct {
 	Sediaan     []string `json:"sediaan"`
 	Dosis       string   `json:"dosis"`
 	Satuan      string   `json:"satuan"`
+	Link        string   `json:"link"`
 }
 
 func main() {
@@ -200,6 +201,7 @@ func getObat(w http.ResponseWriter, r *http.Request) {
 	defer resp.Body.Close()
 	view := &ObatView{
 		Rekomendasi: obt.Rekomendasi,
+		Link:        link,
 	}
 	if obt.Lainnya != "" {
 		view.Sediaan = obt.SediaanLainnya

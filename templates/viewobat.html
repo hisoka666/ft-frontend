@@ -1,1 +1,1 @@
-<p class="infoobat">Rekomendasi: {{.Rekomendasi -}}, Sediaan: {{.Kemasan}} {{range $m, $n := .Sediaan}} {{$n}} {{end}} {{.Satuan}} {{if .Dosis}}, Dosis: {{.Dosis}} {{end}}</p>
+<p class="infoobat">Rekomendasi: {{.Rekomendasi -}}, Sediaan: {{.Kemasan}} {{range $m, $n := .Sediaan}} {{$n}} {{end}} {{.Satuan}} {{if .Dosis}}, Dosis: {{.Dosis}} {{end}} <a id="editobat" href="{{.Link}}">Edit</a></p>
