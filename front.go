@@ -108,6 +108,19 @@ type ServerResponse struct {
 	Error string `json:"error"`
 }
 
+type IndexObat struct {
+	MerkDagang string `json:"merk"`
+	Kandungan  string `json:"kandungan"`
+	Link       string `json:"link"`
+}
+type ObatView struct {
+	Rekomendasi string   `json:"rekom"`
+	Kemasan     string   `json:"kemasan"`
+	Sediaan     []string `json:"sediaan"`
+	Dosis       string   `json:"dosis"`
+	Satuan      string   `json:"satuan"`
+}
+
 func main() {
 	// variable fs membuat folder "script" menjadi sebuah file server,
 	// alamat dari file server ini akan diarahkan oleh http.Handle
@@ -137,6 +150,8 @@ func main() {
 	http.HandleFunc("/getbcpmonth", getBCPMonth)
 	http.HandleFunc("/getpdf", getPDF)
 	http.HandleFunc("/getpdfnow", getPDFNow)
+	http.HandleFunc("/cariobt", cariObat)
+	http.HandleFunc("/getobat", getObat)
 	log.Println("Listening...")
 	log.Fatal(http.ListenAndServe(":8001", nil))
 
@@ -163,6 +178,79 @@ func ConvertToUbah(r *http.Request) *Pasien {
 	return n
 }
 
+func getObat(w http.ResponseWriter, r *http.Request) {
+	if r.Method != "POST" {
+		http.Error(w, "Post request please", http.StatusMethodNotAllowed)
+		return
+	}
+
+	url := "https://link-obat-dot-igdsanglah.appspot.com"
+	link := r.FormValue("link")
+	pos := &IndexObat{
+		Link: link,
+	}
+
+	resp, err := sendPost(pos, r.FormValue("token"), url)
+	if err != nil {
+		log.Fatalf("Terjadi kesalahan di server: %v", err)
+	}
+
+	obt := &InputObat{}
+	json.NewDecoder(resp.Body).Decode(obt)
+	defer resp.Body.Close()
+	view := &ObatView{
+		Rekomendasi: obt.Rekomendasi,
+	}
+	if obt.Lainnya != "" {
+		view.Sediaan = obt.SediaanLainnya
+		view.Kemasan = obt.Lainnya
+	} else if obt.Sirup[0] != "" {
+		view.Sediaan = obt.Sirup
+		view.Kemasan = "sirup"
+		view.Dosis = obt.MinDose + " - " + obt.MaxDose + " mg PerKGBB/kali pemberian"
+		view.Satuan = "mg per 5 ml"
+	} else if obt.Drop[0] != "" {
+		view.Sediaan = obt.Drop
+		view.Kemasan = "drop"
+		view.Dosis = obt.MinDose + " - " + obt.MaxDose + " mg PerKGBB/kali pemberian"
+		view.Satuan = "mg per 1 ml"
+	} else {
+		view.Sediaan = obt.Tablet
+		view.Kemasan = "tablet"
+		view.Dosis = obt.MinDose + " - " + obt.MaxDose + " mg PerKGBB/kali pemberian"
+		view.Satuan = "mg"
+	}
+	responseTemplate(w, "OK", GenTemplate(view, "viewobat"), obt.MerkDagang, nil)
+
+}
+func cariObat(w http.ResponseWriter, r *http.Request) {
+	if r.Method != "POST" {
+		http.Error(w, "Post request please", http.StatusMethodNotAllowed)
+		return
+	}
+
+	url := "https://get-obat-dot-igdsanglah.appspot.com"
+	obat := r.FormValue("obat")
+	pos := &IndexObat{
+		MerkDagang: obat,
+	}
+
+	resp, err := sendPost(pos, r.FormValue("token"), url)
+	if err != nil {
+		log.Fatalf("Terjadi kesalahan di server: %v", err)
+	}
+	listobt := []IndexObat{}
+	json.NewDecoder(resp.Body).Decode(&listobt)
+	defer resp.Body.Close()
+	// fmt.Println(len(listobt))
+	if len(listobt) == 0 {
+		// fmt.Println("This means empty slice")
+		responseTemplate(w, "OK", GenTemplate(pos, "listobtnil"), "", nil)
+	} else {
+		responseTemplate(w, "OK", GenTemplate(listobt, "listobt"), "", nil)
+	}
+
+}
 func getPDFNow(w http.ResponseWriter, r *http.Request) {
 	if r.Method != "POST" {
 		http.Error(w, "Post request please", http.StatusMethodNotAllowed)

@@ -43,3 +43,12 @@
 .khusus{
     height: 46px;
     }  
+
+.listobat{
+    width: 100%;
+}
+
+.infoobat{
+    font-size: 0.75em;
+    font-style: italic;
+}

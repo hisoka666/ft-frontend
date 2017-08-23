@@ -410,10 +410,7 @@ $("#navbar").on("click", "#makeresep", function(e){
 });
 
 $("body").on("change", "input:radio[name=sediaan]:checked", function(){
-	// console.log("Radio button checked");
 	if (this.value == "1"){
-
-		// $("div.obat").not("tablet").hide();
 		$("div.obat").hide();
 		$("input.obat").val("");
 		$("div.obat.tablet").show();
@@ -438,9 +435,9 @@ $("#navbar").on("click", "#inputobat", function(e){
 		if (js.token != "OK"){
 			popModalWarning("Peringatan", "Gagal memperoleh template", "")
 		}else{
-			$("#mymodal").html(js.script)
+			$("#mymodal2").html(js.script)
 			$("#inputby").val($("#email").val());
-			$("#mymodal").modal();
+			$("#mymodal2").modal();
 		}
 
 	})
@@ -532,7 +529,7 @@ $("body").on("click", "#savdrug", function(e){
 				popModalWarning("Sukses", "Berhasil menambahkan obat", "")
 			}
 		})
-	$("#mymodal").modal('hide');
+	$("#mymodal2").modal('hide');
 
 
 });
@@ -749,7 +746,50 @@ var pieChart = function(list, tgl){
 	}
 }
 
+$('body').on('keyup', 'input.isianobat', function(){
+	var ob = ""
+	var ob = $(this).val()
+	var token = localStorage.getItem("token")
+	// $("#listobat").html(ob)
+	$.post("cariobt",{
+		token: token,
+		obat: ob
+	}, function(data){
+		console.log(data)
+		js = JSON.parse(data)
+		console.log(js.script)
+		$("#listobat").html(js.script)
+	})
+})
 
+$('body').on('click', 'a.addobatinfo', function(e){
+	e.preventDefault();
+	obatnam = $(this).find("#obatbaru").html()
+	// console.log(obatnam)
+	$.get("getinputobat")
+	.done(function(data){
+		js = JSON.parse(data)
+		// console.log(js.script)
+		$("#mymodal2").html(js.script)
+		$("#inputby").val($("#email").val());
+		$("#mymodal2").modal();
+	})
+});
+$('body').on('click', 'a.getobatinfo', function(e){
+	e.preventDefault();
+	link = $(this).attr('href');
+	console.log("Link adalah: " + link);
+	token = localStorage.getItem("token");
+	$.post("getobat",{
+		token: token,
+		link: link
+	}, function(data){
+		js = JSON.parse(data);
+		$(".isianobat").val(js.modal)
+		// console.log(js.script);
+		$("#listobat").html(js.script)
+	})
+})
 });
 
 
