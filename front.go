@@ -24,8 +24,16 @@ type MainView struct {
 	Bulan  []string  `json:"bulan"`
 	Pasien []Pasien  `json:"pasien"`
 	IKI    []ListIKI `json:"list"`
+	Admin  Admin     `json:"admin"`
+	Peran  string    `json:"peran"`
 }
-
+type Admin struct {
+	Staff []Staff `json:"list"`
+	Token string  `json:"token"`
+}
+type Staff struct {
+	Email, NamaLengkap, LinkID, Peran string
+}
 type ListIKI struct {
 	Tanggal int `json:"tgl"`
 	SumIKI1 int `json:"iki1"`
@@ -153,9 +161,55 @@ func main() {
 	http.HandleFunc("/getpdfnow", getPDFNow)
 	http.HandleFunc("/cariobt", cariObat)
 	http.HandleFunc("/getobat", getObat)
+	http.HandleFunc("/tambahdokter", tambahDokter)
+	http.HandleFunc("/hapusdokter", hapusDokter)
 	log.Println("Listening...")
 	log.Fatal(http.ListenAndServe(":8001", nil))
 
+}
+func hapusDokter(w http.ResponseWriter, r *http.Request) {
+	if r.Method != "POST" {
+		http.Error(w, "Post request please", http.StatusMethodNotAllowed)
+		return
+	}
+
+	url := "https://hapus-dokter-dot-igdsanglah.appspot.com"
+	st := &Staff{
+		LinkID: r.FormValue("link"),
+	}
+	resp, err := sendPost(st, r.FormValue("token"), url)
+	if err != nil {
+		responseTemplate(w, "not-ok", fmt.Sprintf("Kesalahan pada server %v", err), "", nil)
+		log.Fatalf("Terjadi kesalahan di server: %v", err)
+	}
+	json.NewDecoder(resp.Body).Decode(st)
+	defer resp.Body.Close()
+	if st.Email != "OK" {
+		responseTemplate(w, "not-ok", "", GenModal("Gagal", st.Email, ""), nil)
+	} else {
+		responseTemplate(w, "OK", "", GenModal("Sukses", "Berhasil menghapus data", ""), nil)
+	}
+
+}
+func tambahDokter(w http.ResponseWriter, r *http.Request) {
+	if r.Method != "POST" {
+		http.Error(w, "Post request please", http.StatusMethodNotAllowed)
+		return
+	}
+	url := "https://tambah-dokter-dot-igdsanglah.appspot.com"
+	st := &Staff{
+		NamaLengkap: r.FormValue("nama"),
+		Email:       r.FormValue("email"),
+		Peran:       r.FormValue("peran"),
+	}
+	resp, err := sendPost(st, r.FormValue("token"), url)
+	if err != nil {
+		responseTemplate(w, "not-ok", fmt.Sprintf("Kesalahan pada server %v", err), "", nil)
+		log.Fatalf("Terjadi kesalahan di server: %v", err)
+	}
+	json.NewDecoder(resp.Body).Decode(st)
+	defer resp.Body.Close()
+	responseTemplate(w, "OK", GenTemplate(st, "dokrow"), GenModal("Sukses", "Berhasil menambahkan data", ""), nil)
 }
 
 func index(w http.ResponseWriter, r *http.Request) {
@@ -1086,11 +1140,13 @@ func mainContent(w http.ResponseWriter, r *http.Request) {
 	}
 
 	var web MainView
-
 	json.NewDecoder(resp.Body).Decode(&web)
 	defer resp.Body.Close()
-
-	responseTemplate(w, web.Token, GenTemplate(web, "main", "input", "content"), "", nil)
+	if web.Peran == "admin" {
+		responseTemplate(w, web.Token, GenTemplate(web, "adminpage"), "", nil)
+	} else {
+		responseTemplate(w, web.Token, GenTemplate(web, "main", "input", "content"), "", nil)
+	}
 }
 
 func ProperCapital(input string) string {

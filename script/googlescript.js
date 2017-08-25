@@ -3,15 +3,12 @@ function onSignIn(googleUser) {
   var url = "/login?idtoken=" + id_token;
   $.get(url)
   .done(function(data){
-
     var jos = JSON.parse(data)
-
     if (jos.token == ""){
       signOut();
       alert("Maaf Anda tidak terdaftar sebagai staf. Silahkan hubungi admin");
       $("#signinbut").show();
      } else {
-
       localStorage.setItem("token", jos.token);
       $("#navbar").html(jos.script);
      }
