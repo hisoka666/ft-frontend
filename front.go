@@ -164,9 +164,39 @@ func main() {
 	http.HandleFunc("/tambahdokter", tambahDokter)
 	http.HandleFunc("/hapusdokter", hapusDokter)
 	http.HandleFunc("/getobatedit", editObat)
+	http.HandleFunc("/inputobatedit", confEditObat)
 	log.Println("Listening...")
 	log.Fatal(http.ListenAndServe(":8001", nil))
 
+}
+
+func confEditObat(w http.ResponseWriter, r *http.Request) {
+	if r.Method != "POST" {
+		http.Error(w, "Post request please", http.StatusMethodNotAllowed)
+		return
+	}
+
+	var dat InputObat
+	m := []byte(r.FormValue("send"))
+	err := json.Unmarshal(m, &dat)
+	if err != nil {
+		fmt.Printf("Gagal mengubah json: %v", err)
+	}
+	// fmt.Printf("Json adlaha: %v", dat)
+
+	url := "https://input-edit-obat-dot-igdsanglah.appspot.com/" + r.FormValue("link")
+	resp, err := sendPost(dat, r.FormValue("token"), url)
+	if err != nil {
+		responseTemplate(w, "not-OK", "", GenModal("Kesalahan Server", "Terjadi kesalahan server. Hubungi admin", ""), nil)
+		log.Print("Terjadi kesalahan server")
+		return
+	}
+	n := ServerResponse{}
+	json.NewDecoder(resp.Body).Decode(&n)
+	if n.Error != "" {
+		responseTemplate(w, "not-OK", "", GenModal("Kesalahan Server", "Gagal menyimpan ke datastore. Ulangi lagi menginput data", ""), nil)
+	}
+	responseTemplate(w, "OK", "", "", nil)
 }
 
 func editObat(w http.ResponseWriter, r *http.Request) {
@@ -188,7 +218,7 @@ func editObat(w http.ResponseWriter, r *http.Request) {
 	obt := &InputObat{}
 	json.NewDecoder(resp.Body).Decode(obt)
 	defer resp.Body.Close()
-	responseTemplate(w, "OK", GenTemplate(nil, "modinputobatbaru"), "", obt)
+	responseTemplate(w, "OK", GenTemplate(nil, "modinputobatedit"), link, obt)
 }
 func hapusDokter(w http.ResponseWriter, r *http.Request) {
 	if r.Method != "POST" {
@@ -289,6 +319,7 @@ func getObat(w http.ResponseWriter, r *http.Request) {
 	if obt.Lainnya != "" {
 		view.Sediaan = obt.SediaanLainnya
 		view.Kemasan = obt.Lainnya
+		view.Dosis = minD + " - " + maxD + " mg tiap kali pemberian /(" + obt.MinDose + " - " + obt.MaxDose + ") perKGBB/kali pemberian"
 	} else if obt.Sirup[0] != "" {
 		view.Sediaan = obt.Sirup
 		view.Kemasan = "sirup"

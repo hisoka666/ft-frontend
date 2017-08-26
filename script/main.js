@@ -785,13 +785,14 @@ $('body').on('click', 'a.getobatinfo', function(e){
 	bb = $("#rspbb").html();
 	token = localStorage.getItem("token");
 	ini = $(this).parents('.list-group')
-	inputini = $(this).parents('input.isianobat')
+	inputini = $(this).parents('.listobat').children('input.isianobat')
 	$.post("getobat",{
 		token: token,
 		link: link,
 		berat: bb
 	}, function(data){
 		js = JSON.parse(data);
+		console.log(js.modal)
 		inputini.val(js.modal)
 		// console.log(js.script);
 		ini.html(js.script)
@@ -803,39 +804,94 @@ $('body').on('click', 'button.tambahlistobat', function(e){
 	$('div.template').clone().removeClass('template').addClass('listobat').prop('hidden', false).appendTo('div.form-group.main')
 })
 
-// $('body').on('click', 'a#editobat', function(e){
-// 	e.preventDefault();
-// 	link = $(this).attr('href');
-// 	$.post("getobatedit", {
-// 		token: localStorage.getItem("token"),
-// 		link: link
-// 	},function(data){
-// 		js = JSON.parse(data)
-// 		$("#mymodal2").html(js.script)
-// 		$("#mrkdgng").val(js.data.merk)
-// 		$("#kand").val(js.data.kand)
-// 		$("#mindose").val(js.data.mindose)
-// 		$("#maxdose").val(js.data.maxdose)
-// 		for (i = 0; i<js.data.syr.length; i++){
-// 			$("input.obat.sirup.sediaan").clone()
-// 		}
-// 		var lainnya = 'input[name="sediaan"][value="3"]'
-// 		var 
-// 		if (js.data.tab[0] == "" && js.data.syr[0] == ""){
-// 			for (i=0;i<js.data.lainnya_sediaan.length; i++){
-// 				$('input.obat.lainnya.sediaan').html(js.data.lainnya_sediaan[i])
-// 				tambahElement("obat.lainnya.sediaan", this);
-// 			}
-// 			$('input[name="sediaan"][value="3"]').prop('checked', true);
-// 		}
-// 		if (js.data.syr[0] !== ""){
-// 			for (i=0;i<js.data.syr.length; i++){
-// 				$('input.obat.sirup')
-// 			}
+$('body').on('click', 'a#editobat', function(e){
+	e.preventDefault();
+	link = $(this).attr('href');
+	console.log("this is link: " + link)
+	$.post("getobatedit", {
+		token: localStorage.getItem("token"),
+		link: link
+	},function(data){
+		js = JSON.parse(data)
+		// console.log("This is data: " + data)
+		$("#mymodal2").html(js.script)
+		$("#mrkdgng").val(js.data.merk)
+		$("#kand").val(js.data.kand)
+		$("#mymodal2").modal()
+		// for (i = 0; i<js.data.syr.length; i++){
+		// 	$("input.obat.sirup.sediaan").clone()
+		// }
+		// var lainnya = 'input[name="sediaan"][value="3"]'
+		// var 
+		if (js.data.tab[0] == "" && js.data.syr[0] == ""){
+			// for (i=0;i<js.data.lainnya_sediaan.length; i++){
+			// 	$('input.obat.lainnya.sediaan').html(js.data.lainnya_sediaan[i])
+			// 	tambahElement("obat.lainnya.sediaan", this);
+			// }
+			$('input[name="sediaan"][value="3"]').prop('checked', true);
+			$("div.obat").hide();
+			$("input.obat").val("");
+			$("div.obat.lainnya").show();
+		}else if (js.data.syr[0] !== ""){
+			// for (i=0;i<js.data.syr.length; i++){
+			// 	$('input.obat.sirup')
+			// }
+			$('input[name="sediaan"][value="2"]').prop('checked', true)
+			$("div.obat").hide();
+			$("input.obat").val("");
+			$("div.obat.sirup, div.obat.drop").show();
+		}else {
+			$('input[name="sediaan"][value="1"]').prop('checked', true)
+			$("div.obat").hide();
+			$("input.obat").val("");
+			$("div.obat.tablet").show();
+		}
+		$("div.rekom").show();
+		$("input#mindose").val(js.data.mindose)
+		$("input#maxdose").val(js.data.maxdose)
+		$("input#linkedit").val(link)
+	})
+})
 
-// 		}
-// 	})
-// })
+$("body").on("click", "#savdrugedit", function(e){
+	e.preventDefault();
+	data = {
+		"merk": $("#mrkdgng").val(),
+		"kand": $("#kand").val(),
+		"mindose": $("#mindose").val(),
+		"maxdose": $("#maxdose").val(),
+		"tab": $("input.tablet").val(),
+		"syr": $("input.sirup").val(),
+		"drop": $("input.drop").val(),
+		"lainnya": $("input.lainnya.sediaan").val(),
+		"tab" : convertSerialArray($("input.tablet").serializeArray()),
+		"syr" : convertSerialArray($("input.sirup").serializeArray()),
+		"drop": convertSerialArray($("input.drop").serializeArray()),
+		"lainnya_sediaan": convertSerialArray($("input.lainnya.sediaan").serializeArray()),
+		"lainnya": $("input.lainnya.bentuk").val(),
+		"rekom" : $("#rekom").val(),
+		"doc" : $("#email").val()
+	}
+
+	// console.log("String json adalah : " + JSON.stringify(data))
+	// console.log($("#linkedit").val())
+	$.post("inputobatedit", {
+		send: JSON.stringify(data),
+		token: localStorage.getItem("token"),
+		link: $("input#linkedit").val()
+		}, function(data){
+			var js = JSON.parse(data);
+			if (js.token != "OK"){
+				$("#mymodal").html(js.modal)
+				$("#mymodal").modal()
+			}else{
+				popModalWarning("Sukses", "Berhasil merubah data obat", "")
+			}
+		})
+	$("#mymodal2").modal('hide');
+
+
+});
 });
 
 
