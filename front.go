@@ -169,7 +169,7 @@ func main() {
 
 }
 
-func editObat(w http.ResponseWriter, r *http.Request){
+func editObat(w http.ResponseWriter, r *http.Request) {
 	if r.Method != "POST" {
 		http.Error(w, "Post request please", http.StatusMethodNotAllowed)
 		return
@@ -188,7 +188,7 @@ func editObat(w http.ResponseWriter, r *http.Request){
 	obt := &InputObat{}
 	json.NewDecoder(resp.Body).Decode(obt)
 	defer resp.Body.Close()
-	responseTemplate(w, "OK", GenTemplate(nil, modinputobatbaru), "", obt)
+	responseTemplate(w, "OK", GenTemplate(nil, "modinputobatbaru"), "", obt)
 }
 func hapusDokter(w http.ResponseWriter, r *http.Request) {
 	if r.Method != "POST" {
