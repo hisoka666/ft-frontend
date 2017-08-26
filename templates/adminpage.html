@@ -7,9 +7,9 @@
         <div class="panelbody tambahstafbody">
             <div class="form-group">
                 <label for="">Nama Lengkap</label><br>
-                <input type="text" class="form-control" id="namadktr">
+                <input type="text" class="form-control text-capitalize" id="namadktr">
                 <label for="">Email</label><br>
-                <input type="text" class="form-control" id="emaildktr">
+                <input type="text" class="form-control text-capitalize" id="emaildktr">
                 <label for="">Peran</label><br>
                 <select name="peran" id="perandktr" class="form-control">
                     <option value="staf">Staf</option>
@@ -38,7 +38,7 @@
                         {{range $m, $n := .Admin.Staff}}
                             <tr>
                                 <td class="nourut">{{inc $m}}</td>
-                                <td>{{$n.NamaLengkap}}</td>
+                                <td class="text-capitalize">{{$n.NamaLengkap}}</td>
                                 <td>{{$n.Email}}</td>
                                 <td>{{$n.Peran}}</td>
                                 <td><a href="{{$n.LinkID}}" class="btn btn-warning deldok">Hapus</a></td>

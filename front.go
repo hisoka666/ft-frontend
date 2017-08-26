@@ -69,17 +69,17 @@ type DataPasien struct {
 	TglDaftar, Umur                     time.Time
 }
 
-type Obat struct {
-	Merk        string `json:"merk"`
-	Kandungan   string `json:"kandungan"`
-	PerkiloMin  int    `json:"kgmin"`
-	PerkiloMax  int    `json:"kgmax"`
-	Tablet      []int  `json:"tablet"`
-	Sirop       []int  `json:"sirop"`
-	Drop        []int  `drop:"drop"`
-	Rekomendasi string `json:"rekom"`
-	InputBy     string `json:"inputby"`
-}
+// type Obat struct {
+// 	Merk        string `json:"merk"`
+// 	Kandungan   string `json:"kandungan"`
+// 	PerkiloMin  int    `json:"kgmin"`
+// 	PerkiloMax  int    `json:"kgmax"`
+// 	Tablet      []int  `json:"tablet"`
+// 	Sirop       []int  `json:"sirop"`
+// 	Drop        []int  `drop:"drop"`
+// 	Rekomendasi string `json:"rekom"`
+// 	InputBy     string `json:"inputby"`
+// }
 
 type Response struct {
 	Token  string      `json:"token"`
@@ -163,9 +163,32 @@ func main() {
 	http.HandleFunc("/getobat", getObat)
 	http.HandleFunc("/tambahdokter", tambahDokter)
 	http.HandleFunc("/hapusdokter", hapusDokter)
+	http.HandleFunc("/getobatedit", editObat)
 	log.Println("Listening...")
 	log.Fatal(http.ListenAndServe(":8001", nil))
 
+}
+
+func editObat(w http.ResponseWriter, r *http.Request){
+	if r.Method != "POST" {
+		http.Error(w, "Post request please", http.StatusMethodNotAllowed)
+		return
+	}
+
+	url := "https://link-obat-dot-igdsanglah.appspot.com"
+	link := r.FormValue("link")
+	pos := &IndexObat{
+		Link: link,
+	}
+	resp, err := sendPost(pos, r.FormValue("token"), url)
+	if err != nil {
+		log.Fatalf("Terjadi kesalahan di server: %v", err)
+	}
+
+	obt := &InputObat{}
+	json.NewDecoder(resp.Body).Decode(obt)
+	defer resp.Body.Close()
+	responseTemplate(w, "OK", GenTemplate(nil, modinputobatbaru), "", obt)
 }
 func hapusDokter(w http.ResponseWriter, r *http.Request) {
 	if r.Method != "POST" {
@@ -244,7 +267,6 @@ func getObat(w http.ResponseWriter, r *http.Request) {
 	pos := &IndexObat{
 		Link: link,
 	}
-
 	resp, err := sendPost(pos, r.FormValue("token"), url)
 	if err != nil {
 		log.Fatalf("Terjadi kesalahan di server: %v", err)
@@ -253,6 +275,13 @@ func getObat(w http.ResponseWriter, r *http.Request) {
 	obt := &InputObat{}
 	json.NewDecoder(resp.Body).Decode(obt)
 	defer resp.Body.Close()
+	// fmt.Println(obt.MaxDose)
+	// fmt.Println(obt.MinDose)
+	maxDo, _ := strconv.ParseFloat(obt.MaxDose, 32)
+	minDo, _ := strconv.ParseFloat(obt.MinDose, 32)
+	bb, _ := strconv.ParseFloat(r.FormValue("berat"), 32)
+	maxD := strconv.FormatFloat((maxDo * bb), 'f', -1, 32)
+	minD := strconv.FormatFloat((minDo * bb), 'f', -1, 32)
 	view := &ObatView{
 		Rekomendasi: obt.Rekomendasi,
 		Link:        link,
@@ -263,17 +292,17 @@ func getObat(w http.ResponseWriter, r *http.Request) {
 	} else if obt.Sirup[0] != "" {
 		view.Sediaan = obt.Sirup
 		view.Kemasan = "sirup"
-		view.Dosis = obt.MinDose + " - " + obt.MaxDose + " mg PerKGBB/kali pemberian"
+		view.Dosis = minD + " - " + maxD + " mg tiap kali pemberian /(" + obt.MinDose + " - " + obt.MaxDose + ") perKGBB/kali pemberian"
 		view.Satuan = "mg per 5 ml"
 	} else if obt.Drop[0] != "" {
 		view.Sediaan = obt.Drop
 		view.Kemasan = "drop"
-		view.Dosis = obt.MinDose + " - " + obt.MaxDose + " mg PerKGBB/kali pemberian"
+		view.Dosis = minD + " - " + maxD + " mg tiap kali pemberian /(" + obt.MinDose + " - " + obt.MaxDose + ") perKGBB/kali pemberian"
 		view.Satuan = "mg per 1 ml"
 	} else {
 		view.Sediaan = obt.Tablet
 		view.Kemasan = "tablet"
-		view.Dosis = obt.MinDose + " - " + obt.MaxDose + " mg PerKGBB/kali pemberian"
+		view.Dosis = minD + " - " + maxD + " mg tiap kali pemberian /(" + obt.MinDose + " - " + obt.MaxDose + ") perKGBB/kali pemberian"
 		view.Satuan = "mg"
 	}
 	responseTemplate(w, "OK", GenTemplate(view, "viewobat"), obt.MerkDagang, nil)

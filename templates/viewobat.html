@@ -1,1 +1,51 @@
 <p class="infoobat">Rekomendasi: {{.Rekomendasi -}}, Sediaan: {{.Kemasan}} {{range $m, $n := .Sediaan}} {{$n}} {{end}} {{.Satuan}} {{if .Dosis}}, Dosis: {{.Dosis}} {{end}} <a id="editobat" href="{{.Link}}">Edit</a></p>
+<form action="" class="form-group row">
+{{if eq .Kemasan "tablet"}}
+<div class="col-xs-4">
+<input class="form-control viewobat" type="number" name="" id="" placeholder="Interval (jam)">
+<span class="help-block">Interval pemberian obat (jam)</span>
+</div>
+<div class="col-xs-4">
+<input class="form-control viewobat" type="text" name="" id="" placeholder="Jumlah tablet tiap pemberian">
+<span class="help-block">Jumlah tablet tiap pemberian</span>
+</div>
+<div class="col-xs-4">
+<input class="form-control viewobat" type="number" placeholder="Jumlah tablet">
+<span class="help-block">Jumlah tablet yang akan diberikan</span>
+</div>
+<div class="col-xs-4">
+<input class="form-control viewobat" type="text" name="" id="" placeholder="Keterangan">
+<span class="help-block">Sebelum makan, setelah makan, jika diperlukan</span>
+</div>
+{{else if eq .Kemasan "sirup"}}
+<div class="col-xs-3">
+<input class="form-control viewobat" type="number" name="" id="" placeholder="Interval (jam)">
+<span class="help-block">Interval pemberian obat (jam)</span>
+</div>
+<div class="col-xs-3">
+<input class="form-control viewobat" type="text" name="" id="" placeholder="Jumlah tiap pemberian">
+<span class="help-block">Jumlah takaran tiap pemberian</span>
+</div>
+<div class="col-xs-3">
+<select class="form-control viewobat" name="" id="">
+    <option value="">Sendok Makan (C) (15ml)</option>
+    <option value="">Sendok Teh (cth) (5ml)</option>
+    <option value="">Tetes (gtt)</option>
+</select>
+<span class="help-block">Jenis takaran</span>
+</div>
+<div class="col-xs-3">
+<input class="form-control viewobat" type="number" name="" id="" placeholder="Jumlah kemasan (botol)">
+<span class="help-block">Jumlah kemasan yang akan diberikan</span>
+</div>
+<div class="col-xs-3">
+<input class="form-control viewobat" type="text" name="" id="" placeholder="Keterangan">
+<span class="help-block">Sebelum makan, setelah makan, jika diperlukan</span>
+</div>
+{{else}}
+<div class="col-xs-5">
+    <input class="form-control" type="number" name="" id="" placeholder="Jumlah">
+    <span class="help-block">Jumlah kemasan yang akan diberikan</span>
+</div>
+{{end}}
+</form>

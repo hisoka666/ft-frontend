@@ -389,7 +389,13 @@ $("#navbar").on("click", "#makeresep", function(e){
 		var almt = $("#almt").val();
 		var bb = $("#bb").val();
 		var alergi = $("#alergi").val();
-
+		console.log("Berat adalah: " + bb);
+		if (bb == 0){
+			$("#alertmsgobat").html("<div class=\"alert alert-danger alert-dismissable\"\>" +
+			"<a href=\"#\" class=\"close\" data-dismiss=\"alert\" aria-label=\"close\">&times;</a\>" +
+			"Berat badan harus diisi!" +
+			"</div>");
+		}else{
 
 		$("#mymodal").modal();
 		$.get("getprespage")
@@ -404,7 +410,7 @@ $("#navbar").on("click", "#makeresep", function(e){
 			$("#rspalergi").html(alergi);
 			$("#mymodal").modal();
 		})
-		
+	}
 		
 	})
 });
@@ -750,15 +756,13 @@ $('body').on('keyup', 'input.isianobat', function(){
 	var ob = ""
 	var ob = $(this).val()
 	var token = localStorage.getItem("token")
-	// $("#listobat").html(ob)
+	var ini = $(this).parent().children('.list-group')
 	$.post("cariobt",{
 		token: token,
 		obat: ob
 	}, function(data){
-		console.log(data)
 		js = JSON.parse(data)
-		console.log(js.script)
-		$("#listobat").html(js.script)
+		ini.html(js.script)
 	})
 })
 
@@ -778,18 +782,60 @@ $('body').on('click', 'a.addobatinfo', function(e){
 $('body').on('click', 'a.getobatinfo', function(e){
 	e.preventDefault();
 	link = $(this).attr('href');
-	console.log("Link adalah: " + link);
+	bb = $("#rspbb").html();
 	token = localStorage.getItem("token");
+	ini = $(this).parents('.list-group')
+	inputini = $(this).parents('input.isianobat')
 	$.post("getobat",{
 		token: token,
-		link: link
+		link: link,
+		berat: bb
 	}, function(data){
 		js = JSON.parse(data);
-		$(".isianobat").val(js.modal)
+		inputini.val(js.modal)
 		// console.log(js.script);
-		$("#listobat").html(js.script)
+		ini.html(js.script)
 	})
 })
+
+$('body').on('click', 'button.tambahlistobat', function(e){
+	e.preventDefault();
+	$('div.template').clone().removeClass('template').addClass('listobat').prop('hidden', false).appendTo('div.form-group.main')
+})
+
+// $('body').on('click', 'a#editobat', function(e){
+// 	e.preventDefault();
+// 	link = $(this).attr('href');
+// 	$.post("getobatedit", {
+// 		token: localStorage.getItem("token"),
+// 		link: link
+// 	},function(data){
+// 		js = JSON.parse(data)
+// 		$("#mymodal2").html(js.script)
+// 		$("#mrkdgng").val(js.data.merk)
+// 		$("#kand").val(js.data.kand)
+// 		$("#mindose").val(js.data.mindose)
+// 		$("#maxdose").val(js.data.maxdose)
+// 		for (i = 0; i<js.data.syr.length; i++){
+// 			$("input.obat.sirup.sediaan").clone()
+// 		}
+// 		var lainnya = 'input[name="sediaan"][value="3"]'
+// 		var 
+// 		if (js.data.tab[0] == "" && js.data.syr[0] == ""){
+// 			for (i=0;i<js.data.lainnya_sediaan.length; i++){
+// 				$('input.obat.lainnya.sediaan').html(js.data.lainnya_sediaan[i])
+// 				tambahElement("obat.lainnya.sediaan", this);
+// 			}
+// 			$('input[name="sediaan"][value="3"]').prop('checked', true);
+// 		}
+// 		if (js.data.syr[0] !== ""){
+// 			for (i=0;i<js.data.syr.length; i++){
+// 				$('input.obat.sirup')
+// 			}
+
+// 		}
+// 	})
+// })
 });
 
 
