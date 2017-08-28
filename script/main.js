@@ -756,7 +756,14 @@ $('body').on('keyup', 'input.isianobat', function(){
 	var ob = ""
 	var ob = $(this).val()
 	var token = localStorage.getItem("token")
-	var ini = $(this).parent().children('.list-group')
+	var ini = $(this).parents("div.listobat").children('#listobat')
+	if (ob == "puyer") {
+		$.get("formpuyer")
+		.done(function(data){
+			js = JSON.parse(data)
+			ini.html(js.script)
+		})
+	}else{
 	$.post("cariobt",{
 		token: token,
 		obat: ob
@@ -764,6 +771,7 @@ $('body').on('keyup', 'input.isianobat', function(){
 		js = JSON.parse(data)
 		ini.html(js.script)
 	})
+	}
 })
 
 $('body').on('click', 'a.addobatinfo', function(e){
@@ -784,8 +792,8 @@ $('body').on('click', 'a.getobatinfo', function(e){
 	link = $(this).attr('href');
 	bb = $("#rspbb").html();
 	token = localStorage.getItem("token");
-	ini = $(this).parents('.list-group')
-	inputini = $(this).parents('.listobat').children('input.isianobat')
+	ini = $(this).parent()
+	inputini = $(this).parents('.listobat').children().find('input.isianobat')
 	$.post("getobat",{
 		token: token,
 		link: link,
@@ -889,9 +897,22 @@ $("body").on("click", "#savdrugedit", function(e){
 			}
 		})
 	$("#mymodal2").modal('hide');
-
-
 });
+
+$('body').on('keyup', 'input.obat-puyer', function(){
+	var ob = ""
+	var ob = $(this).val()
+	var token = localStorage.getItem("token")
+	var ini = $(this).parents("div.listobatpuyer")
+	$.post("cariobt",{
+		token: token,
+		obat: ob
+	}, function(data){
+		js = JSON.parse(data)
+		ini.html(js.script)
+	})
+})
+
 });
 
 

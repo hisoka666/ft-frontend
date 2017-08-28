@@ -165,11 +165,20 @@ func main() {
 	http.HandleFunc("/hapusdokter", hapusDokter)
 	http.HandleFunc("/getobatedit", editObat)
 	http.HandleFunc("/inputobatedit", confEditObat)
+	http.HandleFunc("/formpuyer", formPuyer)
 	log.Println("Listening...")
 	log.Fatal(http.ListenAndServe(":8001", nil))
 
 }
 
+func formPuyer(w http.ResponseWriter, r *http.Request){
+	if r.Method != "GET" {
+		http.Error(w, "Post request please", http.StatusMethodNotAllowed)
+		return
+	}
+
+	responseTemplate(w, "", GenTemplate(nil, "formpuyer"),"",nil)
+}
 func confEditObat(w http.ResponseWriter, r *http.Request) {
 	if r.Method != "POST" {
 		http.Error(w, "Post request please", http.StatusMethodNotAllowed)
@@ -310,8 +319,8 @@ func getObat(w http.ResponseWriter, r *http.Request) {
 	maxDo, _ := strconv.ParseFloat(obt.MaxDose, 32)
 	minDo, _ := strconv.ParseFloat(obt.MinDose, 32)
 	bb, _ := strconv.ParseFloat(r.FormValue("berat"), 32)
-	maxD := strconv.FormatFloat((maxDo * bb), 'f', -1, 32)
-	minD := strconv.FormatFloat((minDo * bb), 'f', -1, 32)
+	maxD := strconv.FormatFloat((maxDo * bb), 'f', 2, 32)
+	minD := strconv.FormatFloat((minDo * bb), 'f', 2, 32)
 	view := &ObatView{
 		Rekomendasi: obt.Rekomendasi,
 		Link:        link,
@@ -336,7 +345,7 @@ func getObat(w http.ResponseWriter, r *http.Request) {
 		view.Dosis = minD + " - " + maxD + " mg tiap kali pemberian /(" + obt.MinDose + " - " + obt.MaxDose + ") perKGBB/kali pemberian"
 		view.Satuan = "mg"
 	}
-	responseTemplate(w, "OK", GenTemplate(view, "viewobat"), obt.MerkDagang, nil)
+	responseTemplate(w, "OK", GenTemplate(view, "viewobatbaru"), obt.MerkDagang, nil)
 
 }
 func cariObat(w http.ResponseWriter, r *http.Request) {

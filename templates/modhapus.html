@@ -1,0 +1,26 @@
+<div id="modh" class="modal fade" tabindex="-1" role="dialog">
+
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">&times;</button>
+                <h4 class="modal-title">Hapus Entri</h4>
+            </div>
+
+
+            <div class="modal-body">
+				<p>Yakin ingin menghapus entri ini?</p>
+            </div>
+
+
+            <div class="modal-footer">
+                <button type="button" id="dismissbut" class="btn btn-default" data-dismiss="modal">Batal</button>
+                <button type="button" id="confirmhapus" class="btn btn-default" data-dismiss="modal">Hapus</button>
+                <input type="hidden" name="link" value={{.LinkID}}>
+                <input type="hidden" name="urutan" id="urutan" value="">
+				<div id="alertmodal"></div>
+            </div>
+        </div>
+    </div>
+</div>
+

@@ -1,0 +1,47 @@
+<p class="infoobat">Rekomendasi: {{.Rekomendasi -}}, Sediaan: {{.Kemasan}} {{range $m, $n := .Sediaan}} {{$n}} {{end}} {{.Satuan}} {{if .Dosis}}, Dosis: {{.Dosis}} {{end}} <a id="editobat" href="{{.Link}}">Edit</a></p>
+<form action="" class="form-group row form-list-obat">
+{{if eq .Kemasan "tablet"}}
+<div class="col-xs-12">
+    <div class="input-group">
+    <span class="input-group-addon">&int;</span>
+    <input type="text" class="form-control viewobat" placeholder="Instruksi pemberian">
+    </div>
+</div>
+<div class="col-xs-12">
+    <div class="input-group">
+    <span class="input-group-addon">Keterangan</span>
+    <input class="form-control viewobat" type="text" name="" id="" placeholder="Keterangan">
+    </div>
+    <span class="help-block">Sebelum makan, setelah makan, jika diperlukan</span>
+</div>
+
+{{else if eq .Kemasan "sirup"}}
+<div class="col-xs-12">
+    <div class="input-group">
+    <span class="input-group-addon">&int;</span>
+    <input type="text" class="form-control viewobat" placeholder="Instruksi pemberian">
+    </div>
+</div>
+<div class="col-xs-12">
+    <div class="input-group">
+    <span class="input-group-addon">Keterangan</span>
+    <input class="form-control viewobat" type="text" name="" id="" placeholder="Keterangan">
+    </div>
+    <span class="help-block">Sebelum makan, setelah makan, jika diperlukan</span>
+</div>
+{{else}}
+<div class="col-xs-12">
+    <div class="input-group">
+    <span class="input-group-addon">&int;</span>
+    <input type="text" class="form-control viewobat" placeholder="Instruksi pemberian">
+    </div>
+</div>
+<div class="col-xs-12">
+    <div class="input-group">
+    <span class="input-group-addon">Keterangan</span>
+    <input class="form-control viewobat" type="text" name="" id="" placeholder="Keterangan">
+    </div>
+    <span class="help-block">Sebelum makan, setelah makan, jika diperlukan</span>
+</div>
+{{end}}
+</form>
