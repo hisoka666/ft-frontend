@@ -1,0 +1,7 @@
+{{with .}}
+        {{range $m, $n := .}}
+            <a class="list-group-item getpuyerinfo" href="{{$n.Link}}"><b>{{$n.MerkDagang}}</b> <i>{{$n.Kandungan}}</i></a>
+        {{end}}
+{{else}}
+<a class="list-group-item addobatinfo" href="">Tidak ada obat dengan nama <b><span id="obatbaru"></span></b>. Tambahkan?</a>
+{{end}}

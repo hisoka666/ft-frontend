@@ -130,6 +130,31 @@ type ObatView struct {
 	Link        string   `json:"link"`
 }
 
+type Resep struct {
+	ListObat  []Obat  `json:"listobat"`
+	ListPuyer []Puyer `json:"listpuyer"`
+}
+
+type Obat struct {
+	NamaObat   string `json:"obat"`
+	Jumlah     string `json:"jumlah"`
+	Instruksi  string `json:"instruksi"`
+	Keterangan string `json:"keterangan"`
+}
+
+type Puyer struct {
+	Obat       []SatuObat `json:"satuobat"`
+	Racikan    string     `json:"racikan"`
+	JmlRacikan string     `json:"jml-racikan"`
+	Instruksi  string     `json:"instruksi"`
+	Keterangan string     `json:"keterangan"`
+}
+
+type SatuObat struct {
+	NamaObat string `json:"obat"`
+	Takaran  string `json:"takaran"`
+}
+
 func main() {
 	// variable fs membuat folder "script" menjadi sebuah file server,
 	// alamat dari file server ini akan diarahkan oleh http.Handle
@@ -166,19 +191,75 @@ func main() {
 	http.HandleFunc("/getobatedit", editObat)
 	http.HandleFunc("/inputobatedit", confEditObat)
 	http.HandleFunc("/formpuyer", formPuyer)
+	http.HandleFunc("/cariobatpuyer", cariObatPuyer)
+	http.HandleFunc("/getpuyer", getObat)
+	http.HandleFunc("/buatresep", buatResep)
 	log.Println("Listening...")
 	log.Fatal(http.ListenAndServe(":8001", nil))
 
 }
 
-func formPuyer(w http.ResponseWriter, r *http.Request){
+func buatResep(w http.ResponseWriter, r *http.Request) {
+	if r.Method != "POST" {
+		http.Error(w, "Post request please", http.StatusMethodNotAllowed)
+		return
+	}
+
+	// fmt.Println(r.FormValue("send"))
+	// sendbyte := []byte(r.FormValue("send"))
+	// fmt.Print(sendbyte)
+	rec := &Resep{}
+	err := json.Unmarshal([]byte(r.FormValue("send")), rec)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	for _, v := range rec.ListObat {
+		fmt.Println(v.NamaObat)
+	}
+
+	for _, v := range rec.ListPuyer {
+		fmt.Println(v.Racikan)
+		for _, n := range v.Obat {
+			fmt.Println(n.NamaObat)
+		}
+	}
+
+	// fmt.Printf("Data obat adalah : %v", rec.ListObat)
+	// fmt.Printf("Data obat adalah : %v", rec.ListPuyer)
+	// fmt.Printf("data adalah %v", x[""])
+}
+func formPuyer(w http.ResponseWriter, r *http.Request) {
 	if r.Method != "GET" {
 		http.Error(w, "Post request please", http.StatusMethodNotAllowed)
 		return
 	}
 
-	responseTemplate(w, "", GenTemplate(nil, "formpuyer"),"",nil)
+	responseTemplate(w, "", GenTemplate(nil, "formpuyer"), "", nil)
 }
+
+func cariObatPuyer(w http.ResponseWriter, r *http.Request) {
+	if r.Method != "POST" {
+		http.Error(w, "Post request please", http.StatusMethodNotAllowed)
+		return
+	}
+
+	url := "https://get-obat-dot-igdsanglah.appspot.com"
+	obat := r.FormValue("obat")
+	pos := &IndexObat{
+		MerkDagang: obat,
+	}
+
+	resp, err := sendPost(pos, r.FormValue("token"), url)
+	if err != nil {
+		log.Fatalf("Terjadi kesalahan di server: %v", err)
+	}
+	listobt := []IndexObat{}
+	json.NewDecoder(resp.Body).Decode(&listobt)
+	defer resp.Body.Close()
+	responseTemplate(w, "OK", GenTemplate(listobt, "listpuyer"), pos.MerkDagang, nil)
+}
+
 func confEditObat(w http.ResponseWriter, r *http.Request) {
 	if r.Method != "POST" {
 		http.Error(w, "Post request please", http.StatusMethodNotAllowed)
@@ -345,7 +426,7 @@ func getObat(w http.ResponseWriter, r *http.Request) {
 		view.Dosis = minD + " - " + maxD + " mg tiap kali pemberian /(" + obt.MinDose + " - " + obt.MaxDose + ") perKGBB/kali pemberian"
 		view.Satuan = "mg"
 	}
-	responseTemplate(w, "OK", GenTemplate(view, "viewobatbaru"), obt.MerkDagang, nil)
+	responseTemplate(w, "OK", GenTemplate(view, "viewobatbaru"), obt.MerkDagang, view)
 
 }
 func cariObat(w http.ResponseWriter, r *http.Request) {

@@ -14,30 +14,38 @@
                     <div class="col-sm-6">Berat Badan: <span id="rspbb"></span> kg</div>
                     <div class="col-sm-6 text-capitalize">Alamat: <span id="rspalmt"></span></div>
                     <div class="col-sm-6 text-capitalize">Alergi: <span id="rspalergi"></span></div>
-                    <div class="form-group listobat">
+                    <div class="col-sm-12 form-group listobat">
                         <div class="col-xs-8">
                             <div class="input-group">
-                            <span class="input-group-addon">&#8478;</span>
-                            <input type="text" class="form-control isianobat text-capitalize" placeholder="Masukkan nama obat">
+                                <span class="input-group-addon">&#8478;</span>
+                                <input type="text" name="namaobat" class="form-control isianobat text-capitalize" placeholder="Masukkan nama obat">
+                                <div class="input-group-btn">
+                                    <button class="btn btn-default but-puyer">Puyer</button>
+                                </div>
                             </div>
                         </div>
                         <div class="col-xs-4">
                             <div class="input-group">
                             <span class="input-group-addon">No.</span>
-                            <input type="number" class="form-control viewobat jum-obat" placeholder="Jumlah obat">
+                            <input type="number" name="jumlah" class="form-control viewobat jum-obat" placeholder="Jumlah obat">
                             </div>
                         </div>
                         <div class="col-xs-12 list-group" id="listobat"></div>
+                        <div class="col-xs-8"></div>
+                        <div class="col-xs-2">
+                            <button class="btn btn-danger del-obat-line">Hapus Obat</button>
+                        </div>
                     </div>
                 </div>
                 <button class="tambahlistobat btn btn-warning">Tambah Obat</button>
-
-
-                <div class="form-group template" hidden>
+                <div class="col-sm-12 form-group template" hidden>
                         <div class="col-xs-8">
                             <div class="input-group">
-                            <span class="input-group-addon">&#8478;</span>
-                            <input type="text" class="form-control isianobat text-capitalize" placeholder="Masukkan nama obat">
+                                <span class="input-group-addon">&#8478;</span>
+                                <input type="text" class="form-control isianobat text-capitalize" placeholder="Masukkan nama obat">
+                                <div class="input-group-btn">
+                                    <button class="btn btn-default but-puyer">Puyer</button>
+                                </div>
                             </div>
                         </div>
                         <div class="col-xs-4">
@@ -47,11 +55,15 @@
                             </div>
                         </div>
                         <div class="col-xs-12 list-group" id="listobat"></div>
+                        <div class="col-xs-8"></div>
+                        <div class="col-xs-2">
+                            <button class="btn btn-danger del-obat-line">Hapus Obat</button>
+                        </div>
                 </div>
             </div>
             <div class="modal-footer">
                 <button type="button" id="modalbutton" class="btn btn-default" data-dismiss="modal">Tutup</button>
-                <button type="button" id="resepbut" class="btn btn-default" hidden>Perlihatkan Resep</button>
+                <button type="button" id="resepbut" class="btn btn-default">Perlihatkan Resep</button>
             </div>
         </div>
     </div>

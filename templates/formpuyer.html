@@ -1,31 +1,44 @@
 <div class="obatpuyer">
     <div class="form-group main-puyer">
+        <div class="form-group list-puyer">
+            <div class="col-xs-8">
+                <input type="text" name="namaobat" class="form-control obat-puyer text-capitalize" placeholder="Masukkan nama obat">
+            </div>
+            <div class="col-xs-4">
+                <input type="number" name="takaran" class="form-control takaran-obat" placeholder="Takaran">
+            </div>
+            <div class="col-xs-12 list-group" id="listobatpuyer"></div>
+        </div>
+    </div>
+    <div class="col-xs-12">
+            <button class="btn btn-warning add-obat-puyer">Tambah obat puyer</button>
+    </div>
     <div class="col-xs-8">
-        <input type="text" class="form-control obat-puyer text-capitalize" placeholder="Masukkan nama obat">
+        <input type="text" name="racikan" class="form-control peracikan" placeholder="Cara peracikan">
     </div>
     <div class="col-xs-4">
-        <input type="number" class="form-control viewobat takaran-obat" placeholder="Jumlah obat">
-    </div>
-    <div class="col-xs-12 list-group" id="listobatpuyer"></div>
-    </div>
-    <button class="btn btn-warning add-obat-puyer">Tambah obat puyer</button>
-    <div class="col-xs-12">
-        <input type="text" class="form-control peracikan text-capitalize" placeholder="Cara peracikan">
+            <input type="number" name="jml-racikan" class="form-control jml-racikan" placeholder="Jumlah Puyer">
     </div>
     <div class="col-xs-12">
         <div class="input-group">
             <span class="input-group-addon">&int;</span>
-            <input type="text" class="form-control viewobat" placeholder="Instruksi pemberian">
+            <input type="text" name="instruksi" class="form-control instruksi" placeholder="Instruksi pemberian">
         </div>
     </div>
-
-    <div class="form-group main-puyer template" hidden>
-    <div class="col-xs-8">
-        <input type="text" class="form-control obat-puyer text-capitalize" placeholder="Masukkan nama obat">
-    </div>
-    <div class="col-xs-4">
-        <input type="number" class="form-control viewobat jum-obat" placeholder="Jumlah obat">
-    </div>
-    <div class="col-xs-12 list-group" id="listobatpuyer"></div>
+    <div class="col-xs-12">
+            <div class="input-group">
+            <span class="input-group-addon">Keterangan</span>
+            <input class="form-control viewobat keterangan" type="text" name="keterangan" id="" placeholder="Keterangan">
+            </div>
+            <span class="help-block">Sebelum makan, setelah makan, jika diperlukan</span>
+        </div>
+    <div class="form-group list-puyer template-puyer" hidden>
+        <div class="col-xs-8">
+            <input type="text" name="namaobat" class="form-control obat-puyer text-capitalize" placeholder="Masukkan nama obat">
+        </div>
+        <div class="col-xs-4">
+            <input type="number" name="takaran" class="form-control takaran-obat" placeholder="Takaran">
+        </div>
+        <div class="col-xs-12 list-group" id="listobatpuyer"></div>
     </div>
 </div>

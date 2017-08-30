@@ -756,14 +756,14 @@ $('body').on('keyup', 'input.isianobat', function(){
 	var ob = ""
 	var ob = $(this).val()
 	var token = localStorage.getItem("token")
-	var ini = $(this).parents("div.listobat").children('#listobat')
-	if (ob == "puyer") {
-		$.get("formpuyer")
-		.done(function(data){
-			js = JSON.parse(data)
-			ini.html(js.script)
-		})
-	}else{
+	var ini = $(this).parents(".listobat").children('#listobat')
+	// if (ob == "puyer") {
+	// 	$.get("formpuyer")
+	// 	.done(function(data){
+	// 		js = JSON.parse(data)
+	// 		ini.html(js.script)
+	// 	})
+	// }else{
 	$.post("cariobt",{
 		token: token,
 		obat: ob
@@ -771,7 +771,7 @@ $('body').on('keyup', 'input.isianobat', function(){
 		js = JSON.parse(data)
 		ini.html(js.script)
 	})
-	}
+	// }
 })
 
 $('body').on('click', 'a.addobatinfo', function(e){
@@ -903,15 +903,114 @@ $('body').on('keyup', 'input.obat-puyer', function(){
 	var ob = ""
 	var ob = $(this).val()
 	var token = localStorage.getItem("token")
-	var ini = $(this).parents("div.listobatpuyer")
-	$.post("cariobt",{
+	var ini = $(this).parents(".list-puyer").children('#listobatpuyer')
+	// ini.html(ob)
+	$.post("cariobatpuyer",{
 		token: token,
 		obat: ob
 	}, function(data){
 		js = JSON.parse(data)
 		ini.html(js.script)
+		$("#obatbaru").html(js.modal)
 	})
 })
+
+$('body').on('click', 'a.getpuyerinfo', function(e){
+	e.preventDefault();
+	link = $(this).attr('href');
+	bb = $("#rspbb").html();
+	token = localStorage.getItem("token");
+	ini = $(this).parent()
+	inputini = $(this).parents('.list-puyer').children().find('input.obat-puyer')
+	$.post("getpuyer",{
+		token: token,
+		link: link,
+		berat: bb
+	}, function(data){
+		js = JSON.parse(data);
+		// console.log(inputini.val())
+		inputini.val(js.modal)
+		// console.log(js.data.dosis);
+		ini.html("Rekomendasi: " + js.data.rekom + ", Dosis: " + js.data.dosis + ". <a id='editobat' href=" + js.data.link + ">Edit</a>").addClass("help-block")
+	})
+})
+
+$('body').on('click', 'button.add-obat-puyer', function(e){
+	e.preventDefault();
+	$('div.template-puyer').clone().removeClass('template-puyer').prop('hidden', false).appendTo('div.form-group.main-puyer')
+})
+$('body').on('click', 'button.but-puyer', function(e){
+	e.preventDefault()
+	console.log("button pressed")
+	var ini = $(this).parents(".listobat").children("#listobat")
+	var iniinput = $(this).parents('div.input-group').children('input.isianobat')
+	$.get("formpuyer")
+		.done(function(data){
+			js = JSON.parse(data)
+			iniinput.remove()
+			ini.html(js.script)
+		})
+})
+
+$('body').on('click', 'button.del-obat-line', function(e){
+	e.preventDefault();
+	$(this).parents('.listobat').remove();
+})
+
+$('body').on('click', 'button#resepbut', function(e){
+	e.preventDefault();
+	// var listini = $(this).children()
+	$(".listobat").each(function(){
+		// console.log($(this).find('.obatpuyer'))
+		var obat = []
+		var puyer = []
+		if ($(this).find('.obatpuyer').length == 0){
+			// console.log("not puyer")
+			// var namaobat = $(this).find(".isianobat").val();
+			// var jumlah = $(this).find('.jum-obat').val();
+			// var instruksi = $(this).find('.instruksi').val();
+			// var keterangan = $(this).find('.keterangan').val();
+			arr = {
+				"obat": $(this).find(".isianobat").val(),
+				"jumlah": $(this).find('.jum-obat').val(),
+				"instruksi": $(this).find('.instruksi').val(),
+				"keterangan": $(this).find('.keterangan').val()
+				}
+			obat.push(arr)
+
+		}else{
+			// console.log("puyer")
+			pyr = []
+			$(this).find('.list-puyer').not('.template-puyer').each(function(){
+				arr = {
+					"obat": $(this).find('.obat-puyer').val(),
+					"takaran": $(this).find('.takaran-obat').val()
+				}
+				pyr.push(arr)
+			})
+			mix = {
+				"satuobat": pyr,
+				"racikan": $(this).find('.peracikan').val(),
+				"jml-racikan": $(this).find('.jml-racikan').val(),
+				"instruksi": $(this).find('.instruksi').val(),
+				"keterangan": $(this).find('.keterangan').val()
+			}
+			puyer.push(mix)
+		}
+		send = {
+			"listobat": obat,
+			"listpuyer": puyer
+		}
+		// console.log(obat)
+		// console.log(puyer)
+		// console.log(JSON.stringify(obat))
+		// console.log(JSON.stringify(puyer))
+		// console.log(send)
+		// console.log(JSON.stringify(send))
+		$.post("buatresep", {"send" : JSON.stringify(send)})
+	})
+
+});
 
 });
 
