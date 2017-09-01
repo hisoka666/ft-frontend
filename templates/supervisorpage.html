@@ -1,0 +1,52 @@
+<nav class="navbar navbar-default">
+    <div class="container-fluid">
+        <ul class="nav navbar-nav">
+            <li><a href="">Kondisi IGD Bulan Ini</a></li>
+            <li class="dropdown"><a href="" class="dropdown-toggle" data-toggle="dropdown">Kondisi IGD Perbulan <span class="caret"></span> </a></li>
+                <ul class="dropdown-menu">
+                    <li><a href=""></a></li>
+                    <li><a href=""></a></li>
+                    <li><a href=""></a></li>
+                </ul>
+            <li><a href=""></a></li>
+        </ul>
+    </div>
+</nav>
+
+<div class="container-fluid">
+    <div class="supervisor"></div>
+    {{with .Supervisor}}
+        <div class="col-sm-6">
+            {{range $m, $n := .PerHari}}
+                <div class="col-sm-4">{{$m}}</div>
+                <div class="col-sm-8">{{$n}}</div>
+            {{end}}
+        </div>
+        <div class="col-sm-6">
+            {{range $m, $n := .PerDeptPerHari}}
+                <div class="col-sm-4">{{$m}}</div>
+                <div class="col-sm-8">
+                    Jumlah Interna: <span>{{$n.Interna}}</span></br>
+                    Jumlah Bedah: <span>{{$n.Bedah}}</span></br>
+                    Jumlah Anak: <span>{{$n.Anak}}</span></br>
+                    Jumlah Obgyn: <span>{{$n.Obgyn}}</span></br>
+                    Jumlah Saraf: <span>{{$n.Saraf}}</span></br>
+                    Jumlah Anestesi: <span>{{$n.Anestesi}}</span></br>
+                    Jumlah Psikiatri: <span>{{$n.Psikiatri}}</span></br>
+                    Jumlah THT: <span>{{$n.THT}}</span></br>
+                    Jumlah Kulit: <span>{{$n.Kulit}}</span></br>
+                    Jumlah Kardio: <span>{{$n.Kardio}}</span></br>
+                    Jumlah Umum: <span>{{$n.Umum}}</span></br>
+                    Jumlah Mata: <span>{{$n.Mata}}</span></br>
+                    Jumlah MOD: <span>{{$n.MOD}}</span></br>
+                </div>
+            {{end}}
+        </div>
+        {{range $m, $n := .ListPasien}}
+            <div class="col-sm-3">{{$n.TglKunjungan}}</div>
+            <div class="col-sm-2">{{$n.ATS}}</div>
+            <div class="col-sm-2">{{$n.Dept}}</div>
+            <div class="col-sm-4">{{$n.Diagnosis}}</div>
+        {{end}}
+    {{end}}
+</div>

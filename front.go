@@ -17,16 +17,48 @@ import (
 // type ReturnError struct {
 // 	Error string `json:"error"`
 // }
-
-type MainView struct {
-	Token  string    `json:"token"`
-	User   string    `json:"user"`
-	Bulan  []string  `json:"bulan"`
-	Pasien []Pasien  `json:"pasien"`
-	IKI    []ListIKI `json:"list"`
-	Admin  Admin     `json:"admin"`
-	Peran  string    `json:"peran"`
+type SupervisorList struct {
+	StatusServer   string                 `json:"status"`
+	ListPasien     []SupervisorListPasien `json:"listpasien"`
+	Token          string                 `json:"token"`
+	SupervisorName string                 `json:"user"`
+	ListBulan      []string               `json:"listbulan"`
+	PerHari        []int                  `json:"perhari"`
+	PerDeptPerHari []Departemen           `json:"perdept"`
 }
+type Departemen struct {
+	Interna   int `json:"interna"`
+	Bedah     int `json:"bedah"`
+	Anak      int `json:"anak"`
+	Obgyn     int `json:"obgyn"`
+	Saraf     int `json:"saraf"`
+	Anestesi  int `json:"anes"`
+	Psikiatri int `json:"psik"`
+	THT       int `json:"tht"`
+	Kulit     int `json:"kulit"`
+	Kardio    int `json:"jant"`
+	Umum      int `json:"umum"`
+	Mata      int `json:"mata"`
+	MOD       int `json:"mod"`
+}
+type MainView struct {
+	Token      string         `json:"token"`
+	User       string         `json:"user"`
+	Bulan      []string       `json:"bulan"`
+	Pasien     []Pasien       `json:"pasien"`
+	IKI        []ListIKI      `json:"list"`
+	Admin      Admin          `json:"admin"`
+	Supervisor SupervisorList `json:"supervisor"`
+	Peran      string         `json:"peran"`
+}
+type SupervisorListPasien struct {
+	TglKunjungan time.Time `json:"tgl"`
+	ATS          string    `json:"ats"`
+	Dept         string    `json:"dept"`
+	Diagnosis    string    `json:"diag"`
+	LinkID       string    `json:"link"`
+}
+
 type Admin struct {
 	Staff []Staff `json:"list"`
 	Token string  `json:"token"`
@@ -1294,6 +1326,8 @@ func mainContent(w http.ResponseWriter, r *http.Request) {
 	defer resp.Body.Close()
 	if web.Peran == "admin" {
 		responseTemplate(w, web.Token, GenTemplate(web, "adminpage"), "", nil)
+	} else if web.Peran == "supervisor" {
+		responseTemplate(w, web.Token, GenTemplate(web, "supervisorpage"), "", web)
 	} else {
 		responseTemplate(w, web.Token, GenTemplate(web, "main", "input", "content"), "", nil)
 	}
