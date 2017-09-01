@@ -3,14 +3,19 @@ $(document).ready(function(){
 	var nocm = $("#nocm").val()
 	
 	$("#navbar").on("keyup", "#nocm", function(){
-		
-		var value = $("#nocm").val();
-		
-		
-		if (value == ""){
+		// var str = $("#nocm").val();
+		var value = $("#nocm").val().replace(/\s+/g, '');
+		var reg = /^\d+$/
+		// console.log(reg.test(value))
+		if (reg.test(value) == false){
+			$("#datapasien").html("Harap masukkan angka!")
+			value = "";
+		}else if (value == ""){
 			$("#datapasien").html("Masukkan No. CM");
+			value = "";
 		} else if (value.length < 8){
 			$("#datapasien").html("No. CM tidak lengkap");
+			value = "";
 		} else {
 			$("#nocm").prop("disabled", true);
 			nocm = value;
@@ -39,7 +44,7 @@ $(document).ready(function(){
 	$("#navbar").on("click", "#btnsub", function(event){		
 		event.preventDefault();
 		
-		var nocm = $("#nocm").val();
+		var nocm = $("#nocm").val().replace(/\s+/g, '');
 		var namapts = $("#namapts").val();
 		var diag = $("#diag").val();
 		var ats = $("input[name='ats']:checked").val();
