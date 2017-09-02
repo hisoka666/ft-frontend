@@ -570,7 +570,26 @@ $("#navbar").on("click", "#bulanini", function(e){
 			$("#inputnocm").hide();
 			$(".diagram").show();
 			$("#butpdfnow").show();
-			$("#tabeliki").html(js.modal).show();
+			// $("#tabeliki").html(js.modal).show();
+			$("#tabeliki").html(js.modal)
+			var ekstra = js.data.data2
+			// console.log("p3k " + ekstra.p3k.length)
+			if (jQuery.isEmptyObject(ekstra.p3k) == false){
+				for (i=0;i<ekstra.p3k.length;i++){
+					$("td.iki1").eq(parseInt(js.data.data2.p3k[i])-1).html("P3K").removeClass("jml")
+				}
+			}
+			if (jQuery.isEmptyObject(ekstra.rapat) == false){
+				for (i=0;i<ekstra.rapat.length;i++){
+					$("td.iki1").eq(parseInt(js.data.data2.rapat[i])-1).html("Rapat").removeClass("jml")
+				}
+			}
+			if (jQuery.isEmptyObject(ekstra.pelatihan) == false){
+				for (i=0;i<ekstra.pelatihan.length;i++){
+					$("td.iki1").eq(parseInt(js.data.data2.pelatihan[i])-1).html("Pelatihan").removeClass("jml")
+				}
+			}
+			$("#tabeliki").show();
 			getSum();
 			$("#tabelutama").html(js.script);
 		})
@@ -586,7 +605,26 @@ $("#navbar").on("click", "#bulanini", function(e){
 			pieChart(js.data, "")
 			$(".diagram").show();
 			$("#inputnocm").hide();
-			$("#tabeliki").html(js.modal).show();
+			// $("#tabeliki").html(js.modal).show();
+			$("#tabeliki").html(js.modal)
+			var ekstra = js.data.data2
+			// console.log("p3k " + ekstra.p3k.length)
+			if (jQuery.isEmptyObject(ekstra.p3k) == false){
+				for (i=0;i<ekstra.p3k.length;i++){
+					$("td.iki1").eq(parseInt(js.data.data2.p3k[i])-1).html("P3K").removeClass("jml")
+				}
+			}
+			if (jQuery.isEmptyObject(ekstra.rapat) == false){
+				for (i=0;i<ekstra.rapat.length;i++){
+					$("td.iki1").eq(parseInt(js.data.data2.rapat[i])-1).html("Rapat").removeClass("jml")
+				}
+			}
+			if (jQuery.isEmptyObject(ekstra.pelatihan) == false){
+				for (i=0;i<ekstra.pelatihan.length;i++){
+					$("td.iki1").eq(parseInt(js.data.data2.pelatihan[i])-1).html("Pelatihan").removeClass("jml")
+				}
+			}
+			$("#tabeliki").show();
 			getSum();
 			$("#tabelutama").html(js.script);
 		})
@@ -643,7 +681,27 @@ $("#navbar").on("click", ".bcptgl", function(e){
 		$("#inputnocm").hide();
 		$(".diagram").show();
 		$("#butpdfnow").hide();
-		$("#tabeliki").html(js.modal).show();
+		// console.log("p3k adalah : " +)
+		// $("#tabeliki").html(js.modal).show()
+		$("#tabeliki").html(js.modal)
+		var ekstra = js.data.data2
+		// console.log("p3k " + ekstra.p3k.length)
+		if (jQuery.isEmptyObject(ekstra.p3k) == false){
+			for (i=0;i<ekstra.p3k.length;i++){
+				$("td.iki1").eq(parseInt(js.data.data2.p3k[i])-1).html("P3K").removeClass("jml")
+			}
+		}
+		if (jQuery.isEmptyObject(ekstra.rapat) == false){
+			for (i=0;i<ekstra.rapat.length;i++){
+				$("td.iki1").eq(parseInt(js.data.data2.rapat[i])-1).html("Rapat").removeClass("jml")
+			}
+		}
+		if (jQuery.isEmptyObject(ekstra.pelatihan) == false){
+			for (i=0;i<ekstra.pelatihan.length;i++){
+				$("td.iki1").eq(parseInt(js.data.data2.pelatihan[i])-1).html("Pelatihan").removeClass("jml")
+			}
+		}
+		$("#tabeliki").show();
 		getSum()
 		$("div.tabtitle").html("Tabel IKI " + tgl);
 		$("#tabelutama").html(js.script);
@@ -688,8 +746,6 @@ $("#navbar").on("click", "#bul-ini-pdf", function(e){
 	$("#getpdf").submit();
 })
 var pieChart = function(list, tgl){
-
-
 	google.charts.load('current', {packages: ['corechart', 'bar']});
 	google.charts.setOnLoadCallback(drawChart);
 	google.charts.setOnLoadCallback(barChart);

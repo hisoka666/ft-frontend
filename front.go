@@ -67,9 +67,12 @@ type Staff struct {
 	Email, NamaLengkap, LinkID, Peran string
 }
 type ListIKI struct {
-	Tanggal int `json:"tgl"`
-	SumIKI1 int `json:"iki1"`
-	SumIKI2 int `json:"iki2"`
+	Tanggal   int      `json:"tgl"`
+	SumIKI1   int      `json:"iki1"`
+	SumIKI2   int      `json:"iki2"`
+	P3K       []string `json:"p3k"`
+	Rapat     []string `json:"rapat"`
+	Pelatihan []string `json:"pelatihan"`
 }
 
 type Pasien struct {
@@ -185,6 +188,12 @@ type Puyer struct {
 type SatuObat struct {
 	NamaObat string `json:"obat"`
 	Takaran  string `json:"takaran"`
+}
+
+type KegiatanEkstra struct {
+	P3K       []string `json:"p3k"`
+	Rapat     []string `json:"rapat"`
+	Pelatihan []string `json:"pelatihan"`
 }
 
 func main() {
@@ -671,6 +680,37 @@ func createPDF(w http.ResponseWriter, p []Pasien, l []ListIKI, tgl, email string
 	pdf.CellFormat(25, 6, fmt.Sprintf("%.4f", g), "1", 1, "C", false, 0, "")
 	pdf.CellFormat(256, 6, "Target Point kegiatan pelayanan", "1", 0, "R", false, 0, "")
 	pdf.CellFormat(25, 6, "1,111", "1", 1, "C", false, 0, "")
+	pdf.Ln(-1)
+	linep3k := ": Tanggal "
+	linerapat := ": Tanggal "
+	linepelatihan := ": Tanggal "
+	for _, v := range l {
+		for _, n := range v.P3K {
+			linep3k = linep3k + n + " "
+		}
+		for _, n := range v.Pelatihan {
+			linepelatihan = linepelatihan + n + " "
+		}
+		for _, n := range v.Rapat {
+			linerapat = linerapat + n + " "
+		}
+	}
+
+	// for _, v := range l {
+	// 	linerapat = linerapat + v + " "
+	// }
+
+	// for _, v := range l {
+	// 	linepelatihan = linepelatihan + v + " "
+	// }
+	pdf.Cell(20, 6, "P3K")
+	pdf.Cell(30, 6, linep3k)
+	pdf.Ln(-1)
+	pdf.Cell(20, 6, "Rapat")
+	pdf.Cell(30, 6, linerapat)
+	pdf.Ln(-1)
+	pdf.Cell(20, 6, "Pelatihan")
+	pdf.Cell(30, 6, linepelatihan)
 	////////////////// Buku Catatan Pasien ///////////////////////////////
 	pdf.AddPage()
 	pdf.SetFont("Arial", "B", 16)
@@ -763,7 +803,7 @@ func getBCPMonth(w http.ResponseWriter, r *http.Request) {
 	pts := []Pasien{}
 	json.NewDecoder(resp.Body).Decode(&pts)
 	defer resp.Body.Close()
-	jaga := dataJaga(perBagian(pts), countIKI(pts))
+	jaga := dataJaga(perBagian(pts), countIKI(pts), ConvertEkstra(countIKI(pts)))
 	// bag := perBagian(pts)
 	// bl := countDaysOfMonth(r.FormValue("year"), r.FormValue("month"))
 	iki := countIKI(pts)
@@ -781,6 +821,30 @@ func dataJaga(m ...interface{}) interface{} {
 	}
 
 	return j
+}
+
+func ConvertEkstra(n []ListIKI) KegiatanEkstra {
+	var keg KegiatanEkstra
+	for _, v := range n {
+		// fmt.Println(v.P3K == nil)
+		if v.P3K != nil {
+			for _, n := range v.P3K {
+				keg.P3K = append(keg.P3K, n)
+			}
+		}
+		if v.Pelatihan != nil {
+			for _, n := range v.Pelatihan {
+				keg.Pelatihan = append(keg.Pelatihan, n)
+			}
+		}
+		if v.Rapat != nil {
+			for _, n := range v.Rapat {
+				keg.Rapat = append(keg.Rapat, n)
+			}
+		}
+	}
+	// fmt.Println(keg)
+	return keg
 }
 func getMonthly(w http.ResponseWriter, r *http.Request) {
 	if r.Method != "POST" {
@@ -806,7 +870,7 @@ func getMonthly(w http.ResponseWriter, r *http.Request) {
 	json.NewDecoder(resp.Body).Decode(&pts)
 	defer resp.Body.Close()
 	iki := countIKI(pts)
-	jaga := dataJaga(perBagian(pts), countIKI(pts))
+	jaga := dataJaga(perBagian(pts), countIKI(pts), ConvertEkstra(countIKI(pts)))
 	// fmt.Printf("LIst iki adalah: %v", iki)
 
 	responseTemplate(w, "OK", GenTemplate(pts, "contentrefresh"), GenTemplate(iki, "tabeliki"), jaga)
@@ -819,12 +883,23 @@ func countIKI(n []Pasien) []ListIKI {
 
 	for h := 1; h <= 31; h++ {
 		var u1, u2 int
+		var p3k []string
+		var rapat []string
+		var pelatihan []string
 		for _, v := range n {
 			tgl, _ := strconv.Atoi(v.TglKunjungan[:2])
 			if tgl != h {
 				continue
 			}
-			if v.IKI == "1" {
+
+			// if v.NamaPasien == "P3K" || v.NamaPasien == "Rapat Rutin" || v.NamaPasien == "Pelatihan" {
+			if v.NamaPasien == "P3K" {
+				p3k = append(p3k, v.TglKunjungan[:2])
+			} else if v.NamaPasien == "Rapat/Pertemuan" {
+				rapat = append(rapat, v.TglKunjungan[:2])
+			} else if v.NamaPasien == "Pelatihan" {
+				pelatihan = append(pelatihan, v.TglKunjungan[:2])
+			} else if v.IKI == "1" {
 				u1++
 			} else {
 				u2++
@@ -832,9 +907,12 @@ func countIKI(n []Pasien) []ListIKI {
 		}
 
 		f := ListIKI{
-			Tanggal: h,
-			SumIKI1: u1,
-			SumIKI2: u2,
+			Tanggal:   h,
+			SumIKI1:   u1,
+			SumIKI2:   u2,
+			P3K:       p3k,
+			Rapat:     rapat,
+			Pelatihan: pelatihan,
 		}
 
 		g = append(g, f)

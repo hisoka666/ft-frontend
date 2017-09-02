@@ -75,7 +75,7 @@
                             {{with .}}
                                 {{range $m, $n := .}}
                                     {{if lt $m 16}}
-                                        <td class="cell jml">{{.SumIKI1}} </td>
+                                        <td class="cell jml iki1">{{.SumIKI1}} </td>
                                     {{end}}
                                 {{end}}
                             {{end}}
@@ -182,7 +182,7 @@
                                 {{with .}}
                                     {{range $m, $n := .}}
                                         {{if ge $m 16}}
-                                            <td class="cell jml">{{.SumIKI1}}</td>
+                                            <td class="cell jml iki1">{{.SumIKI1}}</td>
                                         {{end}}
                                     {{end}}
                                 {{end}}
