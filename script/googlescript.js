@@ -10,14 +10,18 @@ function onSignIn(googleUser) {
       $("#signinbut").show();
      } else {
       localStorage.setItem("token", jos.token);
+      localStorage.setItem("user", jos.modal);
+      // console.log("user adalah: "+ jos.user)
+      $("#dokter").html(jos.modal);
       $("#navbar").html(jos.script);
      }
   })
   .fail(function(err){
     alert("Error: " + err)
   });
+
   var profile = googleUser.getBasicProfile();
-  $("#dokter").html(profile.getName());
+  // $("#dokter").html(profile.getName());
   $("#email").attr({"value" : profile.getEmail()});
   $("#welcome").show();
   $("#signoutbut").show();

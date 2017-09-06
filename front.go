@@ -17,14 +17,26 @@ import (
 // type ReturnError struct {
 // 	Error string `json:"error"`
 // }
+
+type PerShift struct {
+	Pagi  int `json:"pagi"`
+	Sore  int `json:"sore"`
+	Malam int `json:"malam"`
+	Total int `json:"total"`
+}
+type KursorIGD struct {
+	Bulan string `json:"bulan"`
+	Point string `json:"point"`
+}
 type SupervisorList struct {
-	StatusServer   string                 `json:"status"`
-	ListPasien     []SupervisorListPasien `json:"listpasien"`
-	Token          string                 `json:"token"`
-	SupervisorName string                 `json:"user"`
-	ListBulan      []string               `json:"listbulan"`
-	PerHari        []int                  `json:"perhari"`
-	PerDeptPerHari []Departemen           `json:"perdept"`
+	StatusServer    string                 `json:"status"`
+	ListPasien      []SupervisorListPasien `json:"listpasien"`
+	Token           string                 `json:"token"`
+	SupervisorName  string                 `json:"user"`
+	ListBulan       []string               `json:"listbulan"`
+	PerHari         []int                  `json:"perhari"`
+	PerDeptPerHari  []Departemen           `json:"perdept"`
+	PerShiftPerHari []PerShift             `json:"shift"`
 }
 type Departemen struct {
 	Interna   int `json:"interna"`
@@ -235,9 +247,32 @@ func main() {
 	http.HandleFunc("/cariobatpuyer", cariObatPuyer)
 	http.HandleFunc("/getpuyer", getObat)
 	http.HandleFunc("/buatresep", buatResep)
+	http.HandleFunc("/supgeteachmonth", supGetMonth)
+	// http.HandleFunc("/getsupervisor", getSupervisor)
 	log.Println("Listening...")
 	log.Fatal(http.ListenAndServe(":8001", nil))
 
+}
+
+func supGetMonth(w http.ResponseWriter, r *http.Request) {
+	if r.Method != "POST" {
+		http.Error(w, "Post request please", http.StatusMethodNotAllowed)
+		return
+	}
+
+	url := "https://igdsanglah.appspot.com/getsupmonth"
+	send := &KursorIGD{
+		Bulan: r.FormValue("tgl"),
+	}
+
+	resp, err := sendPost(send, r.FormValue("token"), url)
+	if err != nil {
+		log.Fatalf("Terjadi kesalahan di server: %v", err)
+	}
+	list := &SupervisorList{}
+	json.NewDecoder(resp.Body).Decode(list)
+	resp.Body.Close()
+	responseTemplate(w, "", GenTemplate(list, "contentsupervisor"), "", nil)
 }
 
 func buatResep(w http.ResponseWriter, r *http.Request) {
@@ -1407,7 +1442,7 @@ func mainContent(w http.ResponseWriter, r *http.Request) {
 	} else if web.Peran == "supervisor" {
 		responseTemplate(w, web.Token, GenTemplate(web, "supervisorpage"), "", web)
 	} else {
-		responseTemplate(w, web.Token, GenTemplate(web, "main", "input", "content"), "", nil)
+		responseTemplate(w, web.Token, GenTemplate(web, "main", "input", "content"), web.User, nil)
 	}
 }
 

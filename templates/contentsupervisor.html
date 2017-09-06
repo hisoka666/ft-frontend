@@ -1,0 +1,29 @@
+        <div class="col-sm-6">
+            {{range $m, $n := .PerDeptPerHari}}
+                <div class="col-sm-4">{{$m}}</div>
+                <div class="col-sm-8">
+                    Jumlah Interna: <span class="jml-int">{{$n.Interna}}</span></br>
+                    Jumlah Bedah: <span class="jml-bdh">{{$n.Bedah}}</span></br>
+                    Jumlah Anak: <span class="jml-ank">{{$n.Anak}}</span></br>
+                    Jumlah Obgyn: <span class="jml-obg">{{$n.Obgyn}}</span></br>
+                    Jumlah Saraf: <span class="jml-srf">{{$n.Saraf}}</span></br>
+                    Jumlah Anestesi: <span class="jml-anes">{{$n.Anestesi}}</span></br>
+                    Jumlah Psikiatri: <span  class="jml-psi">{{$n.Psikiatri}}</span></br>
+                    Jumlah THT: <span class="jml-tht">{{$n.THT}}</span></br>
+                    Jumlah Kulit: <span class="jml-kul">{{$n.Kulit}}</span></br>
+                    Jumlah Kardio: <span class="jml-jtg">{{$n.Kardio}}</span></br>
+                    Jumlah Umum: <span class="jml-um">{{$n.Umum}}</span></br>
+                    Jumlah Mata: <span class="jml-mata">{{$n.Mata}}</span></br>
+                    Jumlah MOD: <span class="jml-mod">{{$n.MOD}}</span></br>
+                </div>
+            {{end}}
+        </div>
+        {{range $m, $n := .PerShiftPerHari}}
+        <div class="container-fluid">
+            <div class="col-sm-2 shift-tgl">{{$m}}</div>
+            <div class="col-sm-2 shift-pagi">{{$n.Pagi}}</div>
+            <div class="col-sm-2 shift-sore">{{$n.Sore}}</div>
+            <div class="col-sm-2 shift-malam">{{$n.Malam}}</div>
+            <div class="col-sm-2 shift-total">{{$n.Total}}</div>
+        </div>
+        {{end}}

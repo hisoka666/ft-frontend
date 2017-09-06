@@ -2,46 +2,55 @@
     <div class="container-fluid">
         <ul class="nav navbar-nav">
             <li><a href="">Kondisi IGD Bulan Ini</a></li>
-            <li class="dropdown"><a href="" class="dropdown-toggle" data-toggle="dropdown">Kondisi IGD Perbulan <span class="caret"></span> </a></li>
+            <li class="dropdown"><a href="" class="dropdown-toggle" data-toggle="dropdown">Kondisi IGD Perbulan <span class="caret"></span> </a>
                 <ul class="dropdown-menu">
-                    <li><a href=""></a></li>
-                    <li><a href=""></a></li>
-                    <li><a href=""></a></li>
+                    {{with .Bulan}}
+                        {{range .}}
+                            <li><a class="bulan-supervisor" href="">{{.}}</a></li>
+                        {{end}}
+                    {{end}}
                 </ul>
-            <li><a href=""></a></li>
+            </li>
         </ul>
     </div>
 </nav>
 
 <div class="container-fluid">
-    <div class="supervisor"></div>
+    <div class="chart-jml-perhari col-sm-6" id="jmlperhari"></div>
+    <div class="chart-jml-perhari-perbagian col-sm-6" id="jmlperbagian"></div>
+</div>
+
+<div class="container-fluid supervisor-content">
     {{with .Supervisor}}
-        <div class="col-sm-6">
-            {{range $m, $n := .PerHari}}
-                <div class="col-sm-4">{{$m}}</div>
-                <div class="col-sm-8">{{$n}}</div>
-            {{end}}
-        </div>
         <div class="col-sm-6">
             {{range $m, $n := .PerDeptPerHari}}
                 <div class="col-sm-4">{{$m}}</div>
                 <div class="col-sm-8">
-                    Jumlah Interna: <span>{{$n.Interna}}</span></br>
-                    Jumlah Bedah: <span>{{$n.Bedah}}</span></br>
-                    Jumlah Anak: <span>{{$n.Anak}}</span></br>
-                    Jumlah Obgyn: <span>{{$n.Obgyn}}</span></br>
-                    Jumlah Saraf: <span>{{$n.Saraf}}</span></br>
-                    Jumlah Anestesi: <span>{{$n.Anestesi}}</span></br>
-                    Jumlah Psikiatri: <span>{{$n.Psikiatri}}</span></br>
-                    Jumlah THT: <span>{{$n.THT}}</span></br>
-                    Jumlah Kulit: <span>{{$n.Kulit}}</span></br>
-                    Jumlah Kardio: <span>{{$n.Kardio}}</span></br>
-                    Jumlah Umum: <span>{{$n.Umum}}</span></br>
-                    Jumlah Mata: <span>{{$n.Mata}}</span></br>
-                    Jumlah MOD: <span>{{$n.MOD}}</span></br>
+                    Jumlah Interna: <span class="jml-int">{{$n.Interna}}</span></br>
+                    Jumlah Bedah: <span class="jml-bdh">{{$n.Bedah}}</span></br>
+                    Jumlah Anak: <span class="jml-ank">{{$n.Anak}}</span></br>
+                    Jumlah Obgyn: <span class="jml-obg">{{$n.Obgyn}}</span></br>
+                    Jumlah Saraf: <span class="jml-srf">{{$n.Saraf}}</span></br>
+                    Jumlah Anestesi: <span class="jml-anes">{{$n.Anestesi}}</span></br>
+                    Jumlah Psikiatri: <span  class="jml-psi">{{$n.Psikiatri}}</span></br>
+                    Jumlah THT: <span class="jml-tht">{{$n.THT}}</span></br>
+                    Jumlah Kulit: <span class="jml-kul">{{$n.Kulit}}</span></br>
+                    Jumlah Kardio: <span class="jml-jtg">{{$n.Kardio}}</span></br>
+                    Jumlah Umum: <span class="jml-um">{{$n.Umum}}</span></br>
+                    Jumlah Mata: <span class="jml-mata">{{$n.Mata}}</span></br>
+                    Jumlah MOD: <span class="jml-mod">{{$n.MOD}}</span></br>
                 </div>
             {{end}}
         </div>
+        {{range $m, $n := .PerShiftPerHari}}
+        <div class="container-fluid">
+            <div class="col-sm-2 shift-tgl">{{$m}}</div>
+            <div class="col-sm-2 shift-pagi">{{$n.Pagi}}</div>
+            <div class="col-sm-2 shift-sore">{{$n.Sore}}</div>
+            <div class="col-sm-2 shift-malam">{{$n.Malam}}</div>
+            <div class="col-sm-2 shift-total">{{$n.Total}}</div>
+        </div>
+        {{end}}
         {{range $m, $n := .ListPasien}}
             <div class="col-sm-3">{{$n.TglKunjungan}}</div>
             <div class="col-sm-2">{{$n.ATS}}</div>
@@ -50,3 +59,170 @@
         {{end}}
     {{end}}
 </div>
+
+<script type="text/javascript">
+    chartOn();
+    function chartOn(){
+        console.log("This function works")
+        // $("jmlperhari").html("please fill this")
+        google.charts.load('current', {packages:['corechart']});
+        google.charts.setOnLoadCallback(barHari);
+        var pagi = []
+        $(".shift-pagi").each(function(){
+            // console.log(typeof $(this).html())
+            pagi.push(parseInt($(this).html()))
+        })
+        var sore = []
+        $(".shift-sore").each(function(){
+            sore.push(parseInt($(this).html()))
+        })
+        var malam = []
+        $(".shift-malam").each(function(){
+            malam.push(parseInt($(this).html()))
+        })
+        var total = []
+        $(".shift-total").each(function(){
+            total.push(parseInt($(this).html()))
+        })
+        console.log("Shift pagi: " + pagi)
+        console.log("Shift sore: " + sore)
+        console.log("Shift malam: " + malam)
+        console.log("Shift total: " + total)
+        function barHari(){
+            var data = new google.visualization.DataTable();
+            data.addColumn('number', 'Tanggal Jaga');
+            data.addColumn('number', 'Pagi');
+            data.addColumn('number', 'Sore');
+            data.addColumn('number', 'Malam');
+            data.addColumn('number', 'Total');
+    
+            
+            var isi = []
+            for(i=0;i<31;i++){
+                data.addRows([
+                    [i+1,pagi[i], sore[i], malam[i], total[i]]
+                ])
+            }
+
+            var options = {
+                title: "Jumlah Kunjungan IGD Perhari",
+                // width: 500,
+                height: 600,
+                hAxis: {
+                    title: "Tanggal Jaga",
+                },
+                vAxis: {
+                    title: "Jumlah Pasien"
+                }
+            };
+
+            var chart = new google.visualization.ColumnChart(document.getElementById('jmlperhari'));
+            chart.draw(data, options);
+        }
+    }
+    barPerBagian();
+    function barPerBagian(){
+        google.charts.load('current', {packages:['corechart']});
+        google.charts.setOnLoadCallback(barBagian);
+
+        var interna = convertArray(".jml-int")
+        var bdh = convertArray(".jml-bdh")
+        var anak = convertArray(".jml-ank")
+        var obgyn = convertArray(".jml-obg")
+        var saraf = convertArray(".jml-srf")
+        var anes = convertArray(".jml-anes")
+        var psik = convertArray(".jml-psi")
+        var tht = convertArray(".jml-tht")
+        var kulit = convertArray(".jml-kul")
+        var kardio = convertArray(".jml-jtg")
+        var umum = convertArray(".jml-um")
+        var mata = convertArray(".jml-mata")
+        var mod = convertArray(".jml-mod")
+        // $(".jml-int").each(function(){
+        //     // console.log(typeof $(this).html())
+        //     int.push(parseInt($(this).html()))
+        // })
+        // var sore = []
+        // $(".shift-sore").each(function(){
+        //     sore.push(parseInt($(this).html()))
+        // })
+        // var malam = []
+        // $(".shift-malam").each(function(){
+        //     malam.push(parseInt($(this).html()))
+        // })
+        // var total = []
+        // $(".shift-total").each(function(){
+        //     total.push(parseInt($(this).html()))
+        // })
+        console.log("Interna jml: " + interna)
+        // console.log("Shift sore: " + sore)
+        // console.log("Shift malam: " + malam)
+        // console.log("Shift total: " + total)
+        function barBagian(){
+            var data = new google.visualization.DataTable();
+            data.addColumn('number', 'Tanggal');
+            data.addColumn('number', 'Interna');
+            data.addColumn('number', 'Bedah');
+            data.addColumn('number', 'Anak');
+            data.addColumn('number', 'Obgyn');
+            data.addColumn('number', 'Saraf');
+            data.addColumn('number', 'Anestesi');
+            data.addColumn('number', 'Psikiatri');
+            data.addColumn('number', 'THT');
+            data.addColumn('number', 'Kulit');
+            data.addColumn('number', 'Kardio');
+            data.addColumn('number', 'Umum');
+            data.addColumn('number', 'Mata');
+            data.addColumn('number', 'MOD');
+    
+            
+            var isi = []
+            for(i=0;i<31;i++){
+                data.addRows([
+                    [i+1, interna[i], bdh[i], anak[i], obgyn[i], saraf[i], anes[i], psik[i], tht[i], kulit[i], kardio[i], umum[i], mata[i], mod[i]]
+                ])
+            }
+
+            var options = {
+                title: "Jumlah Kunjungan IGD Perhari PerBagian",
+                // width: 500,
+                height: 600,
+                isStacked: true,
+                hAxis: {
+                    title: "Tanggal",
+                },
+                vAxis: {
+                    title: "Jumlah Pasien"
+                }
+            };
+
+            var chart = new google.visualization.ColumnChart(document.getElementById('jmlperbagian'));
+            chart.draw(data, options);
+        }
+    }
+
+    function convertArray(className){
+        arrName = []
+        $(className).each(function(){
+            // console.log(typeof $(this).html())
+            arrName.push(parseInt($(this).html()))
+        })
+
+        return arrName
+
+    }
+
+    $("a.bulan-supervisor").click(function(e){
+        e.preventDefault();
+        // console.log("Bulan adalah: " + $(this).html())
+        $.post("supgeteachmonth", {
+            token: localStorage.getItem("token"),
+            tgl: $(this).html()
+        }, function(data){
+            var js = JSON.parse(data)
+            $("div.supervisor-content").html(js.script)
+            chartOn();
+            barPerBagian();
+        })
+    })
+</script>
