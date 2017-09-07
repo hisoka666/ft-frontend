@@ -1,7 +1,7 @@
 <nav class="navbar navbar-default">
     <div class="container-fluid">
         <ul class="nav navbar-nav">
-            <li><a href="">Kondisi IGD Bulan Ini</a></li>
+            <li><a href="" id="igd-now">Kondisi IGD Bulan Ini</a></li>
             <li class="dropdown"><a href="" class="dropdown-toggle" data-toggle="dropdown">Kondisi IGD Perbulan <span class="caret"></span> </a>
                 <ul class="dropdown-menu">
                     {{with .Bulan}}
@@ -19,8 +19,9 @@
     <div class="chart-jml-perhari col-sm-6" id="jmlperhari"></div>
     <div class="chart-jml-perhari-perbagian col-sm-6" id="jmlperbagian"></div>
 </div>
+<div class="sup-bulan" hidden></div>
+<div class="container-fluid supervisor-content" hidden>
 
-<div class="container-fluid supervisor-content">
     {{with .Supervisor}}
         <div class="col-sm-6">
             {{range $m, $n := .PerDeptPerHari}}
@@ -61,12 +62,46 @@
 </div>
 
 <script type="text/javascript">
+    function bulDiv(){
+        $("div.sup-bulan").html(function(){
+            var now = new Date();
+            var dateone = new Date(now.getFullYear(),now.getMonth(),1,8,0,0);
+            var bul = ""
+            var thn = ""
+            if ( now > dateone){
+                bul = "0" + (now.getMonth() + 1).toString().slice(-2)
+                thn = now.getFullYear().toString()
+                $(this).html(bul + "/" + thn)
+            }else {
+                bul = "0" + now.getMonth().toString().slice(-2)
+                thn = now.getFullYear().toString()
+                $(this).html(bul + "/" + thn)
+            }
+        })
+    }
+    bulDiv();
+    // function bulDiv(){
+    //     var now = new Date();
+    //     var dateone = new Date(now.getFullYear(),now.getMonth(),1,8,0,0);
+    //     var bul = ""
+    //     var thn = ""
+    //     if ( now > dateone){
+    //         bul = "0" + (now.getMonth() + 1).toString().slice(-2)
+    //         thn = now.getFullYear().toString()
+    //         $(this).html(bul + "/" + thn)
+    //     }else {
+    //         bul = "0" + now.getMonth().toString().slice(-2)
+    //         thn = now.getFullYear().toString()
+    //         $(this).html(bul + "/" + thn)
+    //     }
+    // }
     chartOn();
     function chartOn(){
-        console.log("This function works")
+        // console.log("This function works")
         // $("jmlperhari").html("please fill this")
         google.charts.load('current', {packages:['corechart']});
         google.charts.setOnLoadCallback(barHari);
+        var bulan = $("div.sup-bulan").html()
         var pagi = []
         $(".shift-pagi").each(function(){
             // console.log(typeof $(this).html())
@@ -84,10 +119,10 @@
         $(".shift-total").each(function(){
             total.push(parseInt($(this).html()))
         })
-        console.log("Shift pagi: " + pagi)
-        console.log("Shift sore: " + sore)
-        console.log("Shift malam: " + malam)
-        console.log("Shift total: " + total)
+        // console.log("Shift pagi: " + pagi)
+        // console.log("Shift sore: " + sore)
+        // console.log("Shift malam: " + malam)
+        // console.log("Shift total: " + total)
         function barHari(){
             var data = new google.visualization.DataTable();
             data.addColumn('number', 'Tanggal Jaga');
@@ -105,9 +140,10 @@
             }
 
             var options = {
-                title: "Jumlah Kunjungan IGD Perhari",
+                title: "Jumlah Kunjungan IGD Perhari (Bulan: " + bulan + ")",
                 // width: 500,
                 height: 600,
+                isStacked: true,
                 hAxis: {
                     title: "Tanggal Jaga",
                 },
@@ -124,7 +160,7 @@
     function barPerBagian(){
         google.charts.load('current', {packages:['corechart']});
         google.charts.setOnLoadCallback(barBagian);
-
+        var bulan = $("div.sup-bulan").html()
         var interna = convertArray(".jml-int")
         var bdh = convertArray(".jml-bdh")
         var anak = convertArray(".jml-ank")
@@ -154,7 +190,7 @@
         // $(".shift-total").each(function(){
         //     total.push(parseInt($(this).html()))
         // })
-        console.log("Interna jml: " + interna)
+        // console.log("Interna jml: " + interna)
         // console.log("Shift sore: " + sore)
         // console.log("Shift malam: " + malam)
         // console.log("Shift total: " + total)
@@ -184,7 +220,7 @@
             }
 
             var options = {
-                title: "Jumlah Kunjungan IGD Perhari PerBagian",
+                title: "Jumlah Kunjungan IGD Perhari PerBagian (Bulan: " + bulan + ")",
                 // width: 500,
                 height: 600,
                 isStacked: true,
@@ -214,6 +250,8 @@
 
     $("a.bulan-supervisor").click(function(e){
         e.preventDefault();
+        bulan = $(this).html()
+        $("div.sup-bulan").html(revStr(bulan))
         // console.log("Bulan adalah: " + $(this).html())
         $.post("supgeteachmonth", {
             token: localStorage.getItem("token"),
@@ -225,4 +263,21 @@
             barPerBagian();
         })
     })
+    $("a#igd-now").click(function(e){
+        bulDiv();
+        e.preventDefault()
+        $.post("supmonthnow", {
+            token: localStorage.getItem("token")
+        }, function(data){
+            // console.log(data)
+            js = JSON.parse(data)
+            // console.log(js.script)
+            $("div.supervisor-content").html(js.script)
+            chartOn();
+            barPerBagian();
+        })
+    })
+    function revStr(str){
+        return str.split("/").reverse().join("/")
+    }
 </script>

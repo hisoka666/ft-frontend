@@ -2,6 +2,7 @@ package main
 
 import (
 	"bytes"
+	"encoding/base64"
 	"encoding/json"
 	"fmt"
 	"html/template"
@@ -115,6 +116,15 @@ type DataPasien struct {
 	NamaPasien, NomorCM, JenKel, Alamat string
 	TglDaftar, Umur                     time.Time
 }
+type PasienResep struct {
+	Nama      string `json:"nama"`
+	Umur      string `json:"umur"`
+	Berat     string `json:"berat"`
+	Alamat    string `json:"alamat"`
+	Alergi    string `json:"alergi"`
+	Diagnosis string `json:"diag"`
+	NoCM      string `json:"nocm"`
+}
 
 // type Obat struct {
 // 	Merk        string `json:"merk"`
@@ -178,8 +188,11 @@ type ObatView struct {
 }
 
 type Resep struct {
-	ListObat  []Obat  `json:"listobat"`
-	ListPuyer []Puyer `json:"listpuyer"`
+	Dokter    string      `json:"dokter"`
+	Tanggal   string      `json:"tanggal"`
+	ListObat  []Obat      `json:"listobat"`
+	ListPuyer []Puyer     `json:"listpuyer"`
+	Pasien    PasienResep `json:"pasien"`
 }
 
 type Obat struct {
@@ -248,12 +261,28 @@ func main() {
 	http.HandleFunc("/getpuyer", getObat)
 	http.HandleFunc("/buatresep", buatResep)
 	http.HandleFunc("/supgeteachmonth", supGetMonth)
+	http.HandleFunc("/supmonthnow", supGetMonthNow)
 	// http.HandleFunc("/getsupervisor", getSupervisor)
 	log.Println("Listening...")
 	log.Fatal(http.ListenAndServe(":8001", nil))
 
 }
+func supGetMonthNow(w http.ResponseWriter, r *http.Request) {
+	if r.Method != "POST" {
+		http.Error(w, "Post request please", http.StatusMethodNotAllowed)
+		return
+	}
 
+	url := "https://igdsanglah.appspot.com/getsupmonthnow"
+	resp, err := sendPost(nil, r.FormValue("token"), url)
+	if err != nil {
+		log.Fatalf("Terjadi kesalahan di server: %v", err)
+	}
+	list := &MainView{}
+	json.NewDecoder(resp.Body).Decode(list)
+	defer resp.Body.Close()
+	responseTemplate(w, "OK", GenTemplate(list.Supervisor, "contentsupervisor"), "", nil)
+}
 func supGetMonth(w http.ResponseWriter, r *http.Request) {
 	if r.Method != "POST" {
 		http.Error(w, "Post request please", http.StatusMethodNotAllowed)
@@ -290,20 +319,110 @@ func buatResep(w http.ResponseWriter, r *http.Request) {
 		fmt.Println(err)
 		return
 	}
-	for _, v := range rec.ListObat {
-		fmt.Println(v.NamaObat)
-	}
+	// for _, v := range rec.ListObat {
+	// 	fmt.Println(v.NamaObat)
+	// }
 
-	for _, v := range rec.ListPuyer {
-		fmt.Println(v.Racikan)
-		for _, n := range v.Obat {
-			fmt.Println(n.NamaObat)
-		}
-	}
-
+	// for _, v := range rec.ListPuyer {
+	// 	fmt.Println(v.Racikan)
+	// 	for _, n := range v.Obat {
+	// 		fmt.Println(n.NamaObat)
+	// 	}
+	// }
+	pdfResep(w, *rec)
 	// fmt.Printf("Data obat adalah : %v", rec.ListObat)
 	// fmt.Printf("Data obat adalah : %v", rec.ListPuyer)
 	// fmt.Printf("data adalah %v", x[""])
+}
+
+func pdfResep(w http.ResponseWriter, r Resep) {
+	pdf := gofpdf.New("P", "mm", "A4", "")
+	pdf.SetFont("Arial", "", 9)
+	pdf.AddPageFormat("P", gofpdf.SizeType{Wd: 100, Ht: 210})
+	pdf.Cell(20, 5, "Nama Dokter")
+	//Nama Dokter
+	pdf.Cell(60, 5, (": dr. " + r.Dokter))
+	pdf.Ln(-1)
+	pdf.Cell(20, 5, "Ruangan")
+	pdf.Cell(60, 5, ": Fasttrack")
+	pdf.Ln(-1)
+	pdf.CellFormat(20, 5, "Diagnosis", "B", 0, "L", false, 0, "")
+	//Diagnosis
+	pdf.CellFormat(60, 5, (": " + r.Pasien.Diagnosis), "B", 0, "L", false, 0, "")
+	pdf.Ln(-1)
+	pdf.Ln(-1)
+	pdf.SetX(60)
+	//Tanggal
+	pdf.Cell(20, 5, ("Tanggal: " + r.Tanggal))
+	//Nama Obat
+	pdf.Ln(-1)
+	for _, v := range r.ListObat {
+		pdf.Cell(70, 5, ("Rx. " + v.NamaObat))
+		//Jumlah obat
+		pdf.Cell(10, 5, ("No. " + v.Jumlah))
+		pdf.Ln(-1)
+		//Aturan minum
+		pdf.Cell(20, 5, "")
+		pdf.CellFormat(40, 5, ("S " + v.Instruksi), "B", 0, "C", false, 0, "")
+		pdf.Ln(-1)
+		pdf.Ln(-1)
+	}
+	if len(r.ListPuyer) > 0 {
+		pdf.Cell(5, 5, "Rx.")
+		pdf.Ln(-1)
+		for _, v := range r.ListPuyer {
+			for _, n := range v.Obat {
+				pdf.Cell(5, 5, "")
+				pdf.Cell(60, 5, n.NamaObat)
+				pdf.Cell(10, 5, n.Takaran)
+				pdf.Ln(-1)
+			}
+			pdf.Cell(20, 5, "")
+			pdf.Cell(40, 5, v.Racikan)
+			pdf.Cell(10, 5, ("No. " + v.JmlRacikan))
+			pdf.Ln(-1)
+			pdf.Cell(20, 5, "")
+			pdf.CellFormat(40, 5, ("S " + v.Instruksi), "B", 0, "", false, 0, "")
+			pdf.Ln(-1)
+			pdf.Ln(-1)
+		}
+	}
+
+	// pdf.Cell(70, 5, "Rx. Paracetamol tab 500 mg ")
+	// //Jumlah obat
+	// pdf.Cell(10, 5, "No. X")
+	// pdf.Ln(-1)
+	// //Aturan minum
+	// pdf.Cell(20, 5, "")
+	// pdf.CellFormat(40, 5, "S 3 dd tab 1", "B", 0, "C", false, 0, "")
+	// pdf.Ln(-1)
+	//Identitas Pasien
+	pdf.SetY(170)
+	pdf.Cell(20, 5, "Pro")
+	pdf.Cell(60, 5, (": " + r.Pasien.Nama))
+	pdf.Ln(-1)
+	pdf.Cell(20, 5, "No. CM")
+	pdf.Cell(20, 5, (": " + r.Pasien.NoCM))
+	pdf.Cell(20, 5, "Umur")
+	pdf.Cell(20, 5, (": " + r.Pasien.Umur + "th"))
+	pdf.Ln(-1)
+	pdf.Cell(20, 5, "Alamat")
+	pdf.Cell(20, 5, (": " + r.Pasien.Alamat))
+	pdf.Cell(20, 5, "Berat Badan")
+	pdf.Cell(20, 5, (": " + r.Pasien.Berat))
+
+	t := new(bytes.Buffer)
+	err := pdf.Output(t)
+	if err != nil {
+		log.Fatalf("Error reading pdf %v", err)
+	}
+	w.Header().Set("Content-type", "application/pdf")
+	base64.NewEncoder(base64.StdEncoding, w).Write(t.Bytes())
+	// json.NewEncoder(w).Encode(t)
+	// w.Header().Set("Content-type", "application/pdf")
+	// if _, err := t.WriteTo(w); err != nil {
+	// 	fmt.Fprintf(w, "%s", err)
+	// }
 }
 func formPuyer(w http.ResponseWriter, r *http.Request) {
 	if r.Method != "GET" {
@@ -1057,7 +1176,7 @@ func getPresPage(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	responseTemplate(w, "OK", GenTemplate(nil, "modlistresep"), "", nil)
+	responseTemplate(w, "OK", GenTemplate(nil, "modlistresepnew"), "", nil)
 }
 
 func getPtsPage(w http.ResponseWriter, r *http.Request) {
@@ -1065,7 +1184,7 @@ func getPtsPage(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Get request please", http.StatusMethodNotAllowed)
 		return
 	}
-	responseTemplate(w, "OK", GenTemplate(nil, "modresep"), "", nil)
+	responseTemplate(w, "OK", GenTemplate(nil, "modresepnew"), "", nil)
 }
 
 func confEditTanggal(w http.ResponseWriter, r *http.Request) {

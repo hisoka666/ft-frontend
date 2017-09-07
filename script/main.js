@@ -367,8 +367,9 @@ $("#navbar").on("click", "#makeresep", function(e){
 	$.get("getptspage")
 	.done(function(data){
 		var js = JSON.parse(data);
-		$("#mymodal").html(js.script);
-		$("#mymodal").modal();
+		$("div#main").html(js.script)
+		// $("#mymodal").html(js.script);
+		// $("#mymodal").modal();
 		$("#tgllahir").datepicker({
 			dateFormat:"dd-mm-yy",
 			changeMonth: true,
@@ -394,7 +395,7 @@ $("#navbar").on("click", "#makeresep", function(e){
 		var almt = $("#almt").val();
 		var bb = $("#bb").val();
 		var alergi = $("#alergi").val();
-		console.log("Berat adalah: " + bb);
+		// console.log("Berat adalah: " + bb);
 		if (bb == 0){
 			$("#alertmsgobat").html("<div class=\"alert alert-danger alert-dismissable\"\>" +
 			"<a href=\"#\" class=\"close\" data-dismiss=\"alert\" aria-label=\"close\">&times;</a\>" +
@@ -402,18 +403,18 @@ $("#navbar").on("click", "#makeresep", function(e){
 			"</div>");
 		}else{
 
-		$("#mymodal").modal();
+		// $("#mymodal").modal();
 		$.get("getprespage")
 		.done(function(resep){
 			var jso = JSON.parse(resep);
-			$("#mymodal").html(jso.script);
+			$("div#main").html(jso.script);
 			$("#rspnamapts").html(nama);
 			$("#rspdiag").html(diag);
 			$("#rspumur").html(umur);
 			$("#rspbb").html(bb);
 			$("#rspalmt").html(almt);
 			$("#rspalergi").html(alergi);
-			$("#mymodal").modal();
+			// $("#mymodal").modal();
 		})
 	}
 		
@@ -1020,11 +1021,24 @@ $('body').on('click', 'button.del-obat-line', function(e){
 
 $('body').on('click', 'button#resepbut', function(e){
 	e.preventDefault();
+	var tgl = new Date()
+	var bul = ("0" + (tgl.getMonth()+1).toString()).slice(-2)
+	var thn = tgl.getFullYear().toString()
+	var hari = ("0" + (tgl.getDate()+1).toString()).slice(-2)
+ 	var strDate = hari + "/" + bul + "/" + thn
+	var pts = {
+		"nama": $("span#rspnamapts").html(),
+		"umur": $("span#rspumur").html(),
+		"berat": $("span#rspbb").html(),
+		"alamat": $("span#rspalmt").html(),
+		"alergi": $("span#rspalergi").html(),
+		"diag": $("span#rspdiag").html()
+	}
 	// var listini = $(this).children()
+	var obat = []
+	var puyer = []
 	$(".listobat").each(function(){
 		// console.log($(this).find('.obatpuyer'))
-		var obat = []
-		var puyer = []
 		if ($(this).find('.obatpuyer').length == 0){
 			// console.log("not puyer")
 			// var namaobat = $(this).find(".isianobat").val();
@@ -1058,20 +1072,36 @@ $('body').on('click', 'button#resepbut', function(e){
 			}
 			puyer.push(mix)
 		}
+	})
 		send = {
+			"dokter": $("#dokter").html(),
+			"tanggal": strDate,
 			"listobat": obat,
-			"listpuyer": puyer
+			"listpuyer": puyer,
+			"pasien": pts
 		}
 		// console.log(obat)
 		// console.log(puyer)
 		// console.log(JSON.stringify(obat))
 		// console.log(JSON.stringify(puyer))
 		// console.log(send)
-		// console.log(JSON.stringify(send))
-		$.post("buatresep", {"send" : JSON.stringify(send)})
-	})
+		console.log(JSON.stringify(send))
+		$.post("buatresep", 
+		{"send" : JSON.stringify(send)},
+		function(data){
+			// js = JSON.parse(data)
+			// window.load(data)
+			// window.open("data:application/pdf;base64, " + data);
+			// $(document).load(data);
+			var a = document.createElement('a');
+			var pdfAsDataUri = "data:application/pdf;base64,"+data;
+			a.download = 'export.pdf';
+			a.type = 'application/pdf';
+			a.href = pdfAsDataUri;
+			a.click();
+		})
 
-});
+	});
 
 });
 
