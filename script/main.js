@@ -291,6 +291,8 @@ $("#navbar").on("click", "#homebutton", function(e){
 			email: email
 		},function(data){
 			var js = JSON.parse(data);
+			$("div#resep").hide();
+			$("div#main").show();
 			// console.log(js.script);
 			if (js.token == "OK") {
 				$("#inputnocm").show();
@@ -366,8 +368,9 @@ $("#navbar").on("click", "#makeresep", function(e){
 
 	$.get("getptspage")
 	.done(function(data){
+		$("div#main").hide();
 		var js = JSON.parse(data);
-		$("div#main").html(js.script)
+		$("div#resep").html(js.script).show();
 		// $("#mymodal").html(js.script);
 		// $("#mymodal").modal();
 		$("#tgllahir").datepicker({
@@ -559,6 +562,7 @@ $("#navbar").on("click", "#bulanini", function(e){
 	var now = new Date();
 	var dateone = new Date(now.getFullYear(),now.getMonth(),1,8,0,0);
 	var token = localStorage.getItem("token");
+	$("div#resep").hide();
 	if (now > dateone){
 		$.post("getmonthly", {
 			token: token,
@@ -567,12 +571,14 @@ $("#navbar").on("click", "#bulanini", function(e){
 			email: $("#email").val()
 		}, function(data){
 			var js = JSON.parse(data);
+			$("div#main").show();
 			pieChart(js.data, "")
 			$("#inputnocm").hide();
 			$(".diagram").show();
 			$("#butpdfnow").show();
 			// $("#tabeliki").html(js.modal).show();
 			$("#tabeliki").html(js.modal)
+			getSum();
 			var ekstra = js.data.data2
 			// console.log("p3k " + ekstra.p3k.length)
 			if (jQuery.isEmptyObject(ekstra.p3k) == false){
@@ -591,7 +597,6 @@ $("#navbar").on("click", "#bulanini", function(e){
 				}
 			}
 			$("#tabeliki").show();
-			getSum();
 			$("#tabelutama").html(js.script);
 		})
 	}else{
@@ -602,12 +607,14 @@ $("#navbar").on("click", "#bulanini", function(e){
 			year: blnlalu.getFullYear(),
 			email: $("#email").val()
 		}, function(data){
+			$("div#main").show();
 			var js = JSON.parse(data);
 			pieChart(js.data, "")
 			$(".diagram").show();
 			$("#inputnocm").hide();
 			// $("#tabeliki").html(js.modal).show();
 			$("#tabeliki").html(js.modal)
+			getSum();
 			var ekstra = js.data.data2
 			// console.log("p3k " + ekstra.p3k.length)
 			if (jQuery.isEmptyObject(ekstra.p3k) == false){
@@ -626,7 +633,6 @@ $("#navbar").on("click", "#bulanini", function(e){
 				}
 			}
 			$("#tabeliki").show();
-			getSum();
 			$("#tabelutama").html(js.script);
 		})
 	}
@@ -671,12 +677,14 @@ $("#navbar").on("click", ".bcptgl", function(e){
 	var token = localStorage.getItem("token");
 	var tgl = $(this).html();
 	console.log(tgl)
+	$("div#resep").hide();
 	$.post("getbcpmonth", {
 		token: token,
 		tgl: tgl,
 		email: $("#email").val()
 	}, function(data){
 		var js = JSON.parse(data);
+		$("div#main").show();
 		// console.log("Jumlah interna adalah : " + JSON.stringify(js.data.data1))
 		pieChart(js.data, tgl);
 		$("#inputnocm").hide();
@@ -685,6 +693,7 @@ $("#navbar").on("click", ".bcptgl", function(e){
 		// console.log("p3k adalah : " +)
 		// $("#tabeliki").html(js.modal).show()
 		$("#tabeliki").html(js.modal)
+		getSum();
 		var ekstra = js.data.data2
 		// console.log("p3k " + ekstra.p3k.length)
 		if (jQuery.isEmptyObject(ekstra.p3k) == false){
@@ -703,7 +712,6 @@ $("#navbar").on("click", ".bcptgl", function(e){
 			}
 		}
 		$("#tabeliki").show();
-		getSum()
 		$("div.tabtitle").html("Tabel IKI " + tgl);
 		$("#tabelutama").html(js.script);
 	})

@@ -1559,7 +1559,7 @@ func mainContent(w http.ResponseWriter, r *http.Request) {
 	if web.Peran == "admin" {
 		responseTemplate(w, web.Token, GenTemplate(web, "adminpage"), "", nil)
 	} else if web.Peran == "supervisor" {
-		responseTemplate(w, web.Token, GenTemplate(web, "supervisorpage"), "", web)
+		responseTemplate(w, web.Token, GenTemplate(web, "supervisorpage"), web.Supervisor.SupervisorName, web)
 	} else {
 		responseTemplate(w, web.Token, GenTemplate(web, "main", "input", "content"), web.User, nil)
 	}
