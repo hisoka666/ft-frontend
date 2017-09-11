@@ -1175,7 +1175,7 @@ func getPresPage(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Get request please", http.StatusMethodNotAllowed)
 		return
 	}
-
+	// fmt.Print(GenTemplate(nil, "modlistresepnew"))
 	responseTemplate(w, "OK", GenTemplate(nil, "modlistresepnew"), "", nil)
 }
 

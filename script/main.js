@@ -398,19 +398,19 @@ $("#navbar").on("click", "#makeresep", function(e){
 		var almt = $("#almt").val();
 		var bb = $("#bb").val();
 		var alergi = $("#alergi").val();
-		// console.log("Berat adalah: " + bb);
+		console.log("Berat adalah: " + bb);
 		if (bb == 0){
 			$("#alertmsgobat").html("<div class=\"alert alert-danger alert-dismissable\"\>" +
 			"<a href=\"#\" class=\"close\" data-dismiss=\"alert\" aria-label=\"close\">&times;</a\>" +
 			"Berat badan harus diisi!" +
 			"</div>");
 		}else{
-
+			console.log("fired!")
 		// $("#mymodal").modal();
 		$.get("getprespage")
 		.done(function(resep){
 			var jso = JSON.parse(resep);
-			$("div#main").html(jso.script);
+			$("div#resep").html(jso.script);
 			$("#rspnamapts").html(nama);
 			$("#rspdiag").html(diag);
 			$("#rspumur").html(umur);
@@ -1099,14 +1099,20 @@ $('body').on('click', 'button#resepbut', function(e){
 		function(data){
 			// js = JSON.parse(data)
 			// window.load(data)
-			// window.open("data:application/pdf;base64, " + data);
+			// window.open("data:application/pdf;base64,"+data);
 			// $(document).load(data);
-			var a = document.createElement('a');
-			var pdfAsDataUri = "data:application/pdf;base64,"+data;
-			a.download = 'export.pdf';
-			a.type = 'application/pdf';
-			a.href = pdfAsDataUri;
-			a.click();
+			// var a = document.createElement('a');
+			// var pdf = "data:application/pdf;base64, " + data;
+			// window.open(pdf, '_blank');
+			// // a.download = 'export.pdf';
+			// a.type = 'application/pdf';
+			// a.href = pdfAsDataUri;
+			// a.click();
+			// var file = new Blob([data], { type: 'application/pdf' });
+			// var fileURL = URL.createObjectURL(file);
+			// window.open(fileURL);
+			let pdfWindow = window.open("")
+			pdfWindow.document.write("<iframe width='100%' height='100%' src='data:application/pdf;base64, " + encodeURI(data)+"'></iframe>")
 		})
 
 	});
