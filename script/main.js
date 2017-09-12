@@ -291,7 +291,8 @@ $("#navbar").on("click", "#homebutton", function(e){
 			email: email
 		},function(data){
 			var js = JSON.parse(data);
-			$("div#resep").hide();
+			$("#resep").hide()
+			$("#detailpts").hide()
 			$("div#main").show();
 			// console.log(js.script);
 			if (js.token == "OK") {
@@ -368,7 +369,8 @@ $("#navbar").on("click", "#makeresep", function(e){
 
 	$.get("getptspage")
 	.done(function(data){
-		$("div#main").hide();
+		$("div#main").hide()
+		$("#detailpts").hide()
 		var js = JSON.parse(data);
 		$("div#resep").html(js.script).show();
 		// $("#mymodal").html(js.script);
@@ -679,7 +681,8 @@ $("#navbar").on("click", ".bcptgl", function(e){
 	var token = localStorage.getItem("token");
 	var tgl = $(this).html();
 	console.log(tgl)
-	$("div#resep").hide();
+	$("#resep").hide()
+	$("#detailpts").hide()
 	$.post("getbcpmonth", {
 		token: token,
 		tgl: tgl,
@@ -1013,13 +1016,17 @@ $('body').on('click', 'button.add-obat-puyer', function(e){
 })
 $('body').on('click', 'button.but-puyer', function(e){
 	e.preventDefault()
-	console.log("button pressed")
+	// console.log("button pressed")
 	var ini = $(this).parents(".listobat").children("#listobat")
-	var iniinput = $(this).parents('div.input-group').children('input.isianobat')
+	var iniinput = $(this).parents('.listobat').children(".col-xs-8")
+	var inijml = $(this).parents('.listobat').children(".col-xs-4")
+	console.log(iniinput.html())
+	// .children('input.isianobat')
 	$.get("formpuyer")
 		.done(function(data){
 			js = JSON.parse(data)
 			iniinput.remove()
+			inijml.remove()
 			ini.html(js.script)
 		})
 })
@@ -1100,6 +1107,63 @@ $('body').on('click', 'button#resepbut', function(e){
 
 	});
 
+	$("#navbar").on("click", "#detailbut", function(e){
+		e.preventDefault()
+		var link = $(this).offsetParent().children().first().html();
+		// console.log(link)
+		$.post("get-detail-pts", {
+			token: localStorage.getItem("token"),
+			link: link
+		}, function(data){
+			var js = JSON.parse(data)
+			// console.log(js.script)
+			$("#detailpts").html(js.script).show()
+			$("#main").hide()
+			$("#resep").hide()
+
+		})
+	})
+
+	$("body").on("click", ".edit-data-pasien", function(e){
+		e.preventDefault()
+		// console.log("Link adalah: " + link)
+		var par = $(this).parents("div.form-group")
+		var nama = par.children().find("p.nama-pts").html()
+		var tgl = par.children().find("p.tgl-lahir").html()
+		var jenkel = par.children().find("p.jen-kel").html()
+		var alamat = par.children().find("p.alamat").html()
+		// console.log(par.children().find("p.nama-pts").html())
+		// console.log("nama adalah : " + nama)
+		// console.log("tgl lahir adalah : " + tgl)
+		// console.log("jenis kelamin adalah : " + jenkel)
+		// console.log("alamat adalah : " + alamat)
+		var innama = "<input type='text' class='form-control nama-pts text-capitalize' value='"+ nama +"'>"
+		par.children().find("p.nama-pts").parent().append(innama)
+		par.children().find("p.nama-pts").remove()
+		var intgl = "<input type='text' class='form-control tgl-lahir' value="+tgl+">"
+		par.children().find("p.tgl-lahir").parent().append(intgl)
+		par.children().find("p.tgl-lahir").remove()
+		$(".tgl-lahir").datepicker({
+			dateFormat:"dd-mm-yy",
+			changeMonth: true,
+			changeYear: true,
+			yearRange: "1900:2035",
+		});
+		par.children().find("p.umur").html('')
+		// "<div class='form-group'<div class='radio'></div><div class='radio'></div></div>
+		var injen = "<label class='radio-inline'><input type='radio' name='jenkel' value='1'> Laki-laki </label>"
+		injen = injen + "<label class='radio-inline'><input type='radio' name='jenkel' value='2'> Perempuan </label>"
+		par.children().find("p.jen-kel").parent().append(injen)
+		par.children().find("p.jen-kel").remove()
+		var inalmt = "<input type='text' class='form-control alamat text-capitalize' value="+alamat+">"
+		par.children().find("p.alamat").parent().append(inalmt)
+		par.children().find("p.alamat").remove()
+		$(this).addClass('simpan-data').html("Simpan")
+	})
+
+	$("body").on("click", ".simpan-data", function(e){
+		e.preventDefault()
+		var link = $(this).parent("div").children("span").html()
+		console.log(link)
+	})
 });
-
-

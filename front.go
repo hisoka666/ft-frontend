@@ -113,8 +113,12 @@ type KunjunganPasien struct {
 }
 
 type DataPasien struct {
-	NamaPasien, NomorCM, JenKel, Alamat string
-	TglDaftar, Umur                     time.Time
+	NamaPasien string    `json:"namapts"`
+	NomorCM    string    `json:"nocm"`
+	JenKel     string    `json:"jenkel"`
+	Alamat     string    `json:"alamat"`
+	TglDaftar  time.Time `json:"tgldaf"`
+	TglLahir   time.Time `json:"tgllhr"`
 }
 type PasienResep struct {
 	Nama      string `json:"nama"`
@@ -125,18 +129,6 @@ type PasienResep struct {
 	Diagnosis string `json:"diag"`
 	NoCM      string `json:"nocm"`
 }
-
-// type Obat struct {
-// 	Merk        string `json:"merk"`
-// 	Kandungan   string `json:"kandungan"`
-// 	PerkiloMin  int    `json:"kgmin"`
-// 	PerkiloMax  int    `json:"kgmax"`
-// 	Tablet      []int  `json:"tablet"`
-// 	Sirop       []int  `json:"sirop"`
-// 	Drop        []int  `drop:"drop"`
-// 	Rekomendasi string `json:"rekom"`
-// 	InputBy     string `json:"inputby"`
-// }
 
 type Response struct {
 	Token  string      `json:"token"`
@@ -221,6 +213,12 @@ type KegiatanEkstra struct {
 	Pelatihan []string `json:"pelatihan"`
 }
 
+type DetailPasien struct {
+	Pasien    DataPasien        `json:"datapts"`
+	Kunjungan []KunjunganPasien `json:"kunjungan"`
+	LinkID    string            `json:"link"`
+}
+
 func main() {
 	// variable fs membuat folder "script" menjadi sebuah file server,
 	// alamat dari file server ini akan diarahkan oleh http.Handle
@@ -262,9 +260,31 @@ func main() {
 	http.HandleFunc("/buatresep", buatResep)
 	http.HandleFunc("/supgeteachmonth", supGetMonth)
 	http.HandleFunc("/supmonthnow", supGetMonthNow)
+	http.HandleFunc("/get-detail-pts", getDetailPasien)
 	// http.HandleFunc("/getsupervisor", getSupervisor)
 	log.Println("Listening...")
 	log.Fatal(http.ListenAndServe(":8001", nil))
+
+}
+
+func getDetailPasien(w http.ResponseWriter, r *http.Request) {
+	if r.Method != "POST" {
+		http.Error(w, "Post request please", http.StatusMethodNotAllowed)
+		return
+	}
+	pts := &Pasien{
+		LinkID: r.FormValue("link"),
+	}
+	url := "https://pasien-dot-igdsanglah.appspot.com"
+	resp, err := sendPost(pts, r.FormValue("token"), url)
+	if err != nil {
+		log.Fatalf("Terjadi kesalahan di server: %v", err)
+	}
+
+	det := &DetailPasien{}
+	json.NewDecoder(resp.Body).Decode(det)
+	// fmt.Print(GenTemplate(det, "detailpasien"))
+	responseTemplate(w, "OK", GenTemplate(det, "detailpasien"), "", nil)
 
 }
 func supGetMonthNow(w http.ResponseWriter, r *http.Request) {
@@ -1510,6 +1530,55 @@ func GenTemplate(n interface{}, temp ...string) string {
 	funcs := template.FuncMap{"inc": func(i int) int {
 		return i + 1
 	},
+		"tgl": func(t time.Time) string {
+			return t.Format("02/01/2006")
+		},
+		"jam": func(t time.Time) string {
+			return t.Format("15:04")
+		},
+		"umur": func(t time.Time) string {
+			now := time.Now()
+			yr := now.Year() - t.Year()
+			if now.YearDay() < t.YearDay() {
+				yr--
+				return fmt.Sprintf("%v Tahun %v Bulan", yr, 12+int(now.Month()-t.Month()))
+			}
+
+			return fmt.Sprintf("%v Tahun %v Bulan", yr, int(now.Month()-t.Month()))
+
+		},
+		"bag": func(n string) string {
+			switch n {
+			case "1":
+				return "Interna"
+				break
+			case "2":
+				return "Bedah"
+			case "3":
+				return "Anak"
+			case "4":
+				return "Obgyn"
+			case "5":
+				return "Neuro"
+			case "6":
+				return "Anestesi"
+			case "7":
+				return "Psikiatri"
+			case "8":
+				return "THT"
+			case "9":
+				return "Kulit/Kelamin"
+			case "10":
+				return "Kardio"
+			case "11":
+				return "Umum"
+			case "12":
+				return "Mata"
+			case "13":
+				return "MOD"
+			}
+			return "Undefined"
+		},
 	}
 
 	tmpl := template.New("")

@@ -1,0 +1,83 @@
+<div class="container container-fluid">
+    <div class="col-sm-2"></div>
+    <div class="col-sm-8">
+        <div class="panel panel-info">
+            <div class="panel-heading text-center">Detail Pasien</div>
+            <div class="panel-body">
+                <form action="" class="form-horizontal">
+                    <div class="form-group">
+                        {{with .Pasien}}
+                        <label for="" class="control-label col-sm-3">No. CM :</label>
+                        <div class="col-sm-9">
+                            <p class="form-control-static">{{.NomorCM}}</p>
+                        </div>
+                        <label for="" class="control-label col-sm-3">Nama :</label>
+                        <div class="col-sm-9">
+                            <p class="form-control-static nama-pts text-capitalize">{{.NamaPasien}}</p>
+                        </div>
+                        <label for="" class="control-label col-sm-3">Tanggal Lahir :</label>
+                        <div class="col-sm-9">
+                            <p class="form-control-static text-left tgl-lahir">{{tgl .TglLahir}}</p>
+                        </div>
+                        <label for="" class="control-label col-sm-3">Umur :</label>
+                        <div class="col-sm-9">
+                            <p class="form-control-static umur">{{umur .TglLahir}}</p>
+                        </div>
+                        <label for="" class="control-label col-sm-3">Jenis Kelamin :</label>
+                        <div class="col-sm-9">
+                            <p class="form-control-static jen-kel">{{.JenKel}}</p>
+                        </div>
+                        <label for="" class="control-label col-sm-3 text-capitalize">Alamat :</label>
+                        <div class="col-sm-9">
+                            <p class="form-control-static alamat">{{.Alamat}}</p>
+                        </div>
+                        {{end}}
+                        <div class="col-sm-10">
+                            <span id="link" hidden>{{.LinkID}}</span>
+                            <button class="btn btn-default edit-data-pasien pull-right">Edit Data Pasien</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="col-sm-2"></div>
+</div>
+
+<div class="container container-fluid">
+    <div class="col-sm-2"></div>
+    <div class="col-sm-8">
+        <div class="panel panel-info">
+            <div class="panel-heading text-center">Daftar Kunjungan</div>
+            <div class="panel-body table-responsive">
+                <table class="table table-bordered table-condensed table-kunjungan">
+                <thead>
+                    <tr>
+                        <th class="bg-success">No</th>
+                        <th class="bg-success">Tanggal</th>
+                        <th class="bg-success">Diagnosis</th>
+                        <th class="bg-success">ATS</th>
+                        <th class="bg-success">Bagian</th>
+                        <th class="bg-success">Dokter</th>
+                    </tr>
+                </thead>
+                <tbody class="daftar-kunjungan">
+                    {{with .Kunjungan}}
+                    {{range $n, $m := .}}
+                    <tr>
+                        <td>{{inc $n}}</td>
+                        <td>{{tgl $m.JamDatangRiil}} {{jam $m.JamDatangRiil}}</td>
+                        <td class="text-capitalize">{{$m.Diagnosis}}</td>
+                        <td>{{$m.ATS}}</td>
+                        <td>{{bag $m.Bagian}}</td>
+                        <td>{{$m.Dokter}}</td>
+                    </tr>
+                    {{end}}
+                    {{end}}
+                </tbody>
+            </table>
+            </div>
+        </div>
+    </div>
+    <div class="col-sm-2"></div>
+</div>
