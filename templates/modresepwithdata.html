@@ -7,14 +7,14 @@
         <div class="form-group" id="form1">
                 <div class="form-group">
                         <label for="">Nama Pasien</label>
-                        <input type="text" name="" id="namapts" class="form-control text-capitalize">
+                        <input type="text" name="" id="namapts" class="form-control text-capitalize" value="{{.Pasien.NamaPasien}}">
                         <label for="">Diagnosis</label>
                         <input type="text" name="" id="diag" class="form-control text-capitalize">
                         <label for="">Tanggal Lahir</label>
-                        <input type="text" name="" id="tgllahir" class="form-control" >
-                        <input type="hidden" name="" id="umur">
+                        <input type="text" name="" id="tgllahir" class="form-control" value="{{tgl .Pasien.TglLahir}}">
+                        <input type="hidden" name="" id="umur" value="{{umur .Pasien.TglLahir}}">
                         <label for="">Alamat</label>
-                        <input type="text" name="" id="almt" class="form-control text-capitalize">
+                        <input type="text" name="" id="almt" class="form-control text-capitalize" value="{{.Pasien.Alamat}}">
                         <label for="">Berat Badan</label>
                         <input type="number" name="" id="bb" class="form-control text-capitalize">
                         <label for="">Alergi</label>

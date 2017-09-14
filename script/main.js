@@ -391,41 +391,43 @@ $("#navbar").on("click", "#makeresep", function(e){
 		});
 	});
 
-	$("body").on("click", "#rspnextbut", function(e){
-		e.preventDefault();
+	// $("body").on("click", ".rspnextbut", function(e){
+	// 	e.preventDefault();
+	// 	console.log("button fired!")
+	// 	var nama = $("#namapts").val();
+	// 	var diag = $("#diag").val();
+	// 	var umur = $("#umur").val();
+	// 	var almt = $("#almt").val();
+	// 	var bb = $("#bb").val();
+	// 	var alergi = $("#alergi").val();
+	// 	var ptsid = $(".ptsid").val();
+	// 	var nocm = $(".rspnocm").val();
+	// 	console.log("Berat adalah: " + bb);
+	// 	if (bb == 0){
+	// 		$("#alertmsgobat").html("<div class=\"alert alert-danger alert-dismissable\"\>" +
+	// 		"<a href=\"#\" class=\"close\" data-dismiss=\"alert\" aria-label=\"close\">&times;</a\>" +
+	// 		"Berat badan harus diisi!" +
+	// 		"</div>");
+	// 	}else{
+	// 		console.log("fired!")
+	// 	// $("#mymodal").modal();
+	// 	$.get("getprespage")
+	// 	.done(function(resep){
+	// 		var jso = JSON.parse(resep);
+	// 		$("div#resep").html(jso.script);
+	// 		$("#rspnamapts").html(nama);
+	// 		$("#rspdiag").html(diag);
+	// 		$("#rspumur").html(umur);
+	// 		$("#rspbb").html(bb);
+	// 		$("#rspalmt").html(almt);
+	// 		$("#rspalergi").html(alergi);
+	// 		$(".ptsid").html(ptsid);
+	// 		$(".rspnocm").html(nocm);
+	// 		// $("#mymodal").modal();
+	// 	})
+	// }
 		
-		var nama = $("#namapts").val();
-		var diag = $("#diag").val();
-		var umur = $("#umur").val();
-		var almt = $("#almt").val();
-		var bb = $("#bb").val();
-		var alergi = $("#alergi").val();
-		var ptsid = $(".ptsid").val();
-		console.log("Berat adalah: " + bb);
-		if (bb == 0){
-			$("#alertmsgobat").html("<div class=\"alert alert-danger alert-dismissable\"\>" +
-			"<a href=\"#\" class=\"close\" data-dismiss=\"alert\" aria-label=\"close\">&times;</a\>" +
-			"Berat badan harus diisi!" +
-			"</div>");
-		}else{
-			console.log("fired!")
-		// $("#mymodal").modal();
-		$.get("getprespage")
-		.done(function(resep){
-			var jso = JSON.parse(resep);
-			$("div#resep").html(jso.script);
-			$("#rspnamapts").html(nama);
-			$("#rspdiag").html(diag);
-			$("#rspumur").html(umur);
-			$("#rspbb").html(bb);
-			$("#rspalmt").html(almt);
-			$("#rspalergi").html(alergi);
-			$(".ptsid").html(ptsid);
-			// $("#mymodal").modal();
-		})
-	}
-		
-	})
+	// })
 });
 
 $("body").on("change", "input:radio[name=sediaan]:checked", function(){
@@ -534,7 +536,7 @@ $("body").on("click", "#savdrug", function(e){
 		"doc" : $("#email").val()
 	}
 
-	console.log("String json adalah : " + JSON.stringify(data))
+	// console.log("String json adalah : " + JSON.stringify(data))
 	
 	$.post("inputobat", {
 		send: JSON.stringify(data),
@@ -783,7 +785,6 @@ var pieChart = function(list, tgl){
 
         var options = {
 		  title: 'Jumlah Pasien PerBagian',
-		  width: 800,
 		  height: 400,
         };
 
@@ -812,7 +813,7 @@ var pieChart = function(list, tgl){
 		// var data = new google.visualization.arrayToDataTable(title);
         var options = {
 			title: 'Jumlah Pasien Pertanggal Jaga',
-			width: 800,
+			height: 400,
 			hAxis : {
 				title: "Tanggal Jaga",
 			},
@@ -875,7 +876,7 @@ $('body').on('click', 'a.getobatinfo', function(e){
 		berat: bb
 	}, function(data){
 		js = JSON.parse(data);
-		console.log(js.modal)
+		// console.log(js.modal)
 		inputini.val(js.modal)
 		// console.log(js.script);
 		ini.html(js.script)
@@ -890,7 +891,7 @@ $('body').on('click', 'button.tambahlistobat', function(e){
 $('body').on('click', 'a#editobat', function(e){
 	e.preventDefault();
 	link = $(this).attr('href');
-	console.log("this is link: " + link)
+	// console.log("this is link: " + link)
 	$.post("getobatedit", {
 		token: localStorage.getItem("token"),
 		link: link
@@ -1020,7 +1021,7 @@ $('body').on('click', 'button.but-puyer', function(e){
 	var ini = $(this).parents(".listobat").children("#listobat")
 	var iniinput = $(this).parents('.listobat').children(".col-xs-8")
 	var inijml = $(this).parents('.listobat').children(".col-xs-4")
-	console.log(iniinput.html())
+	// console.log(iniinput.html())
 	// .children('input.isianobat')
 	$.get("formpuyer")
 		.done(function(data){
@@ -1039,18 +1040,22 @@ $('body').on('click', 'button.del-obat-line', function(e){
 $('body').on('click', 'button#resepbut', function(e){
 	e.preventDefault();
 	var tgl = new Date()
-	var bul = ("0" + (tgl.getMonth()+1).toString()).slice(-2)
-	var thn = tgl.getFullYear().toString()
-	var hari = ("0" + (tgl.getDate()+1).toString()).slice(-2)
- 	var strDate = hari + "/" + bul + "/" + thn
+	// var bul = ("0" + (tgl.getMonth()+1).toString()).slice(-2)
+	// var thn = tgl.getFullYear().toString()
+	// var hari = ("0" + (tgl.getDate()+1).toString()).slice(-2)
+ 	// var strDate = hari + "/" + bul + "/" + thn
 	var pts = {
 		"nama": $("span#rspnamapts").html(),
 		"umur": $("span#rspumur").html(),
 		"berat": $("span#rspbb").html(),
 		"alamat": $("span#rspalmt").html(),
 		"alergi": $("span#rspalergi").html(),
-		"diag": $("span#rspdiag").html()
+		"diag": $("span#rspdiag").html(),
+		"nocm": $(".rspnocm").html(),
+		"link": $(".ptsid").html()
 	}
+	console.log("nocm " + $(".rspnocm").html())
+	// console.log("link : " + $(".ptsid").html())
 	// var listini = $(this).children()
 	var obat = []
 	var puyer = []
@@ -1092,17 +1097,22 @@ $('body').on('click', 'button#resepbut', function(e){
 	})
 		send = {
 			"dokter": $("#dokter").html(),
-			"tanggal": strDate,
+			// "tanggal": strDate,
 			"listobat": obat,
 			"listpuyer": puyer,
 			"pasien": pts
 		}
-		console.log(JSON.stringify(send))
+		// console.log(JSON.stringify(send))
 		$.post("buatresep", 
-		{"send" : JSON.stringify(send)},
+		{
+			"send" : JSON.stringify(send),
+			"token": localStorage.getItem("token")
+		},
 		function(data){
+
 			let pdfWindow = window.open("")
 			pdfWindow.document.write("<iframe width='100%' height='100%' src='data:application/pdf;base64, " + encodeURI(data)+"'></iframe>")
+			location.reload()
 		})
 
 	});
@@ -1164,6 +1174,99 @@ $('body').on('click', 'button#resepbut', function(e){
 	$("body").on("click", ".simpan-data", function(e){
 		e.preventDefault()
 		var link = $(this).parent("div").children("span").html()
-		console.log(link)
+		// console.log(link)
+		// console.log($(".nama-pts").val())
+		// console.log($(".tgl-lahir").val())
+		// console.log($(".alamat").val())
+		// console.log($("input[name='jenkel']:checked").val())
+		$.post("input-detail-pts",{
+			token: localStorage.getItem("token"),
+			nama: $(".nama-pts").val(),
+			tgl: $(".tgl-lahir").val(),
+			almt: $(".alamat").val(),
+			jenkel: $("input[name='jenkel']:checked").val(),
+			link: link
+		}, function(data){
+			var js = JSON.parse(data)
+			// I Kadek Bendesa Slash Wijaya
+			$(".detail-pts").html(js.script)
+		})
+	})
+
+	$("body").on("click", "#resepbut", function(e){
+		e.preventDefault()
+		var link = $(this).offsetParent().children().first().html();
+		var doc = $("#dokter").html()
+		var diag = $(this).parents("tr").children(".diag").html()
+		// console.log(link)
+		// console.log(doc)
+		$.post("buat-resep-pts", {
+			token: localStorage.getItem("token"),
+			link: link,
+			doc: doc
+		}, function(data){
+			$("div#main").hide()
+			$("#detailpts").hide()
+			var js = JSON.parse(data);
+			// console.log(js.script)
+			$("div#resep").html(js.script).show();
+			$("#tgllahir").datepicker({
+				dateFormat:"dd-mm-yy",
+				changeMonth: true,
+				changeYear: true,
+				yearRange: "1900:2035",
+				onSelect: function(value, ui){
+					var today = new Date();
+					// console.log("Tahun ini adalah: " + today.getFullYear());
+					// console.log("Tahun yang dipilih adalah : " + ui.selectedYear)
+					var umur = today.getFullYear() - ui.selectedYear;
+					// console.log("Umur adalah: " + umur);
+					// $("#umur").val(umur);
+				}
+			});
+			$("#diag").val(diag)
+			$(".ptsid").html(link)
+		})
+	})
+
+	$("body").on("click", ".rspnextbut", function(e){
+		e.preventDefault();
+		var nama = $("#namapts").val();
+		var diag = $("#diag").val();
+		var umur = $("#umur").val();
+		var almt = $("#almt").val();
+		var bb = $("#bb").val();
+		var alergi = $("#alergi").val();
+		// var ptsid = $(".ptsid").html();
+		var nocm = $(".rspnocm").html();
+		var link = $(".ptsid").html();
+		// console.log(link)
+		// console.log("No cm adalah " + nocm)
+		// console.log("Berat adalah: " + bb);
+		if (bb == 0){
+			$("#alertmsgobat").html("<div class=\"alert alert-danger alert-dismissable\"\>" +
+			"<a href=\"#\" class=\"close\" data-dismiss=\"alert\" aria-label=\"close\">&times;</a\>" +
+			"Berat badan harus diisi!" +
+			"</div>");
+		}else{
+			console.log("fired!")
+		// $("#mymodal").modal();
+		$.get("getprespage")
+		.done(function(resep){
+			var jso = JSON.parse(resep);
+			$("div#resep").html(jso.script);
+			$("#rspnamapts").html(nama);
+			$("#rspdiag").html(diag);
+			$("#rspumur").html(umur);
+			$("#rspbb").html(bb);
+			$("#rspalmt").html(almt);
+			$("#rspalergi").html(alergi);
+			$(".ptsid").html(link);
+			$(".rspnocm").html(nocm);
+			// $("#mymodal").modal();
+		})
+	}
+		
 	})
 });
+

@@ -5,7 +5,7 @@
             <div class="panel-heading text-center">Detail Pasien</div>
             <div class="panel-body">
                 <form action="" class="form-horizontal">
-                    <div class="form-group">
+                    <div class="form-group detail-pts">
                         {{with .Pasien}}
                         <label for="" class="control-label col-sm-3">No. CM :</label>
                         <div class="col-sm-9">
@@ -25,11 +25,11 @@
                         </div>
                         <label for="" class="control-label col-sm-3">Jenis Kelamin :</label>
                         <div class="col-sm-9">
-                            <p class="form-control-static jen-kel">{{.JenKel}}</p>
+                            <p class="form-control-static jen-kel">{{jenkel .JenKel}}</p>
                         </div>
                         <label for="" class="control-label col-sm-3 text-capitalize">Alamat :</label>
                         <div class="col-sm-9">
-                            <p class="form-control-static alamat">{{.Alamat}}</p>
+                            <p class="form-control-static alamat text-capitalize">{{.Alamat}}</p>
                         </div>
                         {{end}}
                         <div class="col-sm-10">

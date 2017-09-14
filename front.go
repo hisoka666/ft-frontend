@@ -128,6 +128,7 @@ type PasienResep struct {
 	Alergi    string `json:"alergi"`
 	Diagnosis string `json:"diag"`
 	NoCM      string `json:"nocm"`
+	LinkID    string `json:"link"`
 }
 
 type Response struct {
@@ -261,12 +262,64 @@ func main() {
 	http.HandleFunc("/supgeteachmonth", supGetMonth)
 	http.HandleFunc("/supmonthnow", supGetMonthNow)
 	http.HandleFunc("/get-detail-pts", getDetailPasien)
+	http.HandleFunc("/input-detail-pts", inputDetailPts)
+	http.HandleFunc("/buat-resep-pts", buatResepPts)
 	// http.HandleFunc("/getsupervisor", getSupervisor)
 	log.Println("Listening...")
 	log.Fatal(http.ListenAndServe(":8001", nil))
 
 }
+func buatResepPts(w http.ResponseWriter, r *http.Request) {
+	if r.Method != "POST" {
+		http.Error(w, "Post request please", http.StatusMethodNotAllowed)
+		return
+	}
+	url := "https://pasien-dot-igdsanglah.appspot.com"
+	pts := &Pasien{
+		LinkID: r.FormValue("link"),
+	}
+	resp, err := sendPost(pts, r.FormValue("token"), url)
+	if err != nil {
+		log.Fatalf("Terjadi kesalahan di server: %v", err)
+	}
+	det := &DetailPasien{}
+	json.NewDecoder(resp.Body).Decode(det)
+	defer resp.Body.Close()
+	// fmt.Print(GenTemplate(det, "modresepwithdata"))
+	responseTemplate(w, "", GenTemplate(det, "modresepwithdata"), "", nil)
 
+}
+func inputDetailPts(w http.ResponseWriter, r *http.Request) {
+	if r.Method != "POST" {
+		http.Error(w, "Post request please", http.StatusMethodNotAllowed)
+		return
+	}
+	url := "https://input-detail-pts-dot-igdsanglah.appspot.com/"
+	tgl, err := time.Parse("02-01-2006", r.FormValue("tgl"))
+	if err != nil {
+		log.Fatalf("Kesalahan parsing tgl lahir: %v", err)
+	}
+	data := DataPasien{
+		NamaPasien: r.FormValue("nama"),
+		TglLahir:   tgl,
+		Alamat:     r.FormValue("almt"),
+		JenKel:     r.FormValue("jenkel"),
+	}
+	det := &DetailPasien{
+		Pasien: data,
+		LinkID: r.FormValue("link"),
+	}
+
+	resp, err := sendPost(det, r.FormValue("token"), url)
+	if err != nil {
+		log.Fatalf("Terjadi kesalahan di server: %v", err)
+	}
+
+	json.NewDecoder(resp.Body).Decode(det)
+	defer resp.Body.Close()
+	// fmt.Print(GenTemplate(det, "detailpasienonly"))
+	responseTemplate(w, "", GenTemplate(det, "detailpasienonly"), "", nil)
+}
 func getDetailPasien(w http.ResponseWriter, r *http.Request) {
 	if r.Method != "POST" {
 		http.Error(w, "Post request please", http.StatusMethodNotAllowed)
@@ -283,6 +336,8 @@ func getDetailPasien(w http.ResponseWriter, r *http.Request) {
 
 	det := &DetailPasien{}
 	json.NewDecoder(resp.Body).Decode(det)
+	defer resp.Body.Close()
+	// fmt.Print(det.Kunjungan[0].JamDatang)
 	// fmt.Print(GenTemplate(det, "detailpasien"))
 	responseTemplate(w, "OK", GenTemplate(det, "detailpasien"), "", nil)
 
@@ -339,17 +394,29 @@ func buatResep(w http.ResponseWriter, r *http.Request) {
 		fmt.Println(err)
 		return
 	}
-	// for _, v := range rec.ListObat {
-	// 	fmt.Println(v.NamaObat)
-	// }
+	zone, _ := time.LoadLocation("Asia/Makassar")
+	rec.Tanggal = time.Now().In(zone).Format("02/01/2006")
+	// fmt.Printf("LInk pasien adalah: %v", rec.Pasien.LinkID)
+	if rec.Pasien.LinkID == "" {
+		pdfResep(w, *rec)
+	} else {
+		// for _, v := range rec.ListObat {
+		// 	fmt.Println(v.NamaObat)
+		// }
 
-	// for _, v := range rec.ListPuyer {
-	// 	fmt.Println(v.Racikan)
-	// 	for _, n := range v.Obat {
-	// 		fmt.Println(n.NamaObat)
-	// 	}
-	// }
-	pdfResep(w, *rec)
+		// for _, v := range rec.ListPuyer {
+		// 	fmt.Println(v.Racikan)
+		// 	for _, n := range v.Obat {
+		// 		fmt.Println(n.NamaObat)
+		// 	}
+		// }
+		url := "https://add-obat-pasien-dot-igdsanglah.appspot.com"
+		_, err := sendPost(rec, r.FormValue("token"), url)
+		if err != nil {
+			log.Fatalf("Terjadi kesalahan di server: %v", err)
+		}
+		pdfResep(w, *rec)
+	}
 	// fmt.Printf("Data obat adalah : %v", rec.ListObat)
 	// fmt.Printf("Data obat adalah : %v", rec.ListPuyer)
 	// fmt.Printf("data adalah %v", x[""])
@@ -368,7 +435,7 @@ func pdfResep(w http.ResponseWriter, r Resep) {
 	pdf.Ln(-1)
 	pdf.CellFormat(20, 5, "Diagnosis", "B", 0, "L", false, 0, "")
 	//Diagnosis
-	pdf.CellFormat(60, 5, (": " + r.Pasien.Diagnosis), "B", 0, "L", false, 0, "")
+	pdf.CellFormat(60, 5, (": " + ProperCapital(r.Pasien.Diagnosis)), "B", 0, "L", false, 0, "")
 	pdf.Ln(-1)
 	pdf.Ln(-1)
 	pdf.SetX(60)
@@ -377,7 +444,7 @@ func pdfResep(w http.ResponseWriter, r Resep) {
 	//Nama Obat
 	pdf.Ln(-1)
 	for _, v := range r.ListObat {
-		pdf.Cell(70, 5, ("Rx. " + v.NamaObat))
+		pdf.Cell(70, 5, ("Rx. " + ProperCapital(v.NamaObat)))
 		//Jumlah obat
 		pdf.Cell(10, 5, ("No. " + v.Jumlah))
 		pdf.Ln(-1)
@@ -393,7 +460,7 @@ func pdfResep(w http.ResponseWriter, r Resep) {
 		for _, v := range r.ListPuyer {
 			for _, n := range v.Obat {
 				pdf.Cell(5, 5, "")
-				pdf.Cell(60, 5, n.NamaObat)
+				pdf.Cell(60, 5, ProperCapital(n.NamaObat))
 				pdf.Cell(10, 5, n.Takaran)
 				pdf.Ln(-1)
 			}
@@ -419,15 +486,15 @@ func pdfResep(w http.ResponseWriter, r Resep) {
 	//Identitas Pasien
 	pdf.SetY(170)
 	pdf.Cell(20, 5, "Pro")
-	pdf.Cell(60, 5, (": " + r.Pasien.Nama))
+	pdf.Cell(60, 5, (": " + ProperCapital(r.Pasien.Nama)))
 	pdf.Ln(-1)
 	pdf.Cell(20, 5, "No. CM")
 	pdf.Cell(20, 5, (": " + r.Pasien.NoCM))
 	pdf.Cell(20, 5, "Umur")
-	pdf.Cell(20, 5, (": " + r.Pasien.Umur + "th"))
+	pdf.Cell(20, 5, (": " + r.Pasien.Umur[:2] + "th"))
 	pdf.Ln(-1)
 	pdf.Cell(20, 5, "Alamat")
-	pdf.Cell(20, 5, (": " + r.Pasien.Alamat))
+	pdf.Cell(20, 5, (": " + ProperCapital(r.Pasien.Alamat)))
 	pdf.Cell(20, 5, "Berat Badan")
 	pdf.Cell(20, 5, (": " + r.Pasien.Berat))
 
@@ -1531,20 +1598,30 @@ func GenTemplate(n interface{}, temp ...string) string {
 		return i + 1
 	},
 		"tgl": func(t time.Time) string {
-			return t.Format("02/01/2006")
+			zone, _ := time.LoadLocation("Asia/Makassar")
+			return t.In(zone).Format("02-01-2006")
 		},
 		"jam": func(t time.Time) string {
-			return t.Format("15:04")
+			zone, _ := time.LoadLocation("Asia/Makassar")
+			return t.In(zone).Format("15:04")
 		},
 		"umur": func(t time.Time) string {
-			now := time.Now()
+			zone, _ := time.LoadLocation("Asia/Makassar")
+			now := time.Now().In(zone)
+			t = t.In(zone)
 			yr := now.Year() - t.Year()
+			var har int
+			if now.Day() >= t.Day() {
+				har = now.Day() - t.Day()
+			} else {
+				har = (now.Day() + now.AddDate(0, 0, -(now.Day())).Day()) - t.Day()
+			}
 			if now.YearDay() < t.YearDay() {
 				yr--
-				return fmt.Sprintf("%v Tahun %v Bulan", yr, 12+int(now.Month()-t.Month()))
+				return fmt.Sprintf("%v Tahun %v Bulan %v Hari", yr, 12+int(now.Month()-t.Month()), har)
 			}
 
-			return fmt.Sprintf("%v Tahun %v Bulan", yr, int(now.Month()-t.Month()))
+			return fmt.Sprintf("%v Tahun %v Bulan %v Hari", yr, int(now.Month()-t.Month()), har)
 
 		},
 		"bag": func(n string) string {
@@ -1578,6 +1655,15 @@ func GenTemplate(n interface{}, temp ...string) string {
 				return "MOD"
 			}
 			return "Undefined"
+		},
+		"jenkel": func(n string) string {
+			switch n {
+			case "1":
+				return "Laki-laki"
+			case "2":
+				return "Perempuan"
+			}
+			return "Belum dilengkapi"
 		},
 	}
 

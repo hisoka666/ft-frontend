@@ -1,0 +1,30 @@
+                        {{with .Pasien}}
+                        <label for="" class="control-label col-sm-3">No. CM :</label>
+                        <div class="col-sm-9">
+                            <p class="form-control-static">{{.NomorCM}}</p>
+                        </div>
+                        <label for="" class="control-label col-sm-3">Nama :</label>
+                        <div class="col-sm-9">
+                            <p class="form-control-static nama-pts text-capitalize">{{.NamaPasien}}</p>
+                        </div>
+                        <label for="" class="control-label col-sm-3">Tanggal Lahir :</label>
+                        <div class="col-sm-9">
+                            <p class="form-control-static text-left tgl-lahir">{{tgl .TglLahir}}</p>
+                        </div>
+                        <label for="" class="control-label col-sm-3">Umur :</label>
+                        <div class="col-sm-9">
+                            <p class="form-control-static umur">{{umur .TglLahir}}</p>
+                        </div>
+                        <label for="" class="control-label col-sm-3">Jenis Kelamin :</label>
+                        <div class="col-sm-9">
+                            <p class="form-control-static jen-kel">{{jenkel .JenKel}}</p>
+                        </div>
+                        <label for="" class="control-label col-sm-3 text-capitalize">Alamat :</label>
+                        <div class="col-sm-9">
+                            <p class="form-control-static alamat text-capitalize">{{.Alamat}}</p>
+                        </div>
+                        {{end}}
+                        <div class="col-sm-10">
+                            <span id="link" hidden>{{.LinkID}}</span>
+                            <button class="btn btn-default edit-data-pasien pull-right">Edit Data Pasien</button>
+                        </div>
