@@ -102,3 +102,25 @@
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
   }
+.jumbotron{
+    background-color: dodgerblue;
+}
+
+.affix {
+    top: 0;
+    width: 100%;
+}
+
+#ft-subtitle{
+    font-family: 'Advent Pro'
+}
+
+#ft-title {
+    font-family: 'Cherry Cream Soda';
+    color: #d8ffcc;
+    text-shadow: 3px, 3px, grey;
+}
+
+body {
+    background-color: #b3e6ff;
+}

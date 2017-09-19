@@ -1,10 +1,7 @@
 <html lang="en">
   <head>
-    <meta http-equiv="cache-control" content="max-age=0" />
-    <meta http-equiv="cache-control" content="no-cache" />
-    <meta http-equiv="expires" content="0" />
-    <meta http-equiv="expires" content="Tue, 01 Jan 1980 1:00:00 GMT" />
-    <meta http-equiv="pragma" content="no-cache" />
+    <link href='https://fonts.googleapis.com/css?family=Advent Pro' rel='stylesheet'>
+    <link href='https://fonts.googleapis.com/css?family=Cherry Cream Soda' rel='stylesheet'>
     <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
     <script src="https://apis.google.com/js/platform.js"></script>
     <meta name="google-signin-scope" content="profile email">
@@ -30,15 +27,15 @@
   </head>
   <body>
     		<div class="jumbotron">
-          <h1>IGDSanglah.com</h1>
-          <p>Tools Pencatat IKI</p>
+          <h1 class="text-center" id="ft-title">IGDSanglah.com</h1>
+          <p class="text-center" id="ft-subtitle">Tools Pencatat IKI</p>
       <!--<img class="img-responsive" src="/static/e.jpg" alt="Emergency Room">-->
 		</div>
     
     <div id="signinbut"class="g-signin2" data-onsuccess="onSignIn" data-theme="dark"></div>
-    <div id="welcome" hidden><p>Selamat Datang <span id="dokter"></span></p></div>
+    <div class="text-center" id="welcome" hidden><p>Selamat Datang <span id="dokter"></span></p></div>
     <input type="hidden" id="email">
-    <div id="signoutbut" hidden><button class="btn btn-danger" href="#" onclick="signOut();">Sign out</button></div>
+    <div class="text-center" id="signoutbut" hidden><button class="btn btn-danger" href="#" onclick="signOut();">Sign out</button></div>
     <div id="navbar"></div>
 
     <div id="mymodal" class="modal fade" tabindex="-1" role="dialog">
