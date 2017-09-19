@@ -2,7 +2,6 @@ package main
 
 import (
 	"bytes"
-	"encoding/base64"
 	"encoding/json"
 	"fmt"
 	"html/template"
@@ -287,8 +286,8 @@ func buatResepPts(w http.ResponseWriter, r *http.Request) {
 	defer resp.Body.Close()
 	// fmt.Print(GenTemplate(det, "modresepwithdata"))
 	responseTemplate(w, "", GenTemplate(det, "modresepwithdata"), "", nil)
-
 }
+
 func inputDetailPts(w http.ResponseWriter, r *http.Request) {
 	if r.Method != "POST" {
 		http.Error(w, "Post request please", http.StatusMethodNotAllowed)
@@ -384,32 +383,37 @@ func buatResep(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Post request please", http.StatusMethodNotAllowed)
 		return
 	}
-
-	// fmt.Println(r.FormValue("send"))
-	// sendbyte := []byte(r.FormValue("send"))
-	// fmt.Print(sendbyte)
-	rec := &Resep{}
-	err := json.Unmarshal([]byte(r.FormValue("send")), rec)
+	pts := &PasienResep{}
+	tab := []Obat{}
+	pyr := []Puyer{}
+	err := json.Unmarshal([]byte(r.FormValue("pts")), pts)
 	if err != nil {
-		fmt.Println(err)
+		fmt.Printf("Gagal membaca pts: %v", err)
 		return
+	}
+	err = json.Unmarshal([]byte(r.FormValue("puyer")), &pyr)
+	if err != nil {
+		fmt.Printf("Gagal membaca pyr: %v", err)
+		return
+	}
+	err = json.Unmarshal([]byte(r.FormValue("tablet")), &tab)
+	if err != nil {
+		fmt.Printf("Gagal membaca pts: %v", err)
+		return
+	}
+	rec := &Resep{
+		Dokter:    r.FormValue("dokter"),
+		ListObat:  tab,
+		ListPuyer: pyr,
+		Pasien:    *pts,
 	}
 	zone, _ := time.LoadLocation("Asia/Makassar")
 	rec.Tanggal = time.Now().In(zone).Format("02/01/2006")
-	// fmt.Printf("LInk pasien adalah: %v", rec.Pasien.LinkID)
-	if rec.Pasien.LinkID == "" {
+	// fmt.Println(pts)
+	// fmt.Println(tab)
+	if rec.Pasien.NoCM == "" {
 		pdfResep(w, *rec)
 	} else {
-		// for _, v := range rec.ListObat {
-		// 	fmt.Println(v.NamaObat)
-		// }
-
-		// for _, v := range rec.ListPuyer {
-		// 	fmt.Println(v.Racikan)
-		// 	for _, n := range v.Obat {
-		// 		fmt.Println(n.NamaObat)
-		// 	}
-		// }
 		url := "https://add-obat-pasien-dot-igdsanglah.appspot.com"
 		_, err := sendPost(rec, r.FormValue("token"), url)
 		if err != nil {
@@ -417,6 +421,40 @@ func buatResep(w http.ResponseWriter, r *http.Request) {
 		}
 		pdfResep(w, *rec)
 	}
+	// fmt.Println(r.FormValue("send"))
+	// sendbyte := []byte(r.FormValue("send"))
+	// fmt.Print(sendbyte)
+	// rec := &Resep{}
+	// err := json.Unmarshal([]byte(r.FormValue("send")), rec)
+	// if err != nil {
+	// 	fmt.Printf("Gagal membaca json: %v", err)
+	// 	return
+	// }
+	// if r.FormValue("nocm") == "" {
+	// 	pdfResep(w, *rec)
+	// } else {
+	// 	zone, _ := time.LoadLocation("Asia/Makassar")
+	// 	rec.Tanggal = time.Now().In(zone).Format("02/01/2006")
+	// 	fmt.Printf("LInk pasien adalah: %v", rec.Pasien.LinkID)
+	// 	// if rec.Pasien.LinkID == "" {
+
+	// 	// for _, v := range rec.ListObat {
+	// 	// 	fmt.Println(v.NamaObat)
+	// 	// }
+
+	// 	// for _, v := range rec.ListPuyer {
+	// 	// 	fmt.Println(v.Racikan)
+	// 	// 	for _, n := range v.Obat {
+	// 	// 		fmt.Println(n.NamaObat)
+	// 	// 	}
+	// 	// }
+	// 	url := "https://add-obat-pasien-dot-igdsanglah.appspot.com"
+	// 	_, err := sendPost(rec, r.FormValue("token"), url)
+	// 	if err != nil {
+	// 		log.Fatalf("Terjadi kesalahan di server: %v", err)
+	// 	}
+	// 	pdfResep(w, *rec)
+	// }
 	// fmt.Printf("Data obat adalah : %v", rec.ListObat)
 	// fmt.Printf("Data obat adalah : %v", rec.ListPuyer)
 	// fmt.Printf("data adalah %v", x[""])
@@ -491,25 +529,23 @@ func pdfResep(w http.ResponseWriter, r Resep) {
 	pdf.Cell(20, 5, "No. CM")
 	pdf.Cell(20, 5, (": " + r.Pasien.NoCM))
 	pdf.Cell(20, 5, "Umur")
-	pdf.Cell(20, 5, (": " + r.Pasien.Umur[:2] + "th"))
+	pdf.Cell(20, 5, (": " + r.Pasien.Umur[:2] + " th"))
 	pdf.Ln(-1)
 	pdf.Cell(20, 5, "Alamat")
 	pdf.Cell(20, 5, (": " + ProperCapital(r.Pasien.Alamat)))
 	pdf.Cell(20, 5, "Berat Badan")
-	pdf.Cell(20, 5, (": " + r.Pasien.Berat))
+	pdf.Cell(20, 5, (": "+r.Pasien.Berat)+" kg")
 
 	t := new(bytes.Buffer)
 	err := pdf.Output(t)
 	if err != nil {
 		log.Fatalf("Error reading pdf %v", err)
 	}
+
 	w.Header().Set("Content-type", "application/pdf")
-	base64.NewEncoder(base64.StdEncoding, w).Write(t.Bytes())
-	// json.NewEncoder(w).Encode(t)
-	// w.Header().Set("Content-type", "application/pdf")
-	// if _, err := t.WriteTo(w); err != nil {
-	// 	fmt.Fprintf(w, "%s", err)
-	// }
+	if _, err := t.WriteTo(w); err != nil {
+		fmt.Fprintf(w, "%s", err)
+	}
 }
 func formPuyer(w http.ResponseWriter, r *http.Request) {
 	if r.Method != "GET" {

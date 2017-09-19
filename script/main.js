@@ -385,7 +385,7 @@ $("#navbar").on("click", "#makeresep", function(e){
 				// console.log("Tahun ini adalah: " + today.getFullYear());
 				// console.log("Tahun yang dipilih adalah : " + ui.selectedYear)
 				var umur = today.getFullYear() - ui.selectedYear;
-				// console.log("Umur adalah: " + umur);
+				console.log("Umur adalah: " + umur);
 				$("#umur").val(umur);
 			}
 		});
@@ -1029,6 +1029,7 @@ $('body').on('click', 'button.but-puyer', function(e){
 			iniinput.remove()
 			inijml.remove()
 			ini.html(js.script)
+			$(this).remove()
 		})
 })
 
@@ -1039,7 +1040,7 @@ $('body').on('click', 'button.del-obat-line', function(e){
 
 $('body').on('click', 'button#resepbut', function(e){
 	e.preventDefault();
-	var tgl = new Date()
+	// var tgl = new Date()
 	// var bul = ("0" + (tgl.getMonth()+1).toString()).slice(-2)
 	// var thn = tgl.getFullYear().toString()
 	// var hari = ("0" + (tgl.getDate()+1).toString()).slice(-2)
@@ -1054,6 +1055,9 @@ $('body').on('click', 'button#resepbut', function(e){
 		"nocm": $(".rspnocm").html(),
 		"link": $(".ptsid").html()
 	}
+	$("#tok-form").val(localStorage.getItem("token"))
+	$("#dok-form").val(localStorage.getItem("user"))
+	$("#pts-form").val(JSON.stringify(pts))
 	console.log("nocm " + $(".rspnocm").html())
 	// console.log("link : " + $(".ptsid").html())
 	// var listini = $(this).children()
@@ -1095,25 +1099,41 @@ $('body').on('click', 'button#resepbut', function(e){
 			puyer.push(mix)
 		}
 	})
-		send = {
-			"dokter": $("#dokter").html(),
-			// "tanggal": strDate,
-			"listobat": obat,
-			"listpuyer": puyer,
-			"pasien": pts
-		}
-		// console.log(JSON.stringify(send))
-		$.post("buatresep", 
-		{
-			"send" : JSON.stringify(send),
-			"token": localStorage.getItem("token")
-		},
-		function(data){
 
-			let pdfWindow = window.open("")
-			pdfWindow.document.write("<iframe width='100%' height='100%' src='data:application/pdf;base64, " + encodeURI(data)+"'></iframe>")
-			location.reload()
-		})
+	$("#puyer-form").val(JSON.stringify(puyer))
+	$("#tablet-form").val(JSON.stringify(obat))
+	$(".hidden-resep").submit()
+	$(".resep-form-send").empty()
+
+		// send = {
+		// 	"dokter": $("#dokter").html(),
+		// 	// "tanggal": strDate,
+		// 	"listobat": obat,
+		// 	"listpuyer": puyer,
+		// 	"pasien": pts
+		// }
+		// console.log(JSON.stringify(send))
+		// var xhr = new XMLHttpRequest()
+		// xhr.open("POST", "buatresep", true)
+		// // xhr.setRequestHeader('Content-Type', 'application/json')
+		// xhr.send({
+		// 	"send": JSON.stringify(send),
+		// 	"token": localStorage.getItem("token")
+		// })
+		// $.post("buatresep", 
+		// {
+		// 	"send" : JSON.stringify(send),
+		// 	"token": localStorage.getItem("token"),
+		// 	"nocm": $(".rspnocm").html()
+		// },
+		// function(data){
+		// 	// let pdfWindow = window.open("")
+		// 	// pdfWindow.document.write("<iframe width='100%' height='100%' src='data:application/pdf;base64, " + encodeURI(yourDocumentBase64VarHere)+"'></iframe>")
+		// 	let pdfWindow = window.open("")
+		// 	pdfWindow.document.write("<iframe width='100%' height='100%' src='data:application/pdf;base64, " + encodeURI(data) + "'></iframe>")
+		// 	// window.open("data:application/pdf," + encodeURI(data))
+		// 	location.reload()
+		// })
 
 	});
 
