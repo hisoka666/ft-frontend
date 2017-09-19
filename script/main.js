@@ -277,15 +277,11 @@ $("#navbar").on("click", "#delbut", function(e){
 		});
 	});
 
-
-
-
-
-
-$("#navbar").on("click", "#homebutton", function(e){
+	$("#navbar").on("click", "#homebutton", function(e){
 		token = localStorage.getItem("token");
 		email = $("#email").val();
 		e.preventDefault();
+		$("#loading-animation").modal({backdrop: 'static', keyboard: false})
 		$.post("/firstentries", {
 			token: token,
 			email: email
@@ -306,8 +302,7 @@ $("#navbar").on("click", "#homebutton", function(e){
 			}else{
 				popModalWarning("Peringatan", "Terjadi kesalahan pada server. Hubungi admin", "");
 			}
-			
-
+			$("#loading-animation").modal('hide')
 		})
 
 	});
@@ -565,6 +560,9 @@ convertSerialArray = function(arr){
 }
 $("#navbar").on("click", "#bulanini", function(e){
 	e.preventDefault();
+	// console.log($("#loading-animation").html())
+	$("#loading-animation").modal({backdrop: 'static', keyboard: false})
+	// $("#loading-animation").modal()
 	var now = new Date();
 	var dateone = new Date(now.getFullYear(),now.getMonth(),1,8,0,0);
 	var token = localStorage.getItem("token");
@@ -604,6 +602,7 @@ $("#navbar").on("click", "#bulanini", function(e){
 			}
 			$("#tabeliki").show();
 			$("#tabelutama").html(js.script);
+			$("#loading-animation").modal('hide')
 		})
 	}else{
 		var blnlalu = new Date(now.getFullYear(), now.getMonth() - 1, 1)
@@ -640,10 +639,10 @@ $("#navbar").on("click", "#bulanini", function(e){
 			}
 			$("#tabeliki").show();
 			$("#tabelutama").html(js.script);
+			$("#loading-animation").modal('hide')
 		})
 	}
-
-
+	// $("#loading-animation").modal('hide')
 });
 
 var getSum = function(){
@@ -680,9 +679,10 @@ var getSum = function(){
 
 $("#navbar").on("click", ".bcptgl", function(e){
 	e.preventDefault();
+	$("#loading-animation").modal({backdrop: 'static', keyboard: false})
 	var token = localStorage.getItem("token");
 	var tgl = $(this).html();
-	console.log(tgl)
+	// console.log(tgl)
 	$("#resep").hide()
 	$("#detailpts").hide()
 	$.post("getbcpmonth", {
@@ -721,11 +721,13 @@ $("#navbar").on("click", ".bcptgl", function(e){
 		$("#tabeliki").show();
 		$("div.tabtitle").html("Tabel IKI " + tgl);
 		$("#tabelutama").html(js.script);
+		$("#loading-animation").modal('hide')
 	})
 });
 
 $("#navbar").on("click", ".createpdf", function(e){
 	e.preventDefault();
+	$("#loading-animation").modal({backdrop: 'static', keyboard: false})
 	var token = localStorage.getItem("token");
 	var tgl = $(this).html();
 	var nama = "dr. " + $("#dokter").html();
@@ -741,6 +743,7 @@ $("#navbar").on("click", ".createpdf", function(e){
 
 $("#navbar").on("click", "#bul-ini-pdf", function(e){
 	e.preventDefault();
+	$("#loading-animation").modal({backdrop: 'static', keyboard: false})
 	var token = localStorage.getItem("token");
 	// var tgl = $(this).html();
 	var nama = "dr. " + $("#dokter").html();

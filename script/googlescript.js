@@ -1,6 +1,7 @@
 function onSignIn(googleUser) {
   var id_token = googleUser.getAuthResponse().id_token;
   var url = "/login?idtoken=" + id_token;
+  $("#loading-animation").modal({backdrop: 'static', keyboard: false})
   $.get(url)
   .done(function(data){
     var jos = JSON.parse(data)
@@ -15,6 +16,7 @@ function onSignIn(googleUser) {
       $("#dokter").html(jos.modal);
       $("#navbar").html(jos.script);
      }
+     $("#loading-animation").modal('hide')
   })
   .fail(function(err){
     alert("Error: " + err)
