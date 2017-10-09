@@ -1291,5 +1291,16 @@ $('body').on('click', 'button#resepbut', function(e){
 	}
 		
 	})
+
+	$("#doc-page").click(function(e){
+		e.preventDefault()
+
+		$.post("docpage", {
+			token: localStorage.getItem("token"),
+			email: $("#email").val(),
+		}, function(data){
+			var js = JSON.parse(data)
+		})
+	})
 });
 

@@ -263,9 +263,21 @@ func main() {
 	http.HandleFunc("/get-detail-pts", getDetailPasien)
 	http.HandleFunc("/input-detail-pts", inputDetailPts)
 	http.HandleFunc("/buat-resep-pts", buatResepPts)
+	http.HandleFunc("/docpage", docPage)
 	// http.HandleFunc("/getsupervisor", getSupervisor)
 	log.Println("Listening...")
 	log.Fatal(http.ListenAndServe(":8001", nil))
+
+}
+
+func docPage(w http.ResponseWriter, r *http.Request) {
+	if r.Method != "POST" {
+		http.Error(w, "Post request please", http.StatusMethodNotAllowed)
+		return
+	}
+
+	// url := "https://dokter-dot-igdsanglah.appspot.com"
+	// responseTemplate(w, "", GenTemplate(nil, docPage))
 
 }
 func buatResepPts(w http.ResponseWriter, r *http.Request) {
@@ -421,43 +433,6 @@ func buatResep(w http.ResponseWriter, r *http.Request) {
 		}
 		pdfResep(w, *rec)
 	}
-	// fmt.Println(r.FormValue("send"))
-	// sendbyte := []byte(r.FormValue("send"))
-	// fmt.Print(sendbyte)
-	// rec := &Resep{}
-	// err := json.Unmarshal([]byte(r.FormValue("send")), rec)
-	// if err != nil {
-	// 	fmt.Printf("Gagal membaca json: %v", err)
-	// 	return
-	// }
-	// if r.FormValue("nocm") == "" {
-	// 	pdfResep(w, *rec)
-	// } else {
-	// 	zone, _ := time.LoadLocation("Asia/Makassar")
-	// 	rec.Tanggal = time.Now().In(zone).Format("02/01/2006")
-	// 	fmt.Printf("LInk pasien adalah: %v", rec.Pasien.LinkID)
-	// 	// if rec.Pasien.LinkID == "" {
-
-	// 	// for _, v := range rec.ListObat {
-	// 	// 	fmt.Println(v.NamaObat)
-	// 	// }
-
-	// 	// for _, v := range rec.ListPuyer {
-	// 	// 	fmt.Println(v.Racikan)
-	// 	// 	for _, n := range v.Obat {
-	// 	// 		fmt.Println(n.NamaObat)
-	// 	// 	}
-	// 	// }
-	// 	url := "https://add-obat-pasien-dot-igdsanglah.appspot.com"
-	// 	_, err := sendPost(rec, r.FormValue("token"), url)
-	// 	if err != nil {
-	// 		log.Fatalf("Terjadi kesalahan di server: %v", err)
-	// 	}
-	// 	pdfResep(w, *rec)
-	// }
-	// fmt.Printf("Data obat adalah : %v", rec.ListObat)
-	// fmt.Printf("Data obat adalah : %v", rec.ListPuyer)
-	// fmt.Printf("data adalah %v", x[""])
 }
 
 func pdfResep(w http.ResponseWriter, r Resep) {
