@@ -69,13 +69,13 @@
             var bul = ""
             var thn = ""
             if ( now > dateone){
-                bul = "0" + (now.getMonth() + 1).toString().slice(-2)
+                bul = "0" + (now.getMonth() + 1).toString()
                 thn = now.getFullYear().toString()
-                $(this).html(bul + "/" + thn)
+                $(this).html(bul.slice(-2) + "/" + thn)
             }else {
-                bul = "0" + now.getMonth().toString().slice(-2)
+                bul = "0" + now.getMonth().toString()
                 thn = now.getFullYear().toString()
-                $(this).html(bul + "/" + thn)
+                $(this).html(bul.slice(-2) + "/" + thn)
             }
         })
     }

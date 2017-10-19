@@ -62,6 +62,7 @@ type MainView struct {
 	Admin      Admin          `json:"admin"`
 	Supervisor SupervisorList `json:"supervisor"`
 	Peran      string         `json:"peran"`
+	LinkID     string         `json:"link"`
 }
 type SupervisorListPasien struct {
 	TglKunjungan time.Time `json:"tgl"`
@@ -219,6 +220,18 @@ type DetailPasien struct {
 	LinkID    string            `json:"link"`
 }
 
+type DetailStaf struct {
+	NamaLengkap  string    `json:"nama"`
+	NIP          string    `json:"nip"`
+	NPP          string    `json:"npp"`
+	GolonganPNS  string    `json:"golpns"`
+	Alamat       string    `json:"alamat"`
+	Bagian       string    `json:"bagian"`
+	LinkID       string    `json:"link"`
+	TanggalLahir time.Time `json:"tgl"`
+	Umur         string    `json:"umur"`
+}
+
 func main() {
 	// variable fs membuat folder "script" menjadi sebuah file server,
 	// alamat dari file server ini akan diarahkan oleh http.Handle
@@ -264,22 +277,73 @@ func main() {
 	http.HandleFunc("/input-detail-pts", inputDetailPts)
 	http.HandleFunc("/buat-resep-pts", buatResepPts)
 	http.HandleFunc("/docpage", docPage)
+	http.HandleFunc("/simpandoc", simpanDoc)
+	http.HandleFunc("/get-surat-sakit-page", getSuratSakit)
 	// http.HandleFunc("/getsupervisor", getSupervisor)
 	log.Println("Listening...")
 	log.Fatal(http.ListenAndServe(":8001", nil))
 
 }
+func getSuratSakit(w http.ResponseWriter, r *http.Request) {
+	if r.Method != "GET" {
+		http.Error(w, "Post request please", http.StatusMethodNotAllowed)
+		return
+	}
+	// fmt.Print(GenTemplate(nil, "modsuratsakit"))
+	responseTemplate(w, "", GenTemplate(nil, "modsuratsakit"), "", nil)
+}
+func simpanDoc(w http.ResponseWriter, r *http.Request) {
+	if r.Method != "POST" {
+		http.Error(w, "Post request please", http.StatusMethodNotAllowed)
+		return
+	}
+	var nip string
+	var npp string
+	i := &nip
+	p := &npp
+	if r.FormValue("gol") != "" {
+		*i = r.FormValue("nopeg")
+	} else {
+		*p = r.FormValue("nopeg")
+	}
 
+	det := &DetailStaf{
+		NamaLengkap: r.FormValue("nama"),
+		NIP:         nip,
+		NPP:         npp,
+		GolonganPNS: r.FormValue("gol"),
+		Bagian:      r.FormValue("docbag"),
+		LinkID:      r.FormValue("link"),
+	}
+	url := "https://dokter-dot-igdsanglah.appspot.com/simpan-dokter"
+	send, err := sendPost(det, r.FormValue("token"), url)
+	if err != nil {
+		log.Fatalf("Terjadi kesalahan di server: %v", err)
+	}
+	json.NewDecoder(send.Body).Decode(det)
+	defer send.Body.Close()
+	responseTemplate(w, "", GenTemplate(det, "docpage"), "", nil)
+}
 func docPage(w http.ResponseWriter, r *http.Request) {
 	if r.Method != "POST" {
 		http.Error(w, "Post request please", http.StatusMethodNotAllowed)
 		return
 	}
+	staf := &Staff{
+		LinkID: r.FormValue("link"),
+	}
+	url := "https://dokter-dot-igdsanglah.appspot.com"
 
-	// url := "https://dokter-dot-igdsanglah.appspot.com"
-	// responseTemplate(w, "", GenTemplate(nil, docPage))
-
+	send, err := sendPost(staf, r.FormValue("token"), url)
+	if err != nil {
+		log.Fatalf("Terjadi kesalahan di server: %v", err)
+	}
+	det := &DetailStaf{}
+	json.NewDecoder(send.Body).Decode(det)
+	defer send.Body.Close()
+	responseTemplate(w, "", GenTemplate(det, "docpage"), "", nil)
 }
+
 func buatResepPts(w http.ResponseWriter, r *http.Request) {
 	if r.Method != "POST" {
 		http.Error(w, "Post request please", http.StatusMethodNotAllowed)
@@ -759,7 +823,17 @@ func getPDFNow(w http.ResponseWriter, r *http.Request) {
 	url := "https://get-bulan-dot-igdsanglah.appspot.com/bulanini"
 
 	gettgl := r.FormValue("tgl")
-
+	url2 := "https://dokter-dot-igdsanglah.appspot.com"
+	staf := &Staff{
+		LinkID: r.FormValue("linkpdf"),
+	}
+	kirim, err := sendPost(staf, r.FormValue("token"), url2)
+	if err != nil {
+		log.Fatalf("Terjadi kesalahan di server: %v", err)
+	}
+	det := &DetailStaf{}
+	json.NewDecoder(kirim.Body).Decode(det)
+	defer kirim.Body.Close()
 	send := &MainView{
 		User:  r.FormValue("email"),
 		Bulan: []string{gettgl},
@@ -773,8 +847,15 @@ func getPDFNow(w http.ResponseWriter, r *http.Request) {
 	defer resp.Body.Close()
 	iki := countIKI(pts)
 	// jaga := dataJaga(perBagian(pts), countIKI(pts))
-
-	createPDF(w, pts, iki, gettgl, r.FormValue("nama"))
+	nopeg := ""
+	n := &nopeg
+	if det.NIP == "" {
+		*n = det.NPP
+	} else {
+		*n = det.NIP
+	}
+	log.Printf("NIp adalah : %v", r.FormValue("linkdok"))
+	createPDF(w, pts, iki, gettgl, r.FormValue("nama"), nopeg)
 }
 
 func getPDF(w http.ResponseWriter, r *http.Request) {
@@ -798,8 +879,26 @@ func getPDF(w http.ResponseWriter, r *http.Request) {
 	pts := []Pasien{}
 	json.NewDecoder(resp.Body).Decode(&pts)
 	defer resp.Body.Close()
-
-	createPDF(w, pts, countIKI(pts), gettgl, r.FormValue("nama"))
+	url2 := "https://dokter-dot-igdsanglah.appspot.com"
+	staf := &Staff{
+		LinkID: r.FormValue("linkpdf"),
+	}
+	kirim, err := sendPost(staf, r.FormValue("token"), url2)
+	if err != nil {
+		log.Fatalf("Terjadi kesalahan di server: %v", err)
+	}
+	det := &DetailStaf{}
+	json.NewDecoder(kirim.Body).Decode(det)
+	defer kirim.Body.Close()
+	nopeg := ""
+	n := &nopeg
+	if det.NIP == "" {
+		*n = det.NPP
+	} else {
+		*n = det.NIP
+	}
+	log.Printf("NIp adalah : %v", r.FormValue("linkdok"))
+	createPDF(w, pts, countIKI(pts), gettgl, r.FormValue("nama"), nopeg)
 }
 func countTotalIKI(l []ListIKI) (int, int, int, int, float32, float32, float32) {
 	var a, b, c, d int
@@ -822,7 +921,7 @@ func countTotalIKI(l []ListIKI) (int, int, int, int, float32, float32, float32) 
 	// // e = (a.(float32)+c.(float32))*g + (b.(float32)+d.(float32))*h
 	return a, b, a + c, b + d, float32(a+c) * 0.0032, float32(b+d) * 0.01, e
 }
-func createPDF(w http.ResponseWriter, p []Pasien, l []ListIKI, tgl, email string) {
+func createPDF(w http.ResponseWriter, p []Pasien, l []ListIKI, tgl, email, nip string) {
 	a, b, c, d, e, f, g := countTotalIKI(l)
 	pdf := gofpdf.New("P", "mm", "A4", "")
 	pdf.SetFont("Arial", "", 12)
@@ -832,7 +931,7 @@ func createPDF(w http.ResponseWriter, p []Pasien, l []ListIKI, tgl, email string
 	pdf.Cell(120, 6, ("Nama Pegawai: " + email))
 	pdf.Ln(-1)
 	pdf.Cell(160, 6, "Pegawai RSUP Sanglah Denpasar")
-	pdf.Cell(120, 6, "NIP/Gol: ")
+	pdf.Cell(120, 6, "NIP/Gol: "+nip)
 	pdf.Ln(-1)
 	pdf.Cell(160, 6, ("Bulan: " + tgl))
 	pdf.Cell(120, 6, "Tempat Tugas: IGD RSUP Sanglah")
@@ -934,20 +1033,39 @@ func createPDF(w http.ResponseWriter, p []Pasien, l []ListIKI, tgl, email string
 	pdf.CellFormat(25, 6, "1,111", "1", 1, "C", false, 0, "")
 	pdf.Ln(-1)
 	linep3k := ": Tanggal "
+	p3k := &linep3k
 	linerapat := ": Tanggal "
+	rapat := &linerapat
 	linepelatihan := ": Tanggal "
+	pelatihan := &linepelatihan
 	for _, v := range l {
 		for _, n := range v.P3K {
-			linep3k = linep3k + n + " "
+			*p3k = *p3k + n + " "
 		}
 		for _, n := range v.Pelatihan {
-			linepelatihan = linepelatihan + n + " "
+			*pelatihan = *pelatihan + n + " "
 		}
 		for _, n := range v.Rapat {
-			linerapat = linerapat + n + " "
+			*rapat = *rapat + n + " "
 		}
 	}
-
+	for _, v := range l {
+		if v.P3K != nil {
+			pdf.Cell(20, 6, "P3K")
+			pdf.Cell(30, 6, linep3k)
+			pdf.Ln(-1)
+		}
+		if v.Pelatihan != nil {
+			pdf.Cell(40, 6, "Pelatihan/Simulasi/Lainnya")
+			pdf.Cell(30, 6, linepelatihan)
+			pdf.Ln(-1)
+		}
+		if v.Rapat != nil {
+			pdf.Cell(20, 6, "Rapat")
+			pdf.Cell(30, 6, linerapat)
+			pdf.Ln(-1)
+		}
+	}
 	// for _, v := range l {
 	// 	linerapat = linerapat + v + " "
 	// }
@@ -955,14 +1073,14 @@ func createPDF(w http.ResponseWriter, p []Pasien, l []ListIKI, tgl, email string
 	// for _, v := range l {
 	// 	linepelatihan = linepelatihan + v + " "
 	// }
-	pdf.Cell(20, 6, "P3K")
-	pdf.Cell(30, 6, linep3k)
-	pdf.Ln(-1)
-	pdf.Cell(20, 6, "Rapat")
-	pdf.Cell(30, 6, linerapat)
-	pdf.Ln(-1)
-	pdf.Cell(20, 6, "Pelatihan")
-	pdf.Cell(30, 6, linepelatihan)
+	// pdf.Cell(20, 6, "P3K")
+	// pdf.Cell(30, 6, linep3k)
+	// pdf.Ln(-1)
+	// pdf.Cell(20, 6, "Rapat")
+	// pdf.Cell(30, 6, linerapat)
+	// pdf.Ln(-1)
+	// pdf.Cell(20, 6, "Pelatihan")
+	// pdf.Cell(30, 6, linepelatihan)
 	////////////////// Buku Catatan Pasien ///////////////////////////////
 	pdf.AddPage()
 	pdf.SetFont("Arial", "B", 16)

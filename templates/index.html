@@ -33,7 +33,7 @@
 		</div>
     
     <div id="signinbut"class="g-signin2" data-onsuccess="onSignIn" data-theme="dark"></div>
-    <div class="text-center" id="welcome" hidden><p>Selamat Datang <a href="#" id="doc-page"><span id="dokter"></span></a></p></div>
+    <div class="text-center" id="welcome" hidden><p>Selamat Datang <a href="" id="doc-page"><span id="dokter"></span></a></p></div>
     <input type="hidden" id="email">
     <div class="text-center" id="signoutbut" hidden><button class="btn btn-danger" href="#" onclick="signOut();">Sign out</button></div>
     <div id="navbar"></div>
@@ -76,12 +76,15 @@
         <input type="text" name="nama" id="namapdf" class="hidgetpdf" hidden>
         <input class="hidgetpdf" id="tglpdf"type="text" name="tgl" hidden>
         <input class="hidgetpdf" id="tokenpdf" type="text" name="token" hidden>
+        <input type="text" class="hidgetpdf" name="linkpdf" id="linkdok" hidden>
 
     </form>
 <div class="modal fade" id="loading-animation">
     <div class="modal-content">
         <div id="loader"></div>
     </div>
+</div>
+<div class="modal fade" id="buat-surat-sakit">
 </div>
   </body>
 </html>

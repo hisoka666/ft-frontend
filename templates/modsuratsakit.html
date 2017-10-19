@@ -1,0 +1,39 @@
+<div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">&times;</button>
+                <h4 class="modal-title text-center">Data Untuk Surat Sakit</h4>
+            </div>
+            <div class="modal-body">
+                    <div class="container-fluid form-group">
+                            <div class="col-sm-6">Nama</div>
+                            <div class="col-sm-6"><p class="form-control-static text-capitalize" id="sakit-nama"></p></div>
+                        </div>
+                        <div class="container-fluid form-group">
+                            <div class="col-sm-6">Umur</div>
+                            <div class="col-sm-6"><input type="number" id="sakit-umur" class="form-control"></div>
+                        </div>
+                        <div class="container-fluid form-group">
+                            <div class="col-sm-6">Pekerjaan</div>
+                            <div class="col-sm-6"><input type="text" id="sakit-pekerjaan" class="form-control"></div>
+                        </div>
+                        <div class="container-fluid form-group">
+                            <div class="col-sm-6">Alamat</div>
+                            <div class="col-sm-6"><input type="text" id="sakit-alamat" class="form-control"></div>
+                        </div>
+                        <div class="container-fluid form-group">
+                            <div class="col-sm-6">Lama surat sakit</div>
+                            <div class="col-sm-6"></div>
+                        </div>
+                        <input type="text" class="sakit-link-pts" hidden>
+                        <form action="/pdf-surat-sakit" id="pdf-sakit" method="post">
+                            <input type="text" name="content" class="pdf-sakit-isi" hidden>
+                            <input type="text" name="token" class="pdf-sakit-token" hidden>
+                        </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" id="modal-close-button" class="btn btn-default pull-left" data-dismiss="modal">Tutup</button>
+                <button type="button" id="buat-surat-sakit-but" class="btn btn-warning pull-right">Simpan</button>
+            </div>
+        </div>
+    </div>

@@ -34,7 +34,10 @@ $(document).ready(function(){
 				} else {
 					alert("Terjadi kesalahan: " + js.token)
 					$("#nocm").prop("disabled", false);
-				}			    
+				}
+				if (value == "00000000" || value == "00000001" || value == "00000002"){
+					$("#namapts").attr("disabled", true)
+				}
 
 			});
         }
@@ -290,6 +293,7 @@ $("#navbar").on("click", "#delbut", function(e){
 			$("#resep").hide()
 			$("#detailpts").hide()
 			$("div#main").show();
+			$("#detail-dokter").hide()
 			// console.log(js.script);
 			if (js.token == "OK") {
 				$("#inputnocm").show();
@@ -365,6 +369,7 @@ $("#navbar").on("click", "#makeresep", function(e){
 	$.get("getptspage")
 	.done(function(data){
 		$("div#main").hide()
+		$("#detail-dokter").hide()
 		$("#detailpts").hide()
 		var js = JSON.parse(data);
 		$("div#resep").html(js.script).show();
@@ -576,6 +581,7 @@ $("#navbar").on("click", "#bulanini", function(e){
 		}, function(data){
 			var js = JSON.parse(data);
 			$("div#main").show();
+			$("#detail-dokter").hide()
 			pieChart(js.data, "")
 			$("#inputnocm").hide();
 			$(".diagram").show();
@@ -613,6 +619,7 @@ $("#navbar").on("click", "#bulanini", function(e){
 			email: $("#email").val()
 		}, function(data){
 			$("div#main").show();
+			$("#detail-dokter").hide()
 			var js = JSON.parse(data);
 			pieChart(js.data, "")
 			$(".diagram").show();
@@ -685,6 +692,7 @@ $("#navbar").on("click", ".bcptgl", function(e){
 	// console.log(tgl)
 	$("#resep").hide()
 	$("#detailpts").hide()
+	$("#detail-dokter").hide()
 	$.post("getbcpmonth", {
 		token: token,
 		tgl: tgl,
@@ -732,10 +740,13 @@ $("#navbar").on("click", ".createpdf", function(e){
 	var tgl = $(this).html();
 	var nama = "dr. " + $("#dokter").html();
 	var email = $("#email").val();
+	var link = $("#link-dokter").html();
+	console.log("link per bulan adalah: " + link)
 	$("#emailpdf").val(email);
 	$("#namapdf").val(nama);
 	$("#tglpdf").val(tgl);
 	$("#tokenpdf").val(token);
+	$("#linkdok").val(link);
 	$("#getpdf").prop("action", "/getpdf")
 	$("#getpdf").submit();
 
@@ -748,6 +759,8 @@ $("#navbar").on("click", "#bul-ini-pdf", function(e){
 	// var tgl = $(this).html();
 	var nama = "dr. " + $("#dokter").html();
 	var email = $("#email").val();
+	var link = $("#link-dokter").html();
+	console.log("link bulan ini adalah: " + link)
 	var now = new Date();
 	var dateone = new Date(now.getFullYear(),now.getMonth(),1,8,0,0);
 	var tgl = ""
@@ -761,6 +774,7 @@ $("#navbar").on("click", "#bul-ini-pdf", function(e){
 	$("#namapdf").val(nama);
 	$("#tglpdf").val(tgl);
 	$("#tokenpdf").val(token);
+	$("#linkdok").val(link);
 	$("#getpdf").prop("action", "/getpdfnow")
 	$("#getpdf").submit();
 })
@@ -1108,36 +1122,6 @@ $('body').on('click', 'button#resepbut', function(e){
 	$(".hidden-resep").submit()
 	$(".resep-form-send").empty()
 
-		// send = {
-		// 	"dokter": $("#dokter").html(),
-		// 	// "tanggal": strDate,
-		// 	"listobat": obat,
-		// 	"listpuyer": puyer,
-		// 	"pasien": pts
-		// }
-		// console.log(JSON.stringify(send))
-		// var xhr = new XMLHttpRequest()
-		// xhr.open("POST", "buatresep", true)
-		// // xhr.setRequestHeader('Content-Type', 'application/json')
-		// xhr.send({
-		// 	"send": JSON.stringify(send),
-		// 	"token": localStorage.getItem("token")
-		// })
-		// $.post("buatresep", 
-		// {
-		// 	"send" : JSON.stringify(send),
-		// 	"token": localStorage.getItem("token"),
-		// 	"nocm": $(".rspnocm").html()
-		// },
-		// function(data){
-		// 	// let pdfWindow = window.open("")
-		// 	// pdfWindow.document.write("<iframe width='100%' height='100%' src='data:application/pdf;base64, " + encodeURI(yourDocumentBase64VarHere)+"'></iframe>")
-		// 	let pdfWindow = window.open("")
-		// 	pdfWindow.document.write("<iframe width='100%' height='100%' src='data:application/pdf;base64, " + encodeURI(data) + "'></iframe>")
-		// 	// window.open("data:application/pdf," + encodeURI(data))
-		// 	location.reload()
-		// })
-
 	});
 
 	$("#navbar").on("click", "#detailbut", function(e){
@@ -1153,6 +1137,7 @@ $('body').on('click', 'button#resepbut', function(e){
 			$("#detailpts").html(js.script).show()
 			$("#main").hide()
 			$("#resep").hide()
+			$("#detail-dokter").hide()
 
 		})
 	})
@@ -1230,6 +1215,7 @@ $('body').on('click', 'button#resepbut', function(e){
 		}, function(data){
 			$("div#main").hide()
 			$("#detailpts").hide()
+			$("#detail-dokter").hide()
 			var js = JSON.parse(data);
 			// console.log(js.script)
 			$("div#resep").html(js.script).show();
@@ -1294,12 +1280,80 @@ $('body').on('click', 'button#resepbut', function(e){
 
 	$("#doc-page").click(function(e){
 		e.preventDefault()
-
+		console.log("button pressed")
+		$("#loading-animation").modal({backdrop: 'static', keyboard: false})
 		$.post("docpage", {
 			token: localStorage.getItem("token"),
-			email: $("#email").val(),
+			link: $("#link-dokter").html(),
 		}, function(data){
 			var js = JSON.parse(data)
+			$("#detail-dokter").html(js.script)
+			$("#main").hide()
+			$("#resep").hide()
+			$("#detail-dokter").show()
+			$("#loading-animation").modal('hide')
+		})
+	})
+
+	$("body").on("click", "#ubah-data-doc", function(e){
+		e.preventDefault()
+		var nama = $("#doc-name").html()
+		var nopeg = $("#no-peg").html()
+		var gol = $("#gol").html()
+		var docbag = $("#doc-bag").html()
+		$("#doc-name").html(changeToInput("input-doc-name", nama))
+		$("#no-peg").html(changeToInput("input-no-peg", nopeg))
+		$("#gol").html(changeToInput("input-gol", gol))
+		$("#doc-bag").html(changeToInput("input-doc-bag", docbag))
+		$(this).html("Simpan")
+		$(this).attr("id", "simpan-data-doc")
+	})
+
+	var changeToInput = function(inputId, inputContent){
+		var str1 = "<input type='text' class='form-control text-capitalize' id='"
+		var str2 = "' value='"
+		var str3 = "'>"
+		return str1 + inputId + str2 + inputContent + str3
+	}
+
+	$("body").on("click", "#simpan-data-doc", function(e){
+		e.preventDefault()
+		$("#loading-animation").modal({backdrop: 'static', keyboard: false})
+		var nama = $("#input-doc-name").val()
+		var nopeg = $("#input-no-peg").val()
+		var gol = $("#input-gol").val()
+		var docbag = $("#input-doc-bag").val()
+		console.log($("#link-dokter").html())
+		$.post("simpandoc", {
+			token: localStorage.getItem("token"),
+			nama: nama,
+			nopeg: nopeg, 
+			gol: gol,
+			docbag : docbag,
+			link: $("#link-dokter").html()
+		}, function(data){
+			var js = JSON.parse(data)
+			$("#detail-dokter").html(js.script)
+			$("#loading-animation").modal('hide')
+		})
+
+	})
+
+	$("body").on("click", "#sakitbut", function(e){
+		e.preventDefault()
+		var link = $(this).offsetParent().children().first().html();
+		var namapts = $(this).parents("tr").children("td.content-nama-pasien").html()
+		// .find(".content-nama-pasien").html();
+		// console.log("Nama pasien adalah: " + namapts)
+		// console.log("link pasien adalah: " + link)
+		$.get("get-surat-sakit-page")
+		.done(function(data){
+			// console.log(data)
+			var js = JSON.parse(data)
+			$("#buat-surat-sakit").html(js.script)
+			$("#sakit-nama").html(namapts)
+			$("#sakit-link-pts").val(link)
+			$("#buat-surat-sakit").modal()
 		})
 	})
 });

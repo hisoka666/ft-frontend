@@ -1,0 +1,41 @@
+<div class="container-fluid">
+        <div class="panel">
+            <div class="panel-heading head-dokter text-center">Data Dokter</div>
+            <div class="panel-body body-dokter">
+                    <div class="col-sm-4 foto">Foto Profil</div>
+                    <div class="col-sm-8 identitas">
+                        <div class="container-fluid form-group">
+                            <div class="col-sm-4">Nama</div>
+                            <div class="col-sm-8" id="doc-name">{{.NamaLengkap}}</div>
+                        </div>
+                        <div class="container-fluid form-group">
+                            <div class="col-sm-4">NIP/NPP</div>
+                            {{if .NIP}}
+                            <div class="col-sm-8" id="no-peg">{{.NIP}}</div>
+                            {{else}}
+                            <div class="col-sm-8" id="no-peg">{{.NPP}}</div>
+                            {{end}}
+                        </div>
+                        <div class="container-fluid form-group">
+                            <div class="col-sm-4">Golongan</div>
+                            {{if .GolonganPNS}}
+                            <div class="col-sm-8" id="gol">{{.GolonganPNS}}</div>
+                            {{else}}
+                            <div class="col-sm-8" id="gol"></div>
+                            {{end}}
+                        </div>
+                        <div class="container-fluid form-group">
+                            <div class="col-sm-4">Tempat Tugas</div>
+                            {{if .Bagian}}
+                            <div class="col-sm-8" id="doc-bag">{{.Bagian}}</div>
+                            {{else}}
+                            <div class="col-sm-8" id="doc-bag"></div>
+                            {{end}}
+                        </div>
+                        <div class="container-fluid pull-right"><button class="btn btn-default" id="ubah-data-doc">Ubah</button></div>
+                        <div id="link-detail-dokter" hidden>{{.LinkID}}</div>
+                    </div>
+            </div>
+        </div>
+        
+    </div>
