@@ -670,6 +670,7 @@ func buatResep(w http.ResponseWriter, r *http.Request) {
 	// fmt.Println(pts)
 	fmt.Println(rec.Pasien.Nama)
 	fmt.Println(rec.Pasien.NoCM)
+	fmt.Println(rec.ListObat[0].NamaObat)
 	if rec.Pasien.NoCM == "" {
 		pdfResep(w, *rec)
 	} else {
@@ -751,7 +752,7 @@ func pdfResep(w http.ResponseWriter, r Resep) {
 	pdf.Cell(20, 5, "No. CM")
 	pdf.Cell(20, 5, (": " + r.Pasien.NoCM))
 	pdf.Cell(20, 5, "Umur")
-	pdf.Cell(20, 5, (": " + r.Pasien.Umur[:2] + " th"))
+	pdf.Cell(20, 5, (": " + r.Pasien.Umur + " th"))
 	pdf.Ln(-1)
 	pdf.Cell(20, 5, "Alamat")
 	pdf.Cell(20, 5, (": " + ProperCapital(r.Pasien.Alamat)))
@@ -1935,6 +1936,16 @@ func GenTemplate(n interface{}, temp ...string) string {
 
 			return fmt.Sprintf("%v Tahun %v Bulan %v Hari", yr, int(now.Month()-t.Month()), har)
 
+		},
+		"umurtahun": func(t time.Time) string {
+		    zone, _ := time.LoadLocation("Asia/Makassar")
+			now := time.Now().In(zone)
+			t = t.In(zone)
+			yr := now.Year() - t.Year()
+			if now.YearDay() < t.YearDay(){
+			   yr--
+			}
+			return strconv.Itoa(yr)
 		},
 		"bag": func(n string) string {
 			switch n {

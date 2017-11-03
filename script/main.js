@@ -1060,7 +1060,7 @@ $('body').on('click', 'button.del-obat-line', function(e){
 	$(this).parents('.listobat').remove();
 })
 
-$('body').on('click', 'button#resepbut', function(e){
+$('body').on('click', "#mod-resepbut", function(e){
 	e.preventDefault();
 	// var tgl = new Date()
 	// var bul = ("0" + (tgl.getMonth()+1).toString()).slice(-2)
@@ -1125,6 +1125,8 @@ $('body').on('click', 'button#resepbut', function(e){
 	$("#puyer-form").val(JSON.stringify(puyer))
 	$("#tablet-form").val(JSON.stringify(obat))
 	console.log($("#pts-form").val())
+	console.log($("#puyer-form").val())
+	console.log($("#tablet-form").val())
 	$(".hidden-resep").submit()
 	$(".resep-form-send").empty()
 
@@ -1207,42 +1209,42 @@ $('body').on('click', 'button#resepbut', function(e){
 		})
 	})
 
-	// $("body").on("click", "#resepbut", function(e){
-	// 	e.preventDefault()
-	// 	var link = $(this).offsetParent().children().first().html();
-	// 	var doc = $("#dokter").html()
-	// 	var diag = $(this).parents("tr").children(".diag").html()
-	// 	// console.log(link)
-	// 	// console.log(doc)
-	// 	$.post("buat-resep-pts", {
-	// 		token: localStorage.getItem("token"),
-	// 		link: link,
-	// 		doc: doc
-	// 	}, function(data){
-	// 		$("div#main").hide()
-	// 		$("#detailpts").hide()
-	// 		$("#detail-dokter").hide()
-	// 		var js = JSON.parse(data);
-	// 		// console.log(js.script)
-	// 		$("div#resep").html(js.script).show();
-	// 		$("#tgllahir").datepicker({
-	// 			dateFormat:"dd-mm-yy",
-	// 			changeMonth: true,
-	// 			changeYear: true,
-	// 			yearRange: "1900:2035",
-	// 			onSelect: function(value, ui){
-	// 				var today = new Date();
-	// 				// console.log("Tahun ini adalah: " + today.getFullYear());
-	// 				// console.log("Tahun yang dipilih adalah : " + ui.selectedYear)
-	// 				var umur = today.getFullYear() - ui.selectedYear;
-	// 				// console.log("Umur adalah: " + umur);
-	// 				$("#umur").val(umur);
-	// 			}
-	// 		});
-	// 		$("#diag").val(diag)
-	// 		$(".ptsid").html(link)
-	// 	})
-	// })
+	$("body").on("click", "#resepbut", function(e){
+		e.preventDefault()
+		var link = $(this).offsetParent().children().first().html();
+		var doc = $("#dokter").html()
+		var diag = $(this).parents("tr").children(".diag").html()
+		// console.log(link)
+		// console.log(doc)
+		$.post("buat-resep-pts", {
+			token: localStorage.getItem("token"),
+			link: link,
+			doc: doc
+		}, function(data){
+			$("div#main").hide()
+			$("#detailpts").hide()
+			$("#detail-dokter").hide()
+			var js = JSON.parse(data);
+			// console.log(js.script)
+			$("div#resep").html(js.script).show();
+			$("#tgllahir").datepicker({
+				dateFormat:"dd-mm-yy",
+				changeMonth: true,
+				changeYear: true,
+				yearRange: "1900:2035",
+				onSelect: function(value, ui){
+					var today = new Date();
+					// console.log("Tahun ini adalah: " + today.getFullYear());
+					// console.log("Tahun yang dipilih adalah : " + ui.selectedYear)
+					var umur = today.getFullYear() - ui.selectedYear;
+					// console.log("Umur adalah: " + umur);
+					$("#umur").val(umur);
+				}
+			});
+			$("#diag").val(diag)
+			$(".ptsid").html(link)
+		})
+	})
 
 	$("body").on("click", ".rspnextbut", function(e){
 		e.preventDefault();

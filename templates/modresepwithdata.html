@@ -12,7 +12,7 @@
                         <input type="text" name="" id="diag" class="form-control text-capitalize">
                         <label for="">Tanggal Lahir</label>
                         <input type="text" name="" id="tgllahir" class="form-control" value="{{tgl .Pasien.TglLahir}}">
-                        <input type="hidden" name="" id="umur" value="{{umur .Pasien.TglLahir}}">
+                        <input type="hidden" name="" id="umur" value="{{umurtahun .Pasien.TglLahir}}">
                         <label for="">Alamat</label>
                         <input type="text" name="" id="almt" class="form-control text-capitalize" value="{{.Pasien.Alamat}}">
                         <label for="">Berat Badan</label>
@@ -29,4 +29,4 @@
     </div>
   </div>
 </div>
-<div class="col-sm-3"></div>
+<div class="col-sm-3"></div><strconv></strconv>
