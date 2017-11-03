@@ -232,6 +232,45 @@ type DetailStaf struct {
 	Umur         string    `json:"umur"`
 }
 
+type SuratSakit struct {
+	LinkID        string `json:"link"`
+	TglLahir      string `json:"tgl"`
+	Pekerjaan     string `json:"pekerjaan"`
+	Alamat        string `json:"alamat"`
+	LamaIstirahat string `json:"lama"`
+	StatusData    string `json:"status"`
+	Dokter        string `json:"dokter"`
+}
+type DataSuratSakit struct {
+	TglSurat      time.Time `json:"tglsurat"`
+	NomorSurat    int       `json:"nomor"`
+	LamaIstirahat string    `json:"lama"`
+	Pekerjaan     string    `json:"pekerjaan"`
+	LinkSurat     string    `json:"link"`
+	Dokter        string    `json:"dokter"`
+	NamaPasien    string    `json:"namapts"`
+	NoCM          string    `json:"nocm"`
+	Umur          string    `json:"umur"`
+	Alamat        string    `json:"alamat"`
+}
+
+type LembarATS struct {
+	LinkID         string `json:"link"`
+	KeluhanUtama   string `json:"kelut"`
+	Subyektif      string `json:"subyektif"`
+	TDSistolik     string `json:"tdsis"`
+	TDDiastolik    string `json:"tddi"`
+	Nadi           string `json:"nadi"`
+	LajuPernafasan string `json:"rr"`
+	SuhuBadan      string `json:"temp"`
+	LokasiNyeri    string `json:"nyerilok"`
+	NRS            string `json:"nrs"`
+	Keterangan     string `json:"keterangan"`
+	GCSE           string `json:"gcse"`
+	GCSV           string `json:"gcsv"`
+	GCSM           string `json:"gcsm"`
+}
+
 func main() {
 	// variable fs membuat folder "script" menjadi sebuah file server,
 	// alamat dari file server ini akan diarahkan oleh http.Handle
@@ -279,18 +318,161 @@ func main() {
 	http.HandleFunc("/docpage", docPage)
 	http.HandleFunc("/simpandoc", simpanDoc)
 	http.HandleFunc("/get-surat-sakit-page", getSuratSakit)
+	http.HandleFunc("/pdf-surat-sakit", pdfSuratSakit)
+	http.HandleFunc("/simpan-lembar-ats", simpanLembarATS)
 	// http.HandleFunc("/getsupervisor", getSupervisor)
 	log.Println("Listening...")
 	log.Fatal(http.ListenAndServe(":8001", nil))
 
 }
-func getSuratSakit(w http.ResponseWriter, r *http.Request) {
-	if r.Method != "GET" {
+func simpanLembarATS(w http.ResponseWriter, r *http.Request) {
+	if r.Method != "POST" {
 		http.Error(w, "Post request please", http.StatusMethodNotAllowed)
 		return
 	}
+	ats := &LembarATS{}
+	con := []byte(r.FormValue("ats"))
+	err := json.Unmarshal(con, ats)
+	if err != nil {
+		log.Fatalf("terjadi kesalahan: %v", err)
+	}
+	// fmt.Printf("Subyektif adalah: %v", ats.Subyektif)
+	url := "https://ats-dot-igdsanglah.appspot.com/simpan"
+	resp, err := sendPost(ats, r.FormValue("token"), url)
+	if err != nil {
+		log.Fatalf("terjadi kesalahan: %v", err)
+	}
+	json.NewDecoder(resp.Body).Decode(ats)
+	fmt.Print(ats)
+	responseTemplate(w, "", "ok", "", nil)
+}
+func pdfSuratSakit(w http.ResponseWriter, r *http.Request) {
+	if r.Method != "POST" {
+		http.Error(w, "Post request please", http.StatusMethodNotAllowed)
+		return
+	}
+	sur := &SuratSakit{}
+	// fmt.Print(r.FormValue("content"))
+	surat := []byte(r.FormValue("content"))
+	err := json.Unmarshal(surat, sur)
+	if err != nil {
+		log.Fatalf("Terjadi kesalahan dalam unmarshaling json: %v", err)
+		return
+	}
+	sur.StatusData = r.FormValue("status-data")
+	sur.Dokter = r.FormValue("dokter")
+	url := "https://get-data-pasien-dot-igdsanglah.appspot.com/add-surat-sakit"
+	resp, err := sendPost(sur, r.FormValue("token"), url)
+	if err != nil {
+		log.Fatalf("Terjadi kesalahan di server : %v", err)
+		return
+	}
+	dat := &DataSuratSakit{}
+	json.NewDecoder(resp.Body).Decode(dat)
+	// fmt.Printf("Data umur adalah: %v", dat.Umur)
+	// fmt.Printf("Data alamat adalah: %v", dat.Alamat)
+	// fmt.Printf("Data lama istirahat adalah: %v", dat.LamaIstirahat)
+	// fmt.Printf("Data nomor surat adalah: %v", dat.NomorSurat)
+	// fmt.Printf("Data link surat adalah: %v", dat.LinkSurat)
+	// dat.NamaPasien = r.FormValue("namapts")
+	// dat.Dokter = r.FormValue("dokter")
+	// dat.Alamat = sur.Alamat
+	// dat.Umur = r.FormValue("umur")
+	defer resp.Body.Close()
+	buatPDFSuratSakit(dat, w)
+}
+
+func buatPDFSuratSakit(n *DataSuratSakit, w http.ResponseWriter) {
+	pdf := gofpdf.New("P", "mm", "A4", "")
+	pdf.SetFont("Arial", "", 16)
+	pdf.AddPageFormat("P", gofpdf.SizeType{Wd: 210, Ht: 145})
+	pdf.CellFormat(0, 7, "DEPARTEMEN KESEHATAN RI", "", 0, "C", false, 0, "")
+	pdf.Ln(-1)
+	pdf.CellFormat(0, 7, "RSUP SANGLAH DENPASAR", "B", 0, "C", false, 0, "")
+	pdf.Ln(-1)
+	pdf.Ln(-1)
+	surat := "SURAT KETERANGAN SAKIT"
+	pdf.SetFont("Arial", "", 12)
+	wd := pdf.GetStringWidth(surat) + 6
+	pdf.SetX((210 - wd) / 2)
+	pdf.CellFormat((wd + 6), 10, surat, "B", 0, "C", false, 0, "")
+	pdf.Ln(-1)
+	pdf.SetFont("Arial", "", 10)
+	fmt.Print(n.NomorSurat)
+	nomor := "Nomor: RSUP 01/" + strconv.Itoa(n.NomorSurat) + "/IX/2017"
+	wd = pdf.GetStringWidth(nomor) + 6
+	pdf.SetX((210 - wd) / 2)
+	pdf.CellFormat((wd + 6), 9, nomor, "", 0, "C", false, 0, "")
+	pdf.Ln(-1)
+	pdf.SetFont("Arial", "", 10)
+	pdf.Cell(0, 5, "Yang bertandatangan di bawah ini menerangkan bahwa: ")
+	pdf.Ln(-1)
+	pdf.SetX(30)
+	pdf.Cell(40, 5, "Nama")
+	pdf.Cell(70, 5, ": "+ProperCapital(n.NamaPasien))
+	pdf.Ln(-1)
+	pdf.SetX(30)
+	pdf.Cell(40, 5, "Umur")
+	pdf.Cell(70, 5, ": "+n.Umur)
+	pdf.Ln(-1)
+	pdf.SetX(30)
+	pdf.Cell(40, 5, "Pekerjaan")
+	pdf.Cell(70, 5, ": "+ProperCapital(n.Pekerjaan))
+	pdf.Ln(-1)
+	pdf.SetX(30)
+	pdf.Cell(40, 5, "Alamat")
+	pdf.Cell(70, 5, ": "+ProperCapital(n.Alamat))
+	pdf.Ln(-1)
+	pdf.Cell(0, 5, "oleh karena SAKIT, perlu diberikan ISTIRAHAT")
+	pdf.Ln(-1)
+	zone, _ := time.LoadLocation("Asia/Makassar")
+	lama, _ := strconv.Atoi(n.LamaIstirahat)
+	tglnow := time.Now()
+	tglakhir := tglnow.AddDate(0, 0, lama-1)
+	pdf.Cell(0, 5, "selama "+n.LamaIstirahat+" hari, terhitung mulai tanggal "+tglnow.In(zone).Format("02/01/2006")+" s.d. "+tglakhir.In(zone).Format("02/01/2006"))
+	pdf.Ln(-1)
+	pdf.Ln(-1)
+	pdf.Cell(0, 5, "Demikian surat keterangan ini dibuat dengan sebenarnya dan untuk dipergunakan semestinya")
+	pdf.Ln(-1)
+	pdf.Ln(-1)
+	pdf.SetX(160)
+	pdf.CellFormat(0, 5, "Denpasar, "+tglnow.Format("02/01/2006"), "", 0, "C", false, 0, "")
+	pdf.Ln(-1)
+	pdf.Ln(-1)
+	pdf.Ln(-1)
+	pdf.SetX(160)
+	pdf.CellFormat(0, 5, "("+n.Dokter+")", "", 0, "C", false, 0, "")
+	t := new(bytes.Buffer)
+	err := pdf.Output(t)
+	if err != nil {
+		log.Fatalf("Error reading pdf %v", err)
+	}
+
+	w.Header().Set("Content-type", "application/pdf")
+	if _, err := t.WriteTo(w); err != nil {
+		fmt.Fprintf(w, "%s", err)
+	}
+}
+func getSuratSakit(w http.ResponseWriter, r *http.Request) {
+	if r.Method != "POST" {
+		http.Error(w, "Post request please", http.StatusMethodNotAllowed)
+		return
+	}
+	pts := &Pasien{
+		LinkID: r.FormValue("link"),
+	}
+	url := "https://get-data-pasien-dot-igdsanglah.appspot.com/get-detail"
+	resp, err := sendPost(pts, r.FormValue("token"), url)
+	if err != nil {
+		log.Fatalf("Terjadi kesalahan di server: %v", err)
+	}
+
+	det := &DataPasien{}
+	json.NewDecoder(resp.Body).Decode(det)
+	defer resp.Body.Close()
 	// fmt.Print(GenTemplate(nil, "modsuratsakit"))
-	responseTemplate(w, "", GenTemplate(nil, "modsuratsakit"), "", nil)
+
+	responseTemplate(w, "", GenTemplate(det, "modsuratsakit"), "", nil)
 }
 func simpanDoc(w http.ResponseWriter, r *http.Request) {
 	if r.Method != "POST" {
@@ -486,7 +668,8 @@ func buatResep(w http.ResponseWriter, r *http.Request) {
 	zone, _ := time.LoadLocation("Asia/Makassar")
 	rec.Tanggal = time.Now().In(zone).Format("02/01/2006")
 	// fmt.Println(pts)
-	// fmt.Println(tab)
+	fmt.Println(rec.Pasien.Nama)
+	fmt.Println(rec.Pasien.NoCM)
 	if rec.Pasien.NoCM == "" {
 		pdfResep(w, *rec)
 	} else {
@@ -1626,7 +1809,7 @@ func inputData(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		responseTemplate(w, "kesalahan-template", "", "", nil)
 	}
-	responseTemplate(w, "OK", b.String(), "", nil)
+	responseTemplate(w, "OK", b.String(), GenTemplate(pts, "modformats"), nil)
 
 }
 

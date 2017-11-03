@@ -1,0 +1,104 @@
+<div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">&times;</button>
+            <h4 class="modal-title text-center">Lembar ATS</h4>
+            </div>
+        <div class="modal-body">
+        <div class="col-sm-6">
+            <div class="form-group">
+                <label for="" class="control-label">Nama Pasien :</label>
+                <div>
+                    <p class="form-control-static text-capitalize">{{.NamaPasien}}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-6">
+            <div class="form-group">
+                <label for="" class="control-label">No. RM:</label>
+                <div>
+                    <p class="form-control-static">{{.NoCM}}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-6">
+                <div class="form-group">
+                        <label for="" class="control-label">Bagian:</label>
+                        <div>
+                            <p class="form-control-static">{{bag .Dept}}</p>
+                        </div>
+                    </div>
+        </div>
+        <div class="col-sm-6">
+                <div class="form-group">
+                        <label for="" class="control-label">ATS :</label>
+                        <div>
+                            <p class="form-control-static">{{.ATS}}</p>
+                        </div>
+                    </div>
+        </div>
+        <div class="container-fluid">
+        <form action="" class="form-horizontal">
+            <div class="form-group lembar-ats">
+                <label for="">Keluhan Utama</label>
+                <div><input type="text" class="form-control lembar-ats-kel-ut text-capitalize"></div>
+                <label for="">Subyektif</label>
+                <div><textarea name="" id="" cols="30" rows="3" class="form-control lembar-ats-subyektif"></textarea></div>
+                <label for="">Obyektif</label>
+                <div class="container-fluid lembar-ats-obyektif">
+                    <div class="container-fluid">
+                        <div class="col-sm-12">
+                        <label for="">Tekanan Darah</label>
+                        </div>
+                        <div class="col-sm-4"><input type="number" name="" id="" class="form-control lembar-ats-tensi-sistol"></div><div class="col-sm-4 text-center">/</div><div class="col-sm-4"><input type="number" name="" id="" class="form-control lembar-ats-tensi-diastol"></div>
+                        <div class="col-sm-4">
+                            <label for="">Nadi</label>
+                            <div><input type="number" name="" id="" class="form-control lembar-ats-nadi"></div>
+                        </div>
+                        <div class="col-sm-4">
+                            <label for="">Laju Pernafasan</label>
+                            <div><input type="number" name="" id="" class="form-control lembar-ats-rr"></div>
+                        </div>
+                        <div class="col-sm-4">
+                            <label for="">Suhu Badan</label>
+                            <div><input type="number" name="" id="" class="form-control lembar-ats-temp"></div>
+                        </div>
+                        <div class="col-sm-12">
+                            <label for="">Nyeri (NRS)</label>
+                            <img src="script/nrs.jpg" alt="">
+                            <div><input type="text" name="" id="" class="form-control lembar-ats-lokasi-nyeri text-capitalize" placeholder="Lokasi"></div>
+                            <div><input type="number" name="" id="" class="form-control lembar-ats-nyeri-nrs"></div>
+                        </div>
+                        <div class="col-sm-12">
+                        <label for="">GCS</label>
+                            <div class="lembar-ats-gcs">
+                                <div class="col-sm-4">
+                                <label for="">Eye</label>
+                                <div><input type="number" name="" id="" class="form-control lembar-ats-gcs-e"></div>
+                                </div>
+                                <div class="col-sm-4">
+                                <label for="">Verbal</label>
+                                <div><input type="number" name="" id="" class="form-control lembar-ats-gcs-v"></div>
+                                </div>
+                                <div class="col-sm-4">
+                                <label for="">Movement</label>
+                                <div><input type="number" name="" id="" class="form-control lembar-ats-gcs-m"></div>
+                                </div>
+                            </div>
+                </div>
+                </div>
+            </div>
+                <label for="">Keterangan</label>
+                <div><textarea name="" id="" cols="30" rows="3" class="form-control lembar-ats-keterangan"></textarea></div>
+                <div class="modal-lembar-ats-warning"></div>
+                <input type="text" name="" id="lembar-ats-link-pasien" hidden value="{{.LinkID}}">
+            </div>
+        </form>
+        </div>
+        </div>
+        <div class="modal-footer">
+                <button type="button" id="modalbutton" class="btn btn-default" data-dismiss="modal">Tutup</button>
+            <button type="button" id="modal-but-lembar-ats-save" class="btn btn-warning pull-right">Simpan</button>
+        </div>
+        </div>
+        </div>

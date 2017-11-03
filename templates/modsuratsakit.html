@@ -7,11 +7,17 @@
             <div class="modal-body">
                     <div class="container-fluid form-group">
                             <div class="col-sm-6">Nama</div>
-                            <div class="col-sm-6"><p class="form-control-static text-capitalize" id="sakit-nama"></p></div>
+                            <div class="col-sm-6"><p class="form-control-static text-capitalize" id="sakit-nama">{{.NamaPasien}}</p></div>
                         </div>
                         <div class="container-fluid form-group">
-                            <div class="col-sm-6">Umur</div>
-                            <div class="col-sm-6"><input type="number" id="sakit-umur" class="form-control"></div>
+                            <div class="col-sm-6">Tanggal Lahir</div>
+                            <div class="col-sm-6">
+                                {{if .TglLahir}}
+                                <input type="text" id="sakit-tgl-lahir" class="form-control" value="{{tgl .TglLahir}}">
+                                {{else}}
+                                <input type="text" id="sakit-tgl-lahir" class="form-control">
+                                {{end}}
+                            </div>
                         </div>
                         <div class="container-fluid form-group">
                             <div class="col-sm-6">Pekerjaan</div>
@@ -19,16 +25,31 @@
                         </div>
                         <div class="container-fluid form-group">
                             <div class="col-sm-6">Alamat</div>
-                            <div class="col-sm-6"><input type="text" id="sakit-alamat" class="form-control"></div>
+                            <div class="col-sm-6">
+                                {{if .Alamat}}
+                                <input type="text" id="sakit-alamat" class="form-control" value="{{.Alamat}}">
+                                {{else}}
+                                <input type="text" id="sakit-alamat" class="form-control">
+                                {{end}}
+                            </div>
                         </div>
                         <div class="container-fluid form-group">
-                            <div class="col-sm-6">Lama surat sakit</div>
-                            <div class="col-sm-6"></div>
+                            <div class="col-sm-6">Lama istirahat</div>
+                            <div class="col-sm-6"><input type="number" name="" id="sakit-lama-sakit" class="form-control"></div>
                         </div>
                         <input type="text" class="sakit-link-pts" hidden>
-                        <form action="/pdf-surat-sakit" id="pdf-sakit" method="post">
-                            <input type="text" name="content" class="pdf-sakit-isi" hidden>
-                            <input type="text" name="token" class="pdf-sakit-token" hidden>
+
+                        <form action="/pdf-surat-sakit" id="pdf-sakit" method="post" hidden>
+                            <input type="text" name="content" class="pdf-sakit-isi pdf-sakit" hidden>
+                            <input type="text" name="token" class="pdf-sakit-token pdf-sakit" hidden>
+                            <input type="text" name="namapts" class="pdf-sakit-nama-pasien" hidden>
+                            <input type="text" name="dokter" class="pdf-sakit-dokter" hidden>
+                            <input type="number" name="umur" id="" class="pdf-sakit-umur" hidden>
+                            {{if .Alamat}}
+                            <input type="text" name="status-data" id="" class="pdf-sakit-status-data pdf-sakit" value="data-ada" hidden>
+                            {{else}}
+                            <input type="text" name="status-data" id="" class="pdf-sakit-status-data pdf-sakit" value="data-tidak-ada" hidden>
+                            {{end}}
                         </form>
             </div>
             <div class="modal-footer">

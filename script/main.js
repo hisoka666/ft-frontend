@@ -120,8 +120,13 @@ $(document).ready(function(){
 					$("#datapasien").html('');
 					$("tbody tr:eq(100)").remove();
 					refreshNumber();
-					popModalWarning("Sukses", "Berhasil menambahkan data", "")
-					
+					// popModalWarning("Sukses", "Berhasil menambahkan data", "")
+					if (nocm == "00000000" || nocm == "00000001" || nocm == "00000002"){
+						popModalWarning("Sukses", "Berhasil menambahkan data", "")
+					} else {
+						$("#modal-lembar-ats").html(js.modal)
+						$("#modal-lembar-ats").modal()
+					}
 				}
 			});
 		}
@@ -1119,6 +1124,7 @@ $('body').on('click', 'button#resepbut', function(e){
 
 	$("#puyer-form").val(JSON.stringify(puyer))
 	$("#tablet-form").val(JSON.stringify(obat))
+	console.log($("#pts-form").val())
 	$(".hidden-resep").submit()
 	$(".resep-form-send").empty()
 
@@ -1201,42 +1207,42 @@ $('body').on('click', 'button#resepbut', function(e){
 		})
 	})
 
-	$("body").on("click", "#resepbut", function(e){
-		e.preventDefault()
-		var link = $(this).offsetParent().children().first().html();
-		var doc = $("#dokter").html()
-		var diag = $(this).parents("tr").children(".diag").html()
-		// console.log(link)
-		// console.log(doc)
-		$.post("buat-resep-pts", {
-			token: localStorage.getItem("token"),
-			link: link,
-			doc: doc
-		}, function(data){
-			$("div#main").hide()
-			$("#detailpts").hide()
-			$("#detail-dokter").hide()
-			var js = JSON.parse(data);
-			// console.log(js.script)
-			$("div#resep").html(js.script).show();
-			$("#tgllahir").datepicker({
-				dateFormat:"dd-mm-yy",
-				changeMonth: true,
-				changeYear: true,
-				yearRange: "1900:2035",
-				onSelect: function(value, ui){
-					var today = new Date();
-					// console.log("Tahun ini adalah: " + today.getFullYear());
-					// console.log("Tahun yang dipilih adalah : " + ui.selectedYear)
-					var umur = today.getFullYear() - ui.selectedYear;
-					// console.log("Umur adalah: " + umur);
-					// $("#umur").val(umur);
-				}
-			});
-			$("#diag").val(diag)
-			$(".ptsid").html(link)
-		})
-	})
+	// $("body").on("click", "#resepbut", function(e){
+	// 	e.preventDefault()
+	// 	var link = $(this).offsetParent().children().first().html();
+	// 	var doc = $("#dokter").html()
+	// 	var diag = $(this).parents("tr").children(".diag").html()
+	// 	// console.log(link)
+	// 	// console.log(doc)
+	// 	$.post("buat-resep-pts", {
+	// 		token: localStorage.getItem("token"),
+	// 		link: link,
+	// 		doc: doc
+	// 	}, function(data){
+	// 		$("div#main").hide()
+	// 		$("#detailpts").hide()
+	// 		$("#detail-dokter").hide()
+	// 		var js = JSON.parse(data);
+	// 		// console.log(js.script)
+	// 		$("div#resep").html(js.script).show();
+	// 		$("#tgllahir").datepicker({
+	// 			dateFormat:"dd-mm-yy",
+	// 			changeMonth: true,
+	// 			changeYear: true,
+	// 			yearRange: "1900:2035",
+	// 			onSelect: function(value, ui){
+	// 				var today = new Date();
+	// 				// console.log("Tahun ini adalah: " + today.getFullYear());
+	// 				// console.log("Tahun yang dipilih adalah : " + ui.selectedYear)
+	// 				var umur = today.getFullYear() - ui.selectedYear;
+	// 				// console.log("Umur adalah: " + umur);
+	// 				$("#umur").val(umur);
+	// 			}
+	// 		});
+	// 		$("#diag").val(diag)
+	// 		$(".ptsid").html(link)
+	// 	})
+	// })
 
 	$("body").on("click", ".rspnextbut", function(e){
 		e.preventDefault();
@@ -1346,14 +1352,108 @@ $('body').on('click', 'button#resepbut', function(e){
 		// .find(".content-nama-pasien").html();
 		// console.log("Nama pasien adalah: " + namapts)
 		// console.log("link pasien adalah: " + link)
-		$.get("get-surat-sakit-page")
-		.done(function(data){
+		$.post("get-surat-sakit-page", {
+			token: localStorage.getItem("token"),
+			link: link
+		}, function(data){
 			// console.log(data)
 			var js = JSON.parse(data)
 			$("#buat-surat-sakit").html(js.script)
-			$("#sakit-nama").html(namapts)
-			$("#sakit-link-pts").val(link)
+			$(".sakit-link-pts").val(link)
+			$("#sakit-tgl-lahir").datepicker({
+				dateFormat:"dd-mm-yy",
+				changeMonth: true,
+				changeYear: true,
+				yearRange: "1900:2035",
+				onSelect: function(value, ui){
+					var today = new Date();
+					// console.log("Tahun ini adalah: " + today.getFullYear());
+					// console.log("Tahun yang dipilih adalah : " + ui.selectedYear)
+					var umur = today.getFullYear() - ui.selectedYear;
+					$(".pdf-sakit-umur").val(umur)
+					// console.log("Tanggal lahir adalah: " + value);
+					// $("#umur").val(umur);
+				}
+			});
+			// $("#sakit-lama-sakit").datepicker({
+			// 	dateFormat:"yy-mm-dd",
+			// 	changeMonth: true,
+			// 	changeYear: true,
+			// 	yearRange: "1900:2035",
+			// 	maxDate: 2,
+			// 	onSelect: function(value, ui){
+			// 		var today = new Date()
+			// 		var tglsakit = $("#sakit-lama-sakit").datepicker("getDate")
+			// 		console.log("tanggal adalah: " + tglsakit.getDate())
+			// 		console.log("bulan adalah: " + tglsakit.getMonth())
+			// 		console.log("tahun adalah: " + tglsakit.getFullYear())
+			// 		console.log("lama adalah: " + (tglsakit - today))
+			// 	}
+			// })
 			$("#buat-surat-sakit").modal()
+		})
+	})
+
+	$("body").on("click", "#buat-surat-sakit-but", function(e){
+		e.preventDefault()
+		var link = $(".sakit-link-pts").val()
+		var surat = {
+			"link" : link,
+			"tgl" : $("#sakit-tgl-lahir").val(),
+			"pekerjaan" : $("#sakit-pekerjaan").val(),
+			"alamat" : $("#sakit-alamat").val(),
+			"lama" : $("#sakit-lama-sakit").val(),
+			"statusdata": $(".pdf-sakit-status-data").val()
+		}
+		// console.log("Isi surat adalah: " + JSON.stringify(surat))
+		$(".pdf-sakit-isi").val(JSON.stringify(surat))
+		$(".pdf-sakit-token").val(localStorage.getItem("token"))
+		$(".pdf-sakit-nama-pasien").val($("#sakit-nama").html())
+		$(".pdf-sakit-dokter").val(localStorage.getItem("user"))
+		$("#pdf-sakit").submit()
+		$(".pdf-sakit").empty()
+	})
+
+	$("body").on("click", "#modal-but-lembar-ats-save", function(e){
+		e.preventDefault()
+		var atsinfo = {
+			"link" : $("#lembar-ats-link-pasien").val(),
+			"kelut" : $(".lembar-ats-kel-ut").val(),
+			"subyektif" : $(".lembar-ats-subyektif").val(),
+			"tdsis" : $(".lembar-ats-tensi-sistol").val(),
+			"tddi" : $(".lembar-ats-tensi-diastol").val(),
+			"nadi" : $(".lembar-ats-nadi").val(),
+			"rr" : $(".lembar-ats-rr").val(),
+			"temp" : $(".lembar-ats-temp").val(),
+			"nyerilok" : $(".lembar-ats-lokasi-nyeri").val(),
+			"nrs" : $(".lembar-ats-nyeri-nrs").val(),
+			"keterangan" : $(".lembar-ats-keterangan").html(),
+			"gcse" : $(".lembar-ats-gcs-e").val(),
+			"gcsv" : $(".lembar-ats-gcs-v").val(),
+			"gcsm" : $(".lembar-ats-gcs-m").val()
+		}
+
+		// console.log("Link pasien adalah: " + link + " " + kelut + " " + subyektif + " " + tdsis + " " + tddi + " " + nadi + " " + rr + " " + temp + " " + nyerilok + " " + nrs + " " + gcse + " " + gcsv + " " + gcsm + " " + keterangan)
+		// if (kelut === ""||subyektif === ""|| tdsis === undefined || tddi === undefined||nadi === undefined || rr === undefined || temp === undefined || nyerilok === "" || nrs === undefined || gcse === undefined || gcsv === undefined || gcsm === undefined || keterangan === ""){
+		// 	$(".modal-lembar-ats-warning").html("<div class=\"alert alert-danger alert-dismissable\"\>" +
+		// 	"<a href=\"#\" class=\"close\" data-dismiss=\"alert\" aria-label=\"close\">&times;</a\>" +
+		// 	"Semua harus diisi" +
+		// "</div>")
+		// } else {
+		// 	$(".modal-lembar-ats-warning").html("Terima kasih")
+		// }
+		$.post("simpan-lembar-ats", {
+			token: localStorage.getItem("token"),
+			ats: JSON.stringify(atsinfo)
+		}, function(data){
+			var js = JSON.parse(data)
+			if (js.script == "ok"){
+				$("#modal-lembar-ats").modal('hide')
+				popModalWarning("Sukses", "Berhasil menambahkan data", "")
+			} else {
+				popModalWarning("Gagal", "Terjadi kesalahan", "")
+				$("#modal-lembar-ats").modal('hide')
+			}
 		})
 	})
 });
