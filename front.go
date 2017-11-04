@@ -2054,23 +2054,23 @@ func mainContent(w http.ResponseWriter, r *http.Request) {
 	if r.Method != "GET" {
 		fmt.Fprintln(w, "Akses ditolak")
 	}
-
 	token := r.FormValue("idtoken")
 	resp, err := http.Get("https://igdsanglah.appspot.com/login?token=" + token)
 	if err != nil {
 		log.Fatal(err)
 		return
 	}
-
-	var web MainView
-	json.NewDecoder(resp.Body).Decode(&web)
+	web := &MainView{}
+	json.NewDecoder(resp.Body).Decode(web)
 	defer resp.Body.Close()
 	if web.Peran == "admin" {
 		responseTemplate(w, web.Token, GenTemplate(web, "adminpage"), "", nil)
 	} else if web.Peran == "supervisor" {
 		responseTemplate(w, web.Token, GenTemplate(web, "supervisorpage"), web.Supervisor.SupervisorName, web)
-	} else {
+	} else if web.Peran == "staf" {
 		responseTemplate(w, web.Token, GenTemplate(web, "main", "input", "content"), web.User, nil)
+	} else {
+		responseTemplate(w, web.Token, GenTemplate(web, "residenpage", "residenpage-content"), web.User, nil)
 	}
 }
 

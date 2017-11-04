@@ -1,0 +1,36 @@
+{{define "residen-content"}}
+<div class="container-fluid residen-content-dari-fasttrack">
+        <div class="panel panel-info">
+            <div class="panel-heading text-center">Daftar Pasien</div>
+            <div class="panel-body table-responsive">
+                <table class="table table-bordered table-condensed" id="residen-table-pasien">
+                    <thead>
+                        <th class="bg-success">No</th>
+                        <th class="bg-success">Tanggal/Jam</th>
+                        <th class="bg-success">No.CM</th>
+                        <th class="bg-success">Nama Pasien`</th>
+                        <th class="bg-success">Kecurigaan</th>
+                        <th class="bg-success"></th>
+                    </thead>
+                    <tbody>
+                        {{with .Pasien}}
+                            {{range $m, $n := .}}
+                                {{if $n.NoCM}}
+                                    <tr>
+                                        <td id="residen-table-nourut">{{inc $m}}</td>
+                                        <td>{{tgl $n.TglAsli}}/{{jam $n.TglAsli}}</td>
+                                        <td>{{$n.NoCM}}</td>
+                                        <td>{{$n.NamaPasien}}</td>
+                                        <td>{{$n.Diagnosis}}</td>
+                                        <td><span id="residen-pasien-link">{{$n.LinkID}}</span></td>
+                                    </tr>
+                                {{end}}
+                            {{end}}
+                        {{end}}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    {{end}}
