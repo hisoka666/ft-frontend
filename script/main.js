@@ -297,6 +297,7 @@ $("#navbar").on("click", "#delbut", function(e){
 			var js = JSON.parse(data);
 			$("#resep").hide()
 			$("#detailpts").hide()
+			$("#rekam-medis").hide()
 			$("div#main").show();
 			$("#detail-dokter").hide()
 			// console.log(js.script);
@@ -307,11 +308,12 @@ $("#navbar").on("click", "#delbut", function(e){
 				$("#ket-bulan").hide();
 				$("#tabelutama").html(js.script);
 				refreshNumber();
+				$("#loading-animation").modal('hide')
 				// removeModal("#modwarning")
 			}else{
+				$("#loading-animation").modal('hide')
 				popModalWarning("Peringatan", "Terjadi kesalahan pada server. Hubungi admin", "");
 			}
-			$("#loading-animation").modal('hide')
 		})
 
 	});
@@ -376,6 +378,7 @@ $("#navbar").on("click", "#makeresep", function(e){
 		$("div#main").hide()
 		$("#detail-dokter").hide()
 		$("#detailpts").hide()
+		$("#rekam-medis").hide()
 		var js = JSON.parse(data);
 		$("div#resep").html(js.script).show();
 		// $("#mymodal").html(js.script);
@@ -577,6 +580,7 @@ $("#navbar").on("click", "#bulanini", function(e){
 	var dateone = new Date(now.getFullYear(),now.getMonth(),1,8,0,0);
 	var token = localStorage.getItem("token");
 	$("div#resep").hide();
+	$("#rekam-medis").hide()
 	if (now > dateone){
 		$.post("getmonthly", {
 			token: token,
@@ -696,6 +700,7 @@ $("#navbar").on("click", ".bcptgl", function(e){
 	var tgl = $(this).html();
 	// console.log(tgl)
 	$("#resep").hide()
+	$("#rekam-medis").hide()
 	$("#detailpts").hide()
 	$("#detail-dokter").hide()
 	$.post("getbcpmonth", {
@@ -1145,6 +1150,7 @@ $('body').on('click', "#mod-resepbut", function(e){
 			$("#detailpts").html(js.script).show()
 			$("#main").hide()
 			$("#resep").hide()
+			$("#rekam-medis").hide()
 			$("#detail-dokter").hide()
 
 		})
@@ -1224,6 +1230,7 @@ $('body').on('click', "#mod-resepbut", function(e){
 			$("div#main").hide()
 			$("#detailpts").hide()
 			$("#detail-dokter").hide()
+			$("#rekam-medis").hide()
 			var js = JSON.parse(data);
 			// console.log(js.script)
 			$("div#resep").html(js.script).show();
@@ -1298,6 +1305,7 @@ $('body').on('click', "#mod-resepbut", function(e){
 			$("#detail-dokter").html(js.script)
 			$("#main").hide()
 			$("#resep").hide()
+			$("#rekam-medis").hide()
 			$("#detail-dokter").show()
 			$("#loading-animation").modal('hide')
 		})
@@ -1435,15 +1443,6 @@ $('body').on('click', "#mod-resepbut", function(e){
 			"gcsm" : $(".lembar-ats-gcs-m").val()
 		}
 
-		// console.log("Link pasien adalah: " + link + " " + kelut + " " + subyektif + " " + tdsis + " " + tddi + " " + nadi + " " + rr + " " + temp + " " + nyerilok + " " + nrs + " " + gcse + " " + gcsv + " " + gcsm + " " + keterangan)
-		// if (kelut === ""||subyektif === ""|| tdsis === undefined || tddi === undefined||nadi === undefined || rr === undefined || temp === undefined || nyerilok === "" || nrs === undefined || gcse === undefined || gcsv === undefined || gcsm === undefined || keterangan === ""){
-		// 	$(".modal-lembar-ats-warning").html("<div class=\"alert alert-danger alert-dismissable\"\>" +
-		// 	"<a href=\"#\" class=\"close\" data-dismiss=\"alert\" aria-label=\"close\">&times;</a\>" +
-		// 	"Semua harus diisi" +
-		// "</div>")
-		// } else {
-		// 	$(".modal-lembar-ats-warning").html("Terima kasih")
-		// }
 		$.post("simpan-lembar-ats", {
 			token: localStorage.getItem("token"),
 			ats: JSON.stringify(atsinfo)
@@ -1458,5 +1457,26 @@ $('body').on('click', "#mod-resepbut", function(e){
 			}
 		})
 	})
+	
+	$("body").on("click", "#rmkun", function(e){
+		e.preventDefault()
+		var link = $(this).offsetParent().children().first().html();
+		$("#loading-animation").modal({backdrop: 'static', keyboard: false})
+		// console.log("Link adalah: " + link)
+		$.post("get-rm-kun", {
+			token: localStorage.getItem("token"),
+			link: link,
+		}, function(data){
+			var js = JSON.parse(data)
+			$("#rekam-medis").html(js.script).show()
+			$("#detailpts").hide()
+			$("#main").hide()
+			$("#resep").hide()
+			$("#detail-dokter").hide()
+			$("#loading-animation").modal('hide')
+		})
+		
+	})
+	
 });
 

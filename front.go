@@ -269,6 +269,12 @@ type LembarATS struct {
 	GCSE           string `json:"gcse"`
 	GCSV           string `json:"gcsv"`
 	GCSM           string `json:"gcsm"`
+	TglInput       time.Time `json:"input"`
+}
+
+type RekamMedis struct {
+    Pasien   Pasien    `json:"pasien"`
+	LembarATS LembarATS `json:"lembarats"`
 }
 
 func main() {
@@ -320,10 +326,28 @@ func main() {
 	http.HandleFunc("/get-surat-sakit-page", getSuratSakit)
 	http.HandleFunc("/pdf-surat-sakit", pdfSuratSakit)
 	http.HandleFunc("/simpan-lembar-ats", simpanLembarATS)
-	// http.HandleFunc("/getsupervisor", getSupervisor)
+	http.HandleFunc("/get-rm-kun", getRMKun)
 	log.Println("Listening...")
 	log.Fatal(http.ListenAndServe(":8001", nil))
 
+}
+func getRMKun(w http.ResponseWriter, r *http.Request){
+   if r.Method != "POST" {
+		http.Error(w, "Post request please", http.StatusMethodNotAllowed)
+		return
+	}
+   	ats := &LembarATS{
+	    LinkID : r.FormValue("link"),
+	}
+	url := "https://ats-dot-igdsanglah.appspot.com/get-rm-kun"
+	send, err := sendPost(ats, r.FormValue("token"), url)
+	if err != nil {
+	    log.Fatalf("terjadi kesalahan: %v", err)
+	}
+	rm := &RekamMedis{}
+	json.NewDecoder(send.Body).Decode(rm)
+	send.Body.Close()
+	responseTemplate(w, "", GenTemplate(rm, "rekam-medik-page"),"", nil)
 }
 func simpanLembarATS(w http.ResponseWriter, r *http.Request) {
 	if r.Method != "POST" {
@@ -1987,6 +2011,13 @@ func GenTemplate(n interface{}, temp ...string) string {
 				return "Perempuan"
 			}
 			return "Belum dilengkapi"
+		},
+		"rekmed": func(n string) bool {
+		    if n == "4" || n == "5"{
+			    return true
+			}else{
+			    return false
+			}
 		},
 	}
 

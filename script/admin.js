@@ -4,6 +4,12 @@ $(document).ready(function(){
         namdok = $("input#namadktr").val();
         email = $("input#emaildktr").val();
         peran = $("#perandktr option:checked").val();
+		if (peran == "residen"){
+			var residen = $("#adm-select-residen option:checked").val();
+			peran = peran + "-" + residen
+		} else {
+			peran = peran
+		}
         $.post("tambahdokter", {
             token: localStorage.getItem("token"),
             nama: namdok,
@@ -49,4 +55,14 @@ $(document).ready(function(){
             }
         })
     })
+	$("#navbar").on("change", "#perandktr", (function(){
+		// console.log("triggered")
+		var peran = $("#perandktr").val()
+		// console.log("Peran adalah: " + peran)
+		if (peran == "residen"){
+			$("#div-adm-select-residen").show()
+		}else{
+			$("#div-adm-select-residen").hide()
+		}
+	}))
 })
