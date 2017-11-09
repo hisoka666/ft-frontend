@@ -20,7 +20,7 @@
 {{template "residen-content" .}}
 </div>
 <script type="text/javascript">
-    var refreshResidenPasienList = setInterval(residenPage, 3000);
+    var refreshResidenPasienList = setInterval(residenPage, 10000);
 	function residenPage(){
 		var email = $("#email").val()
 		$.post("get-residen-pasien-list", {
