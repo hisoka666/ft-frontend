@@ -1,0 +1,10 @@
+{{range $m, $n := .}}
+    <tr>
+        <td id="residen-table-nourut">{{inc $m}}</td>
+        <td>{{tgl $n.TglAsli}}/{{jam $n.TglAsli}}</td>
+        <td>{{$n.NoCM}}</td>
+        <td class="text-capitalize">{{$n.NamaPasien}}</td>
+        <td class="text-capitalize">{{$n.Diagnosis}}</td>
+        <td><a href="" data-link="{{$n.LinkID}}" class="btn btn-default res-but-rekam-medik">Lihat RM</a></td>
+    </tr>
+{{end}}

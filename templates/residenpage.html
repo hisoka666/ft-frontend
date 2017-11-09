@@ -19,3 +19,39 @@
 <div class="container-fluid residen-main">
 {{template "residen-content" .}}
 </div>
+<script type="text/javascript">
+    var refreshResidenPasienList = setInterval(residenPage, 3000);
+	function residenPage(){
+		var email = $("#email").val()
+		$.post("get-residen-pasien-list", {
+			token: localStorage.getItem("token"),
+			email: email
+		}, function(data){
+			var js = JSON.parse(data)
+			$("tbody#residen-list-pasien").prepend(js.script)
+			console.log(js.script)
+			console.log("selesai")
+			refreshNumberResidenList()
+		})
+	}
+
+	var refreshNumberResidenList = function(){
+		
+	$("tr").find("#residen-table-nourut").each(function(index, elem){
+			num = index + 1;
+			$(elem).html(num)
+		})
+	}
+	var refreshAll = setInterval(refreshAllResidenPage, 600000)
+	function refreshAllResidenPage (){
+		console.log("this shit is fired!")
+		var email = $("#email").val()
+		$.post("get-residen-refresh-pasien-list", {
+			token:localStorage.getItem("token"),
+			email: email
+		}, function(data){
+			var js = JSON.parse(data)
+			$("tbody#residen-list-pasien").html(js.script)
+		})
+	}
+</script>

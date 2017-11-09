@@ -8,11 +8,11 @@
                         <th class="bg-success">No</th>
                         <th class="bg-success">Tanggal/Jam</th>
                         <th class="bg-success">No.CM</th>
-                        <th class="bg-success">Nama Pasien`</th>
+                        <th class="bg-success">Nama Pasien</th>
                         <th class="bg-success">Kecurigaan</th>
                         <th class="bg-success"></th>
                     </thead>
-                    <tbody>
+                    <tbody id="residen-list-pasien">
                         {{with .Pasien}}
                             {{range $m, $n := .}}
                                 {{if $n.NoCM}}
@@ -20,9 +20,9 @@
                                         <td id="residen-table-nourut">{{inc $m}}</td>
                                         <td>{{tgl $n.TglAsli}}/{{jam $n.TglAsli}}</td>
                                         <td>{{$n.NoCM}}</td>
-                                        <td>{{$n.NamaPasien}}</td>
-                                        <td>{{$n.Diagnosis}}</td>
-                                        <td><span id="residen-pasien-link">{{$n.LinkID}}</span></td>
+                                        <td class="text-capitalize">{{$n.NamaPasien}}</td>
+                                        <td class="text-capitalize">{{$n.Diagnosis}}</td>
+                                        <td><a href="" data-link="{{$n.LinkID}}" class="btn btn-default res-but-rekam-medik">Lihat RM</a></td>
                                     </tr>
                                 {{end}}
                             {{end}}

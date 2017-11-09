@@ -255,26 +255,29 @@ type DataSuratSakit struct {
 }
 
 type LembarATS struct {
-	LinkID         string `json:"link"`
-	KeluhanUtama   string `json:"kelut"`
-	Subyektif      string `json:"subyektif"`
-	TDSistolik     string `json:"tdsis"`
-	TDDiastolik    string `json:"tddi"`
-	Nadi           string `json:"nadi"`
-	LajuPernafasan string `json:"rr"`
-	SuhuBadan      string `json:"temp"`
-	LokasiNyeri    string `json:"nyerilok"`
-	NRS            string `json:"nrs"`
-	Keterangan     string `json:"keterangan"`
-	GCSE           string `json:"gcse"`
-	GCSV           string `json:"gcsv"`
-	GCSM           string `json:"gcsm"`
+	LinkID         string    `json:"link"`
+	KeluhanUtama   string    `json:"kelut"`
+	Subyektif      string    `json:"subyektif"`
+	TDSistolik     string    `json:"tdsis"`
+	TDDiastolik    string    `json:"tddi"`
+	Nadi           string    `json:"nadi"`
+	LajuPernafasan string    `json:"rr"`
+	SuhuBadan      string    `json:"temp"`
+	LokasiNyeri    string    `json:"nyerilok"`
+	NRS            string    `json:"nrs"`
+	Keterangan     string    `json:"keterangan"`
+	GCSE           string    `json:"gcse"`
+	GCSV           string    `json:"gcsv"`
+	GCSM           string    `json:"gcsm"`
 	TglInput       time.Time `json:"input"`
 }
 
 type RekamMedis struct {
-    Pasien   Pasien    `json:"pasien"`
+	Pasien    Pasien    `json:"pasien"`
 	LembarATS LembarATS `json:"lembarats"`
+}
+type ListPasienResiden struct {
+	List []Pasien `json:"listpasien"`
 }
 
 func main() {
@@ -327,27 +330,71 @@ func main() {
 	http.HandleFunc("/pdf-surat-sakit", pdfSuratSakit)
 	http.HandleFunc("/simpan-lembar-ats", simpanLembarATS)
 	http.HandleFunc("/get-rm-kun", getRMKun)
+	http.HandleFunc("/get-residen-pasien-list", getResidenPasienList)
+	http.HandleFunc("/get-residen-refresh-pasien-list", getResidenRefresh)
 	log.Println("Listening...")
 	log.Fatal(http.ListenAndServe(":8001", nil))
 
 }
-func getRMKun(w http.ResponseWriter, r *http.Request){
-   if r.Method != "POST" {
+
+func getResidenRefresh(w http.ResponseWriter, r *http.Request) {
+	if r.Method != "POST" {
 		http.Error(w, "Post request please", http.StatusMethodNotAllowed)
 		return
 	}
-   	ats := &LembarATS{
-	    LinkID : r.FormValue("link"),
+	kun := &KunjunganPasien{
+		Dokter: r.FormValue("email"),
+	}
+	url := "https://residen-dot-igdsanglah.appspot.com/get-refresh"
+	send, err := sendPost(kun, r.FormValue("token"), url)
+	if err != nil {
+		log.Fatalf("terjadi kesalahan: %v", err)
+	}
+	pts := &ListPasienResiden{}
+	json.NewDecoder(send.Body).Decode(pts)
+	responseTemplate(w, "", GenTemplate(pts.List, "residenpage-new-content"), "", nil)
+}
+func getResidenPasienList(w http.ResponseWriter, r *http.Request) {
+	if r.Method != "POST" {
+		http.Error(w, "Post request please", http.StatusMethodNotAllowed)
+		return
+	}
+	// zone, _ := time.LoadLocation("Asia/Makassar")
+	dur, _ := time.ParseDuration("7s")
+	s := time.Now()
+	kun := &KunjunganPasien{
+		Dokter:    r.FormValue("email"),
+		JamDatang: s.Add(-dur),
+	}
+	url := "https://residen-dot-igdsanglah.appspot.com/get-new-pasien"
+	send, err := sendPost(kun, r.FormValue("token"), url)
+	if err != nil {
+		log.Fatalf("terjadi kesalahan: %v", err)
+	}
+	pts := &ListPasienResiden{}
+	json.NewDecoder(send.Body).Decode(pts)
+	defer send.Body.Close()
+	fmt.Printf("body adalah: %v", pts)
+	// fmt.Print(GenTemplate(pts, "residenpage-new-content"))
+	responseTemplate(w, "", GenTemplate(pts.List, "residenpage-new-content"), "", nil)
+}
+func getRMKun(w http.ResponseWriter, r *http.Request) {
+	if r.Method != "POST" {
+		http.Error(w, "Post request please", http.StatusMethodNotAllowed)
+		return
+	}
+	ats := &LembarATS{
+		LinkID: r.FormValue("link"),
 	}
 	url := "https://ats-dot-igdsanglah.appspot.com/get-rm-kun"
 	send, err := sendPost(ats, r.FormValue("token"), url)
 	if err != nil {
-	    log.Fatalf("terjadi kesalahan: %v", err)
+		log.Fatalf("terjadi kesalahan: %v", err)
 	}
 	rm := &RekamMedis{}
 	json.NewDecoder(send.Body).Decode(rm)
 	send.Body.Close()
-	responseTemplate(w, "", GenTemplate(rm, "rekam-medik-page"),"", nil)
+	responseTemplate(w, "", GenTemplate(rm, "rekam-medik-page"), "", nil)
 }
 func simpanLembarATS(w http.ResponseWriter, r *http.Request) {
 	if r.Method != "POST" {
@@ -1828,13 +1875,13 @@ func inputData(w http.ResponseWriter, r *http.Request) {
 	if pts.NoCM == "kesalahan-database" {
 		responseTemplate(w, "kesalahan-database", "", "", nil)
 	}
-	b := new(bytes.Buffer)
-	tmp := template.Must(template.New("baristabel.html").ParseFiles("templates/baristabel.html"))
-	err = tmp.Execute(b, pts)
-	if err != nil {
-		responseTemplate(w, "kesalahan-template", "", "", nil)
-	}
-	responseTemplate(w, "OK", b.String(), GenTemplate(pts, "modformats"), nil)
+	// b := new(bytes.Buffer)
+	// tmp := template.Must(template.New("baristabel.html").ParseFiles("templates/baristabel.html"))
+	// err = tmp.Execute(b, pts)
+	// if err != nil {
+	// 	responseTemplate(w, "kesalahan-template", "", "", nil)
+	// }
+	responseTemplate(w, "OK", GenTemplate(pts, "baristabel"), GenTemplate(pts, "modformats"), nil)
 
 }
 
@@ -1962,12 +2009,12 @@ func GenTemplate(n interface{}, temp ...string) string {
 
 		},
 		"umurtahun": func(t time.Time) string {
-		    zone, _ := time.LoadLocation("Asia/Makassar")
+			zone, _ := time.LoadLocation("Asia/Makassar")
 			now := time.Now().In(zone)
 			t = t.In(zone)
 			yr := now.Year() - t.Year()
-			if now.YearDay() < t.YearDay(){
-			   yr--
+			if now.YearDay() < t.YearDay() {
+				yr--
 			}
 			return strconv.Itoa(yr)
 		},
@@ -2013,10 +2060,10 @@ func GenTemplate(n interface{}, temp ...string) string {
 			return "Belum dilengkapi"
 		},
 		"rekmed": func(n string) bool {
-		    if n == "4" || n == "5"{
-			    return true
-			}else{
-			    return false
+			if n == "4" || n == "5" {
+				return true
+			} else {
+				return false
 			}
 		},
 	}
