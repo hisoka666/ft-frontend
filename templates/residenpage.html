@@ -19,8 +19,9 @@
 <div class="container-fluid residen-main">
 {{template "residen-content" .}}
 </div>
+<div class="container-fluid rekam-medik-main"></div>
 <script type="text/javascript">
-    var refreshResidenPasienList = setInterval(residenPage, 10000);
+    var refreshResidenPasienList = setInterval(residenPage, 3000);
 	function residenPage(){
 		var email = $("#email").val()
 		$.post("get-residen-pasien-list", {
@@ -54,4 +55,25 @@
 			$("tbody#residen-list-pasien").html(js.script)
 		})
 	}
+
+	$("body").on("click", ".res-but-rekam-medik", function(e){
+		// clearInterval(refreshResidenPasienList)
+		$(".residen-main").hide()
+		e.preventDefault()
+		var link = $(this).data("link")
+		// console.log("Link adalah: " + link)
+		$.post("get-rm-kun", {
+			token: localStorage.getItem("token"),
+			link: link
+		}, function(data){
+			var js = JSON.parse(data)
+			$(".rekam-medik-main").html(js.script)
+		})
+	})
+
+	$("#residen-fasttrack").click(function(e){
+		e.preventDefault()
+		$(".residen-main").show()
+		$(".rekam-medik-main").html("")
+	})
 </script>

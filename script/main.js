@@ -125,6 +125,7 @@ $(document).ready(function(){
 						popModalWarning("Sukses", "Berhasil menambahkan data", "")
 					} else {
 						$("#modal-lembar-ats").html(js.modal)
+						$("#dokter-fasttrack").val(localStorage.getItem("user"))
 						$("#modal-lembar-ats").modal()
 					}
 				}
@@ -1426,6 +1427,8 @@ $('body').on('click', "#mod-resepbut", function(e){
 
 	$("body").on("click", "#modal-but-lembar-ats-save", function(e){
 		e.preventDefault()
+		var dokter = localStorage.getItem("user")
+		console.log("dokter adalah: " + $("#dokter").html())
 		var atsinfo = {
 			"link" : $("#lembar-ats-link-pasien").val(),
 			"kelut" : $(".lembar-ats-kel-ut").val(),
@@ -1445,7 +1448,8 @@ $('body').on('click', "#mod-resepbut", function(e){
 
 		$.post("simpan-lembar-ats", {
 			token: localStorage.getItem("token"),
-			ats: JSON.stringify(atsinfo)
+			ats: JSON.stringify(atsinfo),
+			dokter: localStorage.getItem("user")
 		}, function(data){
 			var js = JSON.parse(data)
 			if (js.script == "ok"){
@@ -1477,33 +1481,6 @@ $('body').on('click', "#mod-resepbut", function(e){
 		})
 		
 	})
-
-	$("body").on("click", ".res-but-rekam-medik", function(e){
-		e.preventDefault()
-		var link = $(this).data("link")
-		console.log("Link adalah: " + link)
-	})
-    // var refreshResidenPasienList = setInterval(residenPage, 7000);
-	// function residenPage(){
-	// 	var email = $("#email").val()
-	// 	$.post("get-residen-pasien-list", {
-	// 		token: localStorage.getItem("token"),
-	// 		email: email
-	// 	}, function(data){
-	// 		var js = JSON.parse(data)
-	// 		$("tbody#residen-list-pasien").prepend(js.script)
-	// 		console.log("selesai")
-	// 		refreshNumberResidenList()
-	// 	})
-	// }
-
-	// var refreshNumberResidenList = function(){
-		
-	// $("tr").find("#residen-table-nourut").each(function(index, elem){
-	// 		num = index + 1;
-	// 		$(elem).html(num)
-	// 	})
-	// }
 	
 });
 

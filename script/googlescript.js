@@ -12,7 +12,7 @@ function onSignIn(googleUser) {
      } else {
       localStorage.setItem("token", jos.token);
       localStorage.setItem("user", jos.modal);
-      // console.log("user adalah: "+ jos.user)
+      console.log("user adalah: "+ localStorage.getItem("user"))
       $("#dokter").html(jos.modal);
       $("#navbar").html(jos.script);
      }

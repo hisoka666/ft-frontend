@@ -270,6 +270,7 @@ type LembarATS struct {
 	GCSV           string    `json:"gcsv"`
 	GCSM           string    `json:"gcsm"`
 	TglInput       time.Time `json:"input"`
+	Dokter         string    `json:"dokter"`
 }
 
 type RekamMedis struct {
@@ -360,7 +361,7 @@ func getResidenPasienList(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	// zone, _ := time.LoadLocation("Asia/Makassar")
-	dur, _ := time.ParseDuration("7s")
+	dur, _ := time.ParseDuration("3s")
 	s := time.Now()
 	kun := &KunjunganPasien{
 		Dokter:    r.FormValue("email"),
@@ -407,6 +408,8 @@ func simpanLembarATS(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Fatalf("terjadi kesalahan: %v", err)
 	}
+	fmt.Printf("dokter adalah: %v", r.FormValue("dokter"))
+	ats.Dokter = r.FormValue("dokter")
 	// fmt.Printf("Subyektif adalah: %v", ats.Subyektif)
 	url := "https://ats-dot-igdsanglah.appspot.com/simpan"
 	resp, err := sendPost(ats, r.FormValue("token"), url)
@@ -414,7 +417,6 @@ func simpanLembarATS(w http.ResponseWriter, r *http.Request) {
 		log.Fatalf("terjadi kesalahan: %v", err)
 	}
 	json.NewDecoder(resp.Body).Decode(ats)
-	fmt.Print(ats)
 	responseTemplate(w, "", "ok", "", nil)
 }
 func pdfSuratSakit(w http.ResponseWriter, r *http.Request) {
