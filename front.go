@@ -442,20 +442,45 @@ func pdfSuratSakit(w http.ResponseWriter, r *http.Request) {
 	}
 	dat := &DataSuratSakit{}
 	json.NewDecoder(resp.Body).Decode(dat)
-	// fmt.Printf("Data umur adalah: %v", dat.Umur)
-	// fmt.Printf("Data alamat adalah: %v", dat.Alamat)
-	// fmt.Printf("Data lama istirahat adalah: %v", dat.LamaIstirahat)
-	// fmt.Printf("Data nomor surat adalah: %v", dat.NomorSurat)
-	// fmt.Printf("Data link surat adalah: %v", dat.LinkSurat)
-	// dat.NamaPasien = r.FormValue("namapts")
-	// dat.Dokter = r.FormValue("dokter")
-	// dat.Alamat = sur.Alamat
-	// dat.Umur = r.FormValue("umur")
 	defer resp.Body.Close()
 	buatPDFSuratSakit(dat, w)
 }
+func ubahBulanKeRomawi(s string) string {
+	t := ""
+	switch s {
+	case "01":
+		t = "I"
+	case "02":
+		t = "II"
+	case "03":
+		t = "III"
+	case "04":
+		t = "IV"
+	case "05":
+		t = "V"
+	case "06":
+		t = "VI"
+	case "07":
+		t = "VII"
+	case "08":
+		t = "VIII"
+	case "09":
+		t = "IX"
+	case "10":
+		t = "X"
+	case "11":
+		t = "XI"
+	case "12":
+		t = "XII"
+	}
+	return t
+}
 
 func buatPDFSuratSakit(n *DataSuratSakit, w http.ResponseWriter) {
+	zone, _ := time.LoadLocation("Asia/Makassar")
+	lama, _ := strconv.Atoi(n.LamaIstirahat)
+	tglnow := time.Now()
+	tglakhir := tglnow.AddDate(0, 0, lama-1)
 	pdf := gofpdf.New("P", "mm", "A4", "")
 	pdf.SetFont("Arial", "", 16)
 	pdf.AddPageFormat("P", gofpdf.SizeType{Wd: 210, Ht: 145})
@@ -472,7 +497,7 @@ func buatPDFSuratSakit(n *DataSuratSakit, w http.ResponseWriter) {
 	pdf.Ln(-1)
 	pdf.SetFont("Arial", "", 10)
 	fmt.Print(n.NomorSurat)
-	nomor := "Nomor: RSUP 01/" + strconv.Itoa(n.NomorSurat) + "/IX/2017"
+	nomor := "Nomor: RSUP 01/" + strconv.Itoa(n.NomorSurat) + "/" + ubahBulanKeRomawi(tglnow.In(zone).Format("01")) + "/2017"
 	wd = pdf.GetStringWidth(nomor) + 6
 	pdf.SetX((210 - wd) / 2)
 	pdf.CellFormat((wd + 6), 9, nomor, "", 0, "C", false, 0, "")
@@ -486,7 +511,7 @@ func buatPDFSuratSakit(n *DataSuratSakit, w http.ResponseWriter) {
 	pdf.Ln(-1)
 	pdf.SetX(30)
 	pdf.Cell(40, 5, "Umur")
-	pdf.Cell(70, 5, ": "+n.Umur)
+	pdf.Cell(70, 5, ": "+n.Umur+" tahun")
 	pdf.Ln(-1)
 	pdf.SetX(30)
 	pdf.Cell(40, 5, "Pekerjaan")
@@ -498,10 +523,7 @@ func buatPDFSuratSakit(n *DataSuratSakit, w http.ResponseWriter) {
 	pdf.Ln(-1)
 	pdf.Cell(0, 5, "oleh karena SAKIT, perlu diberikan ISTIRAHAT")
 	pdf.Ln(-1)
-	zone, _ := time.LoadLocation("Asia/Makassar")
-	lama, _ := strconv.Atoi(n.LamaIstirahat)
-	tglnow := time.Now()
-	tglakhir := tglnow.AddDate(0, 0, lama-1)
+
 	pdf.Cell(0, 5, "selama "+n.LamaIstirahat+" hari, terhitung mulai tanggal "+tglnow.In(zone).Format("02/01/2006")+" s.d. "+tglakhir.In(zone).Format("02/01/2006"))
 	pdf.Ln(-1)
 	pdf.Ln(-1)
