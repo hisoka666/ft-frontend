@@ -1311,40 +1311,91 @@ func createPDF(w http.ResponseWriter, p []Pasien, l []ListIKI, tgl, email, nip s
 	pdf.CellFormat(256, 6, "Target Point kegiatan pelayanan", "1", 0, "R", false, 0, "")
 	pdf.CellFormat(25, 6, "1,111", "1", 1, "C", false, 0, "")
 	pdf.Ln(-1)
-	linep3k := ": Tanggal "
+	linep3k := ""
 	p3k := &linep3k
-	linerapat := ": Tanggal "
+	linerapat := ""
 	rapat := &linerapat
-	linepelatihan := ": Tanggal "
+	linepelatihan := ""
 	pelatihan := &linepelatihan
+	// for _, v := range l {
+
+	// }
+	p3 := []string{}
+	rap := []string{}
+	pel := []string{}
 	for _, v := range l {
 		for _, n := range v.P3K {
-			*p3k = *p3k + n + " "
+			*p3k = ": Tanggal "
+			if n == "" {
+				*p3k = ""
+				continue
+			} else {
+				p3 = append(p3, n)
+				// *p3k = *p3k + n + " "
+			}
 		}
 		for _, n := range v.Pelatihan {
-			*pelatihan = *pelatihan + n + " "
+			*pelatihan = ": Tanggal "
+			if n == "" {
+				*pelatihan = ""
+				continue
+			} else {
+				pel = append(pel, n)
+				// *pelatihan = *pelatihan + n + " "
+			}
 		}
 		for _, n := range v.Rapat {
-			*rapat = *rapat + n + " "
+			*rapat = ": Tanggal "
+			if n == "" {
+				*rapat = ""
+				continue
+			} else {
+				rap = append(rap, n)
+				// *rapat = *rapat + n + " "
+			}
 		}
 	}
-	for _, v := range l {
-		if v.P3K != nil {
-			pdf.Cell(20, 6, "P3K")
-			pdf.Cell(30, 6, linep3k)
-			pdf.Ln(-1)
-		}
-		if v.Pelatihan != nil {
-			pdf.Cell(40, 6, "Pelatihan/Simulasi/Lainnya")
-			pdf.Cell(30, 6, linepelatihan)
-			pdf.Ln(-1)
-		}
-		if v.Rapat != nil {
-			pdf.Cell(20, 6, "Rapat")
-			pdf.Cell(30, 6, linerapat)
-			pdf.Ln(-1)
-		}
+
+	for _, v := range p3 {
+		*p3k = *p3k + v + ", "
 	}
+	for _, v := range rap {
+		*rapat = *rapat + v + ", "
+	}
+	for _, v := range pel {
+		*pelatihan = *pelatihan + v + ", "
+	}
+
+	// fo
+	linep3k = strings.TrimSuffix(linep3k, ", ")
+	linepelatihan = strings.TrimSuffix(linepelatihan, ", ")
+	linerapat = strings.TrimSuffix(linerapat, ", ")
+	pdf.Cell(40, 6, "P3K")
+	pdf.Cell(30, 6, linep3k)
+	pdf.Ln(-1)
+	pdf.Cell(40, 6, "Pelatihan/Simulasi/Lainnya")
+	pdf.Cell(30, 6, linepelatihan)
+	pdf.Ln(-1)
+	pdf.Cell(40, 6, "Rapat")
+	pdf.Cell(30, 6, linerapat)
+	pdf.Ln(-1)
+	// for _, v := range l {
+	// 	if v.P3K != nil {
+	// 		pdf.Cell(20, 6, "P3K")
+	// 		pdf.Cell(30, 6, linep3k)
+	// 		pdf.Ln(-1)
+	// 	}
+	// 	if v.Pelatihan != nil {
+	// 		pdf.Cell(40, 6, "Pelatihan/Simulasi/Lainnya")
+	// 		pdf.Cell(30, 6, linepelatihan)
+	// 		pdf.Ln(-1)
+	// 	}
+	// 	if v.Rapat != nil {
+	// 		pdf.Cell(20, 6, "Rapat")
+	// 		pdf.Cell(30, 6, linerapat)
+	// 		pdf.Ln(-1)
+	// 	}
+	// }
 	// for _, v := range l {
 	// 	linerapat = linerapat + v + " "
 	// }
@@ -1554,7 +1605,6 @@ func countIKI(n []Pasien) []ListIKI {
 				u2++
 			}
 		}
-
 		f := ListIKI{
 			Tanggal:   h,
 			SumIKI1:   u1,
