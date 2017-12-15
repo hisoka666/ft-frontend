@@ -1174,7 +1174,7 @@ func getPDF(w http.ResponseWriter, r *http.Request) {
 	if det.NIP == "" {
 		*n = det.NPP
 	} else {
-		*n = det.NIP
+		*n = det.NIP + " " + det.GolonganPNS
 	}
 	log.Printf("NIp adalah : %v", r.FormValue("linkdok"))
 	createPDF(w, pts, countIKI(pts), gettgl, r.FormValue("nama"), nopeg)
